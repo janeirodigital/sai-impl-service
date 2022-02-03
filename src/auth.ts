@@ -7,16 +7,26 @@ import SessionStorage from './session-storage.js';
 
 const router = express.Router({ caseSensitive: false });
 
-router.get('/login', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
+    console.log('[POST][LOGIN] /login handler')
+    const idp = req.body['idp'];
+
+    if (!idp) {
+        res.status(400).json({
+            message: 'No Identity Provided sent with the request'
+        });
+        return;
+    }
+
     const session = new Session();
     req.session!['sessionId'] = session.info.sessionId;
 
     const redirectToIdp = (url: string) => {
-        res.redirect(url);
+        res.send(url);
     }
     await session.login({
         redirectUrl: `${process.env.BASE_URL}/auth/handleLoginRedirect`,
-        oidcIssuer: process.env.DEFAULT_SOLID_OIDC_PROVIDER,
+        oidcIssuer: idp,
         clientName: process.env.APP_NAME,
         handleRedirect: redirectToIdp,
     })

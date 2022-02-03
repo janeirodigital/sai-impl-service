@@ -3,6 +3,7 @@ import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cookieSession from 'cookie-session';
 import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 
@@ -23,6 +24,7 @@ server.use(cookieSession({
 }));
 
 server.use(cookieParser());
+server.use(bodyParser.json())
 server.use(morgan(process.env.NODE_ENV === 'production' ? 'common': 'dev'));
 
 server.use(sessionMiddleware);
