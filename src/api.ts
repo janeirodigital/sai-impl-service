@@ -33,7 +33,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 
 router.get('/id', (req: Request, res: Response) => {
     console.log('[LOG][API] /id handler')
-    res.status(200).json({ webId: req.webId });
+    res.status(200).send(req.webId);
 });
 
 /**
