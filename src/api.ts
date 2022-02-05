@@ -37,27 +37,26 @@ router.get('/id', (req: Request, res: Response) => {
 });
 
 /**
- * Returns an array of all the application registrations found
+ * Returns an array of all the application profiles found
  * in the agent registration
  */
-router.get('/applications', async (req: Request, res: Response) => {
+router.get('/application-profiles', async (req: Request, res: Response) => {
     console.log('[LOG][API] /applications handler')
     const registrations: ReadableApplicationRegistration[] = [];
     for await (const registration of req.saiSession!.applicationRegistrations) {
         registrations.push(registration);
     }
 
-    const registrationsData: {profile: ApplicationProfile, accessGrant: IRI }[] = [];
+    const profiles: ApplicationProfile[] = [];
     for (const registration of registrations) {
         console.log('[Registrations list]', registration.iri);
         const documentResponse = await req.solidSession!.fetch(registration.registeredAgent);
         const applicationSet = await parseRdf(await documentResponse.text(), registration.iri);
         const applicationProfile = getApplicationProfile(applicationSet);
-        const accessGrant = registration.hasAccessGrant.iri;
-        registrationsData.push({profile:applicationProfile, accessGrant: accessGrant});
+        profiles.push(applicationProfile);
     }
 
-    res.status(200).json(registrationsData);
+    res.status(200).json(profiles);
 });
 
 router.get('/data', async(req: Request, res: Response) => {
