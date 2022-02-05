@@ -9,37 +9,11 @@ import {AccessGrant, ApplicationProfile, IRI} from "./sai-api";
 
 const router = Router({ caseSensitive: false });
 
-router.use((req: Request, res: Response, next: NextFunction) => {
-    console.log('[LOG][API] Session check')
-    if (!req.sessionId) {
-        res.status(401).send();
-        return;
-    }
-
-    const session = SessionStore.get(req.sessionId!);
-
-    if (!session || !session.solidSession) {
-        res.status(401).send();
-        return;
-    }
-
-    // TODO (angel) if saiSession does not exist a new one can be instantiated.
-    req.solidSession = session.solidSession;
-    req.saiSession = session.saiSession;
-    req.webId = session.solidSession.info.webId;
-
-    next();
-});
-
 router.get('/id', (req: Request, res: Response) => {
     console.log('[LOG][API] /id handler')
-    res.status(200).send(req.webId);
+    res.status(200).send(req.solidSession?.info.webId);
 });
 
-/**
- * Returns an array of all the application profiles found
- * in the agent registration
- */
 router.get('/application-profiles', async (req: Request, res: Response) => {
     console.log('[LOG][API] /applications handler')
     const registrations: ReadableApplicationRegistration[] = [];
@@ -57,6 +31,16 @@ router.get('/application-profiles', async (req: Request, res: Response) => {
     }
 
     res.status(200).json(profiles);
+});
+
+router.get('/consents', async (req: Request, res: Response) => {
+    console.log('[API] /consents handler');
+
+   for await (const consent of req.saiSession!.accessConsents) {
+       console.log('Found consent for agent', consent.registeredAgent);
+   }
+
+   res.send();
 });
 
 router.get('/data', async(req: Request, res: Response) => {

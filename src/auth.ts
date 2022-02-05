@@ -4,6 +4,7 @@ import { AuthorizationAgent } from '@janeirodigital/authorization-agent';
 import { randomUUID } from 'crypto';
 
 import SessionStorage from './session-storage.js';
+import {RedisStorage} from "./redis-storage";
 
 const router = express.Router({ caseSensitive: false });
 
@@ -18,7 +19,11 @@ router.post('/login', async (req: Request, res: Response) => {
         return;
     }
 
-    const session = new Session();
+    const storage = RedisStorage.instance;
+
+    const session = new Session({
+        storage,
+    });
     req.session!['sessionId'] = session.info.sessionId;
 
     const redirectToIdp = (url: string) => {
@@ -33,10 +38,9 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 router.get('/handleLoginRedirect', async (req: Request, res: Response) => {
-    const solidSession = await getSessionFromStorage(req.session!['sessionId']);
+    const solidSession = await getSessionFromStorage(req.session!['sessionId'], RedisStorage.instance);
 
     if (!solidSession) {
-        // @ts-ignore
         res.redirect(401, process.env.BASE_URL + '/login');
         return;
     }
@@ -47,16 +51,14 @@ router.get('/handleLoginRedirect', async (req: Request, res: Response) => {
     //              accessor. That might be enough to remove the cookie-parser dependency
     const sessionCookie = req.cookies['session'];
     if (solidSession.info.isLoggedIn && solidSession.info.webId) {
-        // @ts-ignore
-        const saiSession = await AuthorizationAgent.build(solidSession.info.webId, process.env.AGENT_ID, {
+        const saiSession = await AuthorizationAgent.build(solidSession.info.webId, process.env.AGENT_ID!, {
             fetch: solidSession.fetch,
             randomUUID,
         });
 
-        SessionStorage.set(solidSession.info.sessionId, {solidSession, saiSession});
+        SessionStorage.set(solidSession.info.sessionId, saiSession);
 
         res.cookie('session', sessionCookie, { httpOnly: true });
-        // @ts-ignore
         res.redirect(200, process.env.BASE_URL + '/dashboard');
     }
 });

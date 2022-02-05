@@ -7,10 +7,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 
-import sessionMiddleware from './session.js';
+import sessionGuard from './session.js';
 import authRouter from './auth.js';
 import usersRouter from './users';
 import apiRouter from './api';
+import {RedisStorage} from "./redis-storage";
 
 const server = express();
 
@@ -27,14 +28,18 @@ server.use(cookieParser());
 server.use(bodyParser.json())
 server.use(morgan(process.env.NODE_ENV === 'production' ? 'common': 'dev'));
 
-server.use(sessionMiddleware);
 server.use('/auth', authRouter)
+server.use(sessionGuard);
 server.use('/users', usersRouter);
 server.use('/api', apiRouter);
 
 server.all('*', (req: Request, res: Response) => {
     res.status(404).send();
 })
+
+// Init the storage;
+const storage = RedisStorage.instance;
+storage.set('LAST STARTUP', new Date().toISOString());
 
 server.listen(process.env.PORT, () => {
     console.log(`Server listening on port ${process.env.PORT}`);

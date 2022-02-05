@@ -1,11 +1,7 @@
-import {Session} from '@inrupt/solid-client-authn-node';
 import {AuthorizationAgent} from '@janeirodigital/authorization-agent';
 
-type SessionInstance = {
-    solidSession: Session,
-    saiSession: AuthorizationAgent,
-};
+type SessionId = string;
 
-const storage = new Map<string, SessionInstance>();
+const storage = new Map<SessionId, AuthorizationAgent>();
 
 export default storage;
