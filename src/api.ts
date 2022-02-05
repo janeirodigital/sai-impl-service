@@ -2,7 +2,10 @@
 
 import {Router, Request, Response, NextFunction} from 'express';
 import SessionStore from './session-storage';
-import {ReadableApplicationRegistration} from '@janeirodigital/interop-data-model';
+import {ReadableApplicationRegistration, ReadableDataConsent} from '@janeirodigital/interop-data-model';
+import {getApplicationProfile, parseRdf} from "./utils/rdf-parser";
+import {DataFactory} from "n3";
+import {AccessGrant, ApplicationProfile, IRI} from "./sai-api";
 
 const router = Router({ caseSensitive: false });
 
@@ -33,6 +36,10 @@ router.get('/id', (req: Request, res: Response) => {
     res.status(200).json({ webId: req.webId });
 });
 
+/**
+ * Returns an array of all the application registrations found
+ * in the agent registration
+ */
 router.get('/applications', async (req: Request, res: Response) => {
     console.log('[LOG][API] /applications handler')
     const registrations: ReadableApplicationRegistration[] = [];
@@ -40,12 +47,17 @@ router.get('/applications', async (req: Request, res: Response) => {
         registrations.push(registration);
     }
 
-    const ids: string[] = [];
+    const registrationsData: {profile: ApplicationProfile, accessGrant: IRI }[] = [];
     for (const registration of registrations) {
-        ids.push(registration.registeredAgent);
+        console.log('[Registrations list]', registration.iri);
+        const documentResponse = await req.solidSession!.fetch(registration.registeredAgent);
+        const applicationSet = await parseRdf(await documentResponse.text(), registration.iri);
+        const applicationProfile = getApplicationProfile(applicationSet);
+        const accessGrant = registration.hasAccessGrant.iri;
+        registrationsData.push({profile:applicationProfile, accessGrant: accessGrant});
     }
 
-    res.status(200).json({ids});
+    res.status(200).json(registrationsData);
 });
 
 router.get('/data', async(req: Request, res: Response) => {
