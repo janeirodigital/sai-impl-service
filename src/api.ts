@@ -1,6 +1,6 @@
 
 import {Router, Request, Response} from 'express';
-import {getAccessNeeds, getApplications, getDescriptions} from "./services";
+import {getAccessConsents, getAccessNeeds, getApplications, getDescriptions} from "./services";
 
 const router = Router({ caseSensitive: false });
 
@@ -24,6 +24,13 @@ router.get('/needs/:applicationId', async (req: Request, res: Response) => {
     const { applicationId } = req.params;
     const needs = await getAccessNeeds(req.sai, applicationId)
     res.json(needs);
+});
+
+router.get('/consents/:applicationId', async (req: Request, res: Response) => {
+    const { applicationId } = req.params;
+
+    const consents = await getAccessConsents(req.sai, applicationId);
+    res.json(consents);
 });
 
 export default router;
