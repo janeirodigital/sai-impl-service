@@ -6,8 +6,6 @@ import {AuthorizationAgent} from "../../sai-js/packages/authorization-agent";
 import {randomUUID} from "crypto";
 
 const sessionGuard = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(`[SESSION GUARD] Handling request for ${req.url}`);
-
     if(!req.cookies['session']) return rejectNoSessionProvided(res);
 
     try {
@@ -15,21 +13,21 @@ const sessionGuard = async (req: Request, res: Response, next: NextFunction) => 
         const sessionId = JSON.parse(cookieValue)['sessionId'];
         if (!sessionId) return rejectNoSessionProvided(res);
 
-        req.solidSession = await getSessionFromStorage(sessionId, RedisStorage.instance);
-        if (!req.solidSession) return rejectNoSessionFound(res);
+        const session = await getSessionFromStorage(sessionId, RedisStorage.instance);
+        if (!session || !session.info.isLoggedIn) return rejectNoSessionFound(res);
 
-        req.saiSession = SessionStorage.get(sessionId);
+        req.sai = SessionStorage.get(sessionId)!;
+        req.webid = session.info.webId!;
 
-        if (!req.saiSession) {
-            req.saiSession = await AuthorizationAgent.build(req.solidSession.info.webId!, process.env.AGENT_ID!, {
-                fetch: req.solidSession.fetch,
+        if (!req.sai) {
+            req.sai = await AuthorizationAgent.build(session.info.webId!, process.env.AGENT_ID!, {
+                fetch: session.fetch,
                 randomUUID,
             });
         }
-
         next();
     } catch (e) {
-        console.log(e);
+        // TODO (angel) log and better error message
         res.status(500).json(JSON.stringify(e));
     }
 }

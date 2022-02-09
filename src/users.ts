@@ -16,7 +16,7 @@ usersRouter.get('/:id', async (req: Request, res: Response) => {
     // TODO (angel) verify that the token is valid. jwtDecode does not perform signature verification
     const { azp: applicationId } = jwtDecode<{azp: string}>(tokenHeader);
 
-    for await (const registration of req.saiSession!.applicationRegistrations) {
+    for await (const registration of req.sai.applicationRegistrations) {
         if (registration.registeredAgent == applicationId) {
             res.status(200)
                 .header('content-type', 'text/turtle')

@@ -6,6 +6,8 @@ export type ApplicationProfile = {
     description: string;
     author: string;
     thumbnail: string;
+    registeredAt: string,
+    updatedAt: string,
 } & UniqueId;
 
 export type ApplicationRegistration = {

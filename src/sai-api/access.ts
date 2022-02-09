@@ -1,20 +1,17 @@
 import {IRI, UniqueId} from "./misc";
 import {ACL} from "./acl";
 
-export enum AccessNecessity {
-    REQUIRED = 'required',
-    OPTIONAL =  'optional',
-};
+export type AccessNecessity =
+    | 'http://www.w3.org/ns/solid/interop#AccessRequired'
+    | 'http://www.w3.org/ns/solid/interop#AccessOptional';
 
-export enum AccessScenario {
-    PERSONAL = 'personal',
-    SHARED = 'shared',
-};
+export type AccessScenario =
+    | 'http://www.w3.org/ns/solid/interop#PersonalAccess'
+    | 'http://www.w3.org/ns/solid/interop#SharedAccess';
 
-export enum AuthenticationRole {
-    SOCIAL = 'social',
-    APPLICATION = 'application',
-};
+export type AuthenticationRole =
+    | 'http://www.w3.org/ns/solid/interop#SocialAgent'
+    | 'http://www.w3.org/ns/solid/interop#Application';
 
 export type Access = {
     shapeTree: IRI;

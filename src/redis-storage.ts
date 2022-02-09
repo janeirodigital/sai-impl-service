@@ -19,7 +19,6 @@ export class RedisStorage implements IStorage {
 
     public static get instance(): RedisStorage {
         if (this._instance) {
-            console.log('[REDIS] Returning existing instance')
             return this._instance
         }
 

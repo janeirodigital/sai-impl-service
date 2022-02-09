@@ -1,34 +1,34 @@
 import {IRI, UniqueId} from './misc';
 import {ACL} from "./acl";
 
-export enum ConsentScope {
-    ALL = 'all',
-    ALL_FROM_AGENT = 'all-from-agent',
-    ALL_FROM_REGISTRY = 'all-from-registry',
-    SELECTED = 'selected',
-    INHERITED = 'inherited',
-}
+export type ConsentScope =
+    | 'http://www.w3.org/ns/solid/interop#All'
+    | 'http://www.w3.org/ns/solid/interop#AllFromAgent'
+    | 'http://www.w3.org/ns/solid/interop#AllFromRegistry'
+    | 'http://www.w3.org/ns/solid/interop#SelectedFromRegistry'
+    | 'http://www.w3.org/ns/solid/interop#Inherited';
 
 export type AccessConsent = {
     grantedBy: IRI;
-    grantedWith: IRI;
+    grantedWith?: IRI;
     grantedAt: Date;
     grantee: IRI;
-    accessNeedGroup: IRI;
-    dataConsent: IRI;
+    accessNeedGroup?: IRI;
+    dataConsent: IRI[];
     replaces?: IRI
 } & UniqueId;
 
 export type DataConsent = {
-    dataOwner: IRI;
+    dataOwner?: IRI;
     grantee: IRI;
     shapeTree: IRI;
-    AccessModes: [ACL],
-    creatorAccessModes: [ACL],
+    accessModes: ACL[],
+    creatorAccessModes?: ACL[],
     scope: ConsentScope,
-    dataRegistration: IRI;
-    dataInstance: IRI;
-    dataResource: IRI;
+    dataRegistration?: IRI;
+    dataInstance: IRI[];
+    // TODO (angel) check whether this property still exists
+    dataResource?: IRI;
     satisfiesAccessNeed?: IRI;
     inheritsFrom?: IRI;
 } & UniqueId;

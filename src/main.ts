@@ -26,6 +26,7 @@ server.use(cookieSession({
 
 server.use(cookieParser());
 server.use(bodyParser.json())
+server.use(bodyParser.urlencoded({extended: true}))
 server.use(morgan(process.env.NODE_ENV === 'production' ? 'common': 'dev'));
 
 server.use('/auth', authRouter)

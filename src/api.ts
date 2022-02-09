@@ -1,62 +1,53 @@
 
+import {Router, Request, Response} from 'express';
+import {getAllObjects} from "./utils/rdf-parser";
 
-import {Router, Request, Response, NextFunction} from 'express';
-import SessionStore from './session-storage';
-import {ReadableApplicationRegistration, ReadableDataConsent} from '@janeirodigital/interop-data-model';
-import {getApplicationProfile, parseRdf} from "./utils/rdf-parser";
-import {DataFactory} from "n3";
-import {AccessGrant, ApplicationProfile, IRI} from "./sai-api";
+import {AccessConsent, ACL, ApplicationProfile, ConsentScope, DataConsent, IRI} from "./sai-api";
+import {getApplications} from "./services";
+import {getDescriptions} from "./services/descriptions";
 
 const router = Router({ caseSensitive: false });
 
 router.get('/id', (req: Request, res: Response) => {
-    console.log('[LOG][API] /id handler')
-    res.status(200).send(req.solidSession?.info.webId);
+    res.send(req.webid);
 });
 
-router.get('/application-profiles', async (req: Request, res: Response) => {
-    console.log('[LOG][API] /applications handler')
-    const registrations: ReadableApplicationRegistration[] = [];
-    for await (const registration of req.saiSession!.applicationRegistrations) {
-        registrations.push(registration);
-    }
-
-    const profiles: ApplicationProfile[] = [];
-    for (const registration of registrations) {
-        console.log('[Registrations list]', registration.iri);
-        const documentResponse = await req.solidSession!.fetch(registration.registeredAgent);
-        const applicationSet = await parseRdf(await documentResponse.text(), registration.iri);
-        const applicationProfile = getApplicationProfile(applicationSet);
-        profiles.push(applicationProfile);
-    }
-
-    res.status(200).json(profiles);
+router.get('/applications', async (req: Request, res: Response) => {
+    const profiles = await getApplications(req.sai);
+    res.json(profiles);
 });
 
-router.get('/consents', async (req: Request, res: Response) => {
-    console.log('[API] /consents handler');
+router.get('/descriptions/:applicationId/:lang', async (req: Request, res: Response) => {
+    const { applicationId, lang } = req.params;
 
-   for await (const consent of req.saiSession!.accessConsents) {
-       console.log('Found consent for agent', consent.registeredAgent);
-   }
-
-   res.send();
+    console.log(applicationId, lang);
+    const descriptions = await getDescriptions(req.sai, applicationId, lang);
+    res.json(descriptions);
 });
 
-router.get('/data', async(req: Request, res: Response) => {
-    console.log('[LOG][API] /data handler')
-    const data = []
-    const dataRegistries = req.saiSession!.registrySet.hasDataRegistry;
-    for (const registry of dataRegistries) {
-       for await (const registration of registry.registrations) {
-           data.push({
-               shapeTree: registration.registeredShapeTree,
-               dataInstances: await (registration.contains),
-           })
-       }
-    }
-
-    res.json(data);
+router.get('/data-consents', async (req: Request, res: Response) => {
+    // console.log('[API] /data-consents handler');
+    // req.saiSession = req.saiSession!;
+    //
+    // const dataConsents: DataConsent[] = [];
+    // for await (const consent of req.saiSession!.accessConsents) {
+    //     for await (const dataConsent of consent.dataConsents) {
+    //         dataConsents.push({
+    //             id: dataConsent.iri,
+    //             dataOwner: dataConsent.dataOwner,
+    //             grantee: dataConsent.grantee,
+    //             shapeTree: dataConsent.registeredShapeTree,
+    //             accessModes: dataConsent.accessMode as ACL[],
+    //             // TODO (angel) add creator access modes from ??
+    //             scope: dataConsent.scopeOfConsent as ConsentScope,
+    //             dataRegistration: dataConsent.hasDataRegistration,
+    //             dataInstance: dataConsent.hasDataInstance,
+    //         })
+    //     }
+    // }
+    //
+    // res.send(dataConsents);
+    res.send();
 });
 
 export default router;
