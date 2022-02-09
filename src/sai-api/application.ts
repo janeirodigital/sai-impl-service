@@ -6,15 +6,8 @@ export type ApplicationProfile = {
     description: string;
     author: string;
     thumbnail: string;
+    // TODO (angel) match with the frontend
     registeredAt: string,
     updatedAt: string,
-} & UniqueId;
-
-export type ApplicationRegistration = {
-    registeredBy: IRI;
-    registeredWith: IRI;
-    registeredAt: Date;
-    updatedAt: Date;
-    registeredAgent: IRI;
-    accessGrant: IRI;
+    accessNeedGroup: string;
 } & UniqueId;

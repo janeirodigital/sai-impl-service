@@ -15,8 +15,9 @@ const buildApplicationProfile = (profile: DatasetCore, registration: ReadableApp
     const thumbnail = getOneObject(profile.match(null, INTEROP.applicationThumbnail))!.value;
     const registeredAt = registration.registeredAt;
     const updatedAt = registration.updatedAt;
+    const accessNeedGroup = getOneObject(profile.match(null, INTEROP.hasAccessNeedGroup))!.value;
 
-    return { id, name, description, author, thumbnail, registeredAt, updatedAt };
+    return { id, name, description, author, thumbnail, registeredAt, updatedAt, accessNeedGroup };
 };
 
 export const getApplications = async (agent: AuthorizationAgent) => {
@@ -31,7 +32,7 @@ export const getApplications = async (agent: AuthorizationAgent) => {
             .then(response => response.dataset());
 
         const applicationProfile = buildApplicationProfile(profile, registration);
-
         profiles.push(applicationProfile);
     }
+    return profiles;
 }
