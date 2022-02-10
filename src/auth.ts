@@ -58,9 +58,9 @@ router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
   //              accessor. That might be enough to remove the cookie-parser dependency
   const sessionCookie = req.cookies["session"];
   if (solidSession.info.isLoggedIn && solidSession.info.webId) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const saiSession = await AuthorizationAgent.build(
       solidSession.info.webId,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       process.env.AGENT_ID!,
       {
         fetch: solidSession.fetch,
