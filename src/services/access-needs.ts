@@ -1,4 +1,4 @@
-import { AuthorizationAgent } from "@janeirodigital/authorization-agent";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { getAllObjects, getAllSubjects, getOneObject, getOneSubject } from "../utils/rdf-parser";
 import { INTEROP, RDF } from "@janeirodigital/interop-namespaces";
 import { DatasetCore, Term } from "@rdfjs/types";

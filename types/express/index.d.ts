@@ -1,4 +1,4 @@
-import {AuthorizationAgent} from '@janeirodigital/authorization-agent';
+import {AuthorizationAgent} from '@janeirodigital/interop-authorization-agent';
 
 declare global {
     namespace Express {

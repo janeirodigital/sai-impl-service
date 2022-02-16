@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import SessionStorage from "./session-storage";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { RedisStorage } from "./redis-storage";
-import { AuthorizationAgent } from "../../sai-js/packages/authorization-agent";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { randomUUID } from "crypto";
 
 const sessionGuard = async (req: Request, res: Response, next: NextFunction) => {
