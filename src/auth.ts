@@ -1,6 +1,6 @@
 import express, { Response, Request } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
-import { AuthorizationAgent } from "@janeirodigital/authorization-agent";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { randomUUID } from "crypto";
 
 import SessionStorage from "./session-storage.js";

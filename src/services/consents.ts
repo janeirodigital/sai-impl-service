@@ -1,4 +1,4 @@
-import { AuthorizationAgent } from "@janeirodigital/authorization-agent";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { ReadableAccessConsent } from "@janeirodigital/interop-data-model";
 

@@ -1,6 +1,9 @@
-import { AuthorizationAgent } from "@janeirodigital/authorization-agent";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { getOneObject } from "../utils/rdf-parser";
-import { INTEROP, SKOS } from "@janeirodigital/interop-namespaces";
+import { INTEROP, buildNamespace } from "@janeirodigital/interop-namespaces";
+
+// TODO (elf-pavlik) add to interop-namespaces
+const SKOS = buildNamespace('http://www.w3.org/2004/02/skos/core#')
 
 /**
  * Get the descriptions for the requested language. If the descriptions for the language are not found
