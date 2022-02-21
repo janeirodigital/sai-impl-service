@@ -2,9 +2,9 @@ import { randomUUID } from "crypto";
 import express, { Response, Request } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 
-import storage, { uuid2clientId } from "./sai-session-storage";
+import { storage, uuid2clientId } from "./sai-session-storage";
 
-export const redirectUrl = `${process.env.BASE_URL}/auth/handleLoginRedirect`
+export const redirectUrl = `${process.env.BASE_URL}/auth/handleLoginRedirect`;
 
 const router = express.Router({ caseSensitive: false });
 
@@ -20,7 +20,7 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 
   const oidcSession = new Session({
-    storage: storage.oidcStorage
+    storage: storage.oidcStorage,
   });
 
   req.session["sessionId"] = oidcSession.info.sessionId;
@@ -55,8 +55,8 @@ router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
   await oidcSession.handleIncomingRedirect(process.env.BASE_URL + "/auth" + req.url);
 
   if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
-    await storage.changeKey(req.session["sessionId"], oidcSession.info.webId)
-    delete req.session["sessionId"]
+    await storage.changeKey(req.session["sessionId"], oidcSession.info.webId);
+    delete req.session["sessionId"];
     req.session["webId"] = oidcSession.info.webId;
     res.redirect(200, process.env.BASE_URL + "/dashboard");
   }

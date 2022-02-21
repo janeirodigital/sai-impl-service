@@ -1,6 +1,6 @@
-import "dotenv/config";
-import server from './server'
+export * from "./service";
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
-});
+// Handlers
+export * from "./handlers/login-handler";
+
+export * from "./sai-session-storage";
