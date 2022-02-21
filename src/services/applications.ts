@@ -39,12 +39,15 @@ export const getApplications = async (agent: AuthorizationAgent) => {
 
   const profiles = [];
   for (const registration of registrations) {
-    const profile = await agent
-      .fetch(registration.registeredAgent)
-      .then((response) => response.dataset());
+    // TODO (angel) what to do when the `.data` property is incomplete?
+    if (registration.data?.registeredAgent) {
+      const profile = await agent
+        .fetch(registration.data.registeredAgent)
+        .then((response) => response.dataset());
 
-    const applicationProfile = buildApplicationProfile(profile, registration);
-    profiles.push(applicationProfile);
+      const applicationProfile = buildApplicationProfile(profile, registration);
+      profiles.push(applicationProfile);
+    }
   }
   return profiles;
 };

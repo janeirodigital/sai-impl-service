@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import path from "path";
 import express, { Request, Response } from "express";
 import cookieSession from "cookie-session";
 import bodyParser from "body-parser";
@@ -10,6 +11,7 @@ import sessionGuard from "./session";
 import authRouter from "./auth";
 import agentsRouter from "./agents";
 import apiRouter from "./api";
+import { Service } from "./service";
 
 const server = express();
 

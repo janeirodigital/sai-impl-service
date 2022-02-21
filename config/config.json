@@ -1,0 +1,53 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@digita-ai/handlersjs-core/^0.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@digita-ai/handlersjs-http/^0.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/solid-redis-token-storage/^0.0.0/components/context.jsonld"
+  ],
+  "@graph": [
+    {
+      "@id": "urn:solid:authorization-agent:default:Service",
+      "@type": "NodeHttpServer",
+      "port": "4000",
+      "host": "0.0.0.0",
+      "nodeHttpStreamsHandler": {
+        "@type": "NodeHttpRequestResponseHandler",
+        "httpHandler": {
+          "@type": "HttpCorsRequestHandler",
+          "handler": {
+            "@type": "RoutedHttpRequestHandler",
+            "handlerControllerList": [
+              {
+                "@type": "HttpHandlerController",
+                "label": "Http Controller",
+                "routes": [
+                  {
+                    "@type": "HttpHandlerRoute",
+                    "path":  "/login",
+                    "operations": [
+                      {
+                        "@type": "HttpHandlerOperation",
+                        "method": "GET",
+                        "publish": false
+                      }
+                    ],
+                    "handler": {
+                      "@type": "LoginHandler",
+                      "sessionManager": {
+                        "@type": "SessionManager",
+                        "storage": {
+                          "type":"RedisSolidStorage"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
