@@ -1,9 +1,24 @@
 import { NextFunction, Request, Response } from "express";
 import SessionStorage from "./session-storage";
-import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
+import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 import { RedisStorage } from "./redis-storage";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { randomUUID } from "crypto";
+
+function webId2agentId(webId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return `${process.env.SERVICE_URL!}/agent/${Buffer.from(webId).toString('base64')}`
+}
+
+export async function buildSaiSession(oidcSession: Session): Promise<AuthorizationAgent> {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const webId = oidcSession.info.webId!
+  return AuthorizationAgent.build(webId, webId2agentId(webId), {
+        fetch: oidcSession.fetch,
+        randomUUID,
+      });
+
+}
 
 const sessionGuard = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.cookies["session"]) return rejectNoSessionProvided(res);
@@ -22,11 +37,7 @@ const sessionGuard = async (req: Request, res: Response, next: NextFunction) => 
     const sai = SessionStorage.get(sessionId);
     if (!sai) {
       // TODO (angel) check config values prior to program startup
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      req.sai = await AuthorizationAgent.build(req.webId, process.env.AGENT_ID!, {
-        fetch: session.fetch,
-        randomUUID,
-      });
+      req.sai = await buildSaiSession(session)
     } else req.sai = sai;
 
     next();

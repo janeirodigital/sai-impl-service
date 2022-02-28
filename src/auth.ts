@@ -1,10 +1,9 @@
 import express, { Response, Request } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { randomUUID } from "crypto";
 
 import SessionStorage from "./session-storage.js";
 import { RedisStorage } from "./redis-storage";
+import { buildSaiSession } from "./session.js";
 
 const router = express.Router({ caseSensitive: false });
 
@@ -58,16 +57,7 @@ router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
   //              accessor. That might be enough to remove the cookie-parser dependency
   const sessionCookie = req.cookies["session"];
   if (solidSession.info.isLoggedIn && solidSession.info.webId) {
-    const saiSession = await AuthorizationAgent.build(
-      solidSession.info.webId,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      process.env.AGENT_ID!,
-      {
-        fetch: solidSession.fetch,
-        randomUUID,
-      }
-    );
-
+    const saiSession = await buildSaiSession(solidSession)
     SessionStorage.set(solidSession.info.sessionId, saiSession);
 
     res.cookie("session", sessionCookie, { httpOnly: true });
