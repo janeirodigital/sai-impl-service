@@ -1,7 +1,7 @@
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 
-type SessionId = string;
+type WebId = string;
 
-const storage = new Map<SessionId, AuthorizationAgent>();
+const storage = new Map<WebId, AuthorizationAgent>();
 
 export default storage;

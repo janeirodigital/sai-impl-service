@@ -7,17 +7,18 @@ import { randomUUID } from "crypto";
 
 function webId2agentId(webId: string) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return `${process.env.SERVICE_URL!}/agent/${Buffer.from(webId).toString('base64')}`
+  return `${process.env.SERVICE_URL!}/users/${Buffer.from(webId).toString('base64')}`
 }
 
-export async function buildSaiSession(oidcSession: Session): Promise<AuthorizationAgent> {
+export async function buildSaiSession(oidcSession: Session, storage: typeof SessionStorage): Promise<AuthorizationAgent> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const webId = oidcSession.info.webId!
-  return AuthorizationAgent.build(webId, webId2agentId(webId), {
+  const saiSession = await AuthorizationAgent.build(webId, webId2agentId(webId), {
         fetch: oidcSession.fetch,
         randomUUID,
       });
-
+  storage.set(webId, saiSession);
+  return saiSession
 }
 
 const sessionGuard = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,10 +35,10 @@ const sessionGuard = async (req: Request, res: Response, next: NextFunction) => 
 
     req.webId = session.info.webId;
 
-    const sai = SessionStorage.get(sessionId);
+    const sai = SessionStorage.get(session.info.webId);
     if (!sai) {
       // TODO (angel) check config values prior to program startup
-      req.sai = await buildSaiSession(session)
+      req.sai = await buildSaiSession(session, SessionStorage)
     } else req.sai = sai;
 
     next();

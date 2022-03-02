@@ -30,9 +30,9 @@ server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(morgan(process.env.NODE_ENV === "production" ? "common" : "dev"));
 
+server.use("/users", usersRouter);
 server.use("/auth", authRouter);
 server.use(sessionGuard);
-server.use("/users", usersRouter);
 server.use("/api", apiRouter);
 
 server.all("*", (req: Request, res: Response) => {
