@@ -57,8 +57,7 @@ router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
   //              accessor. That might be enough to remove the cookie-parser dependency
   const sessionCookie = req.cookies["session"];
   if (solidSession.info.isLoggedIn && solidSession.info.webId) {
-    const saiSession = await buildSaiSession(solidSession)
-    SessionStorage.set(solidSession.info.sessionId, saiSession);
+    await buildSaiSession(solidSession, SessionStorage)
 
     res.cookie("session", sessionCookie, { httpOnly: true });
     res.redirect(200, process.env.BASE_URL + "/dashboard");
