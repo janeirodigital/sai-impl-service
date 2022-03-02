@@ -7,7 +7,7 @@ import { randomUUID } from "crypto";
 
 function webId2agentId(webId: string) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return `${process.env.SERVICE_URL!}/users/${Buffer.from(webId).toString('base64')}`
+  return `${process.env.BASE_URL!}/users/${Buffer.from(webId).toString('base64')}`
 }
 
 export async function buildSaiSession(oidcSession: Session, storage: typeof SessionStorage): Promise<AuthorizationAgent> {

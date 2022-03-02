@@ -32,7 +32,7 @@ usersRouter.get("/:webIdB64", async (req: Request, res: Response) => {
       {
         header: dpop as string,
         method: method as RequestMethod,
-        url: `${process.env.SERVICE_URL}/users${req.url}`,
+        url: `${process.env.BASE_URL}/users${req.url}`,
       },
     );
     webIdFromToken = token.webid
