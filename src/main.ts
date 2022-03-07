@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import express, { Request, Response } from "express";
 import cookieSession from "cookie-session";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
@@ -22,10 +21,13 @@ server.use(
     // TODO (angel) ensure all required env parameters are set before starting the application
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     keys: [process.env.COOKIE_KEY_1!, process.env.COOKIE_KEY_2!],
+    httpOnly: true,
+    // TODO consider enabling
+    // secure: true,
+    // sameSite: true
   })
 );
 
-server.use(cookieParser());
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(morgan(process.env.NODE_ENV === "production" ? "common" : "dev"));
