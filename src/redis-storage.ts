@@ -53,4 +53,12 @@ export class RedisStorage implements IStorage {
       return;
     }
   }
+
+  async rename(from: string, to: string) {
+    const value = await this.get(`solidClientAuthenticationUser:${from}`)
+    if (value) {
+      await this.set(`solidClientAuthenticationUser:${to}`, value)
+      await this.delete(from)
+    }
+  }
 }

@@ -1,17 +1,15 @@
 import express, { Request, Response } from "express";
 import { createSolidTokenVerifier, RequestMethod } from '@solid/access-token-verifier';
 import { INTEROP } from "@janeirodigital/interop-namespaces";
-import SessionStorage from "./session-storage";
+import SaiSessionStorage from "./sai-session-storage";
 
 const usersRouter = express.Router({ caseSensitive: false });
 
 usersRouter.get("/:webIdB64", async (req: Request, res: Response) => {
 
   const webIdFromAgent = Buffer.from(req.params.webIdB64, "base64").toString("utf-8")
-  console.log(webIdFromAgent)
-  const sai = SessionStorage.get(webIdFromAgent);
+  const sai = await SaiSessionStorage.get(webIdFromAgent);
 
-  // TODO rethink how SessionStorage gets pupulated from redis - most likely on start
   if (!sai) {
     res.status(404).send();
     return;
@@ -28,7 +26,7 @@ usersRouter.get("/:webIdB64", async (req: Request, res: Response) => {
   try {
     const token = await verifier(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      authorization!,
+      authorization,
       {
         header: dpop as string,
         method: method as RequestMethod,

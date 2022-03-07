@@ -4,7 +4,10 @@ import { getAccessConsents, getAccessNeeds, getApplications, getDescriptions } f
 const router = Router({ caseSensitive: false });
 
 router.get("/id", (req: Request, res: Response) => {
-  res.send(req.webId);
+
+  // TODO sai-js make sai.webId public
+  // @ts-ignore
+  res.send(req.sai.webId);
 });
 
 router.get("/applications", async (req: Request, res: Response) => {

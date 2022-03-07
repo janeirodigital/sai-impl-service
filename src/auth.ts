@@ -1,9 +1,7 @@
 import express, { Response, Request } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 
-import SessionStorage from "./session-storage.js";
 import { RedisStorage } from "./redis-storage";
-import { buildSaiSession } from "./session.js";
 
 const router = express.Router({ caseSensitive: false });
 
@@ -20,16 +18,16 @@ router.post("/login", async (req: Request, res: Response) => {
 
   const storage = RedisStorage.instance;
 
-  const session = new Session({
+  const oidcSession = new Session({
     storage,
   });
 
-  req.session["sessionId"] = session.info.sessionId;
+  req.session["sessionId"] = oidcSession.info.sessionId;
 
   const redirectToIdp = (url: string) => {
     res.send(url);
   };
-  await session.login({
+  await oidcSession.login({
     redirectUrl: `${process.env.BASE_URL}/auth/handleLoginRedirect`,
     oidcIssuer: idp,
     clientName: process.env.APP_NAME,
@@ -44,22 +42,19 @@ router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
     return;
   }
 
-  const solidSession = await getSessionFromStorage(req.session["sessionId"], RedisStorage.instance);
+  const oidcSession = await getSessionFromStorage(req.session["sessionId"], RedisStorage.instance);
 
-  if (!solidSession) {
+  if (!oidcSession) {
     res.redirect(401, process.env.BASE_URL + "/login");
     return;
   }
 
-  await solidSession.handleIncomingRedirect(process.env.BASE_URL + "/auth" + req.url);
+  await oidcSession.handleIncomingRedirect(process.env.BASE_URL + "/auth" + req.url);
 
-  // TODO (angel) check if instead of using the .cookies accessor it is possible to use the .session.sessionId
-  //              accessor. That might be enough to remove the cookie-parser dependency
-  const sessionCookie = req.cookies["session"];
-  if (solidSession.info.isLoggedIn && solidSession.info.webId) {
-    await buildSaiSession(solidSession, SessionStorage)
-
-    res.cookie("session", sessionCookie, { httpOnly: true });
+  if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
+    await RedisStorage.instance.rename(req.session["sessionId"], oidcSession.info.webId)
+    delete req.session["sessionId"]
+    req.session["webId"] = oidcSession.info.webId;
     res.redirect(200, process.env.BASE_URL + "/dashboard");
   }
 });
