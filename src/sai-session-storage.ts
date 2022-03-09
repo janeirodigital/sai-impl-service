@@ -8,15 +8,14 @@ type WebId = string;
 
 const cache = new Map<WebId, AuthorizationAgent>();
 
-function webId2agentId(webId: string) {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return `${process.env.BASE_URL!}/users/${Buffer.from(webId).toString('base64')}`
+export function uuid2clientId(uuid: string) {
+  return `${process.env.BASE_URL!}/agents/${uuid}`
 }
 
-async function buildSaiSession(oidcSession: Session): Promise<AuthorizationAgent> {
+async function buildSaiSession(oidcSession: Session, clientId: string): Promise<AuthorizationAgent> {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const webId = oidcSession.info.webId!
-  return AuthorizationAgent.build(webId, webId2agentId(webId), {
+  return AuthorizationAgent.build(webId, clientId, {
         fetch: oidcSession.fetch,
         randomUUID,
       });
@@ -29,10 +28,16 @@ const storage = {
 
     const oidcSession = await getSessionFromStorage(webId, RedisStorage.instance)
     if (oidcSession) {
-      const saiSession = await buildSaiSession(oidcSession)
+      const clientId = await RedisStorage.instance.getClientId(oidcSession.info.webId!)
+      const saiSession = await buildSaiSession(oidcSession, clientId!)
       cache.set(webId, saiSession);
       return saiSession
     }
+  },
+  getFromUuid: async (uuid: string): Promise<AuthorizationAgent | undefined> => {
+    const clientId = uuid2clientId(uuid)
+    const webId = await RedisStorage.instance.getWebId(clientId)
+    return webId ? storage.get(webId) : undefined
   }
 }
 export default storage;

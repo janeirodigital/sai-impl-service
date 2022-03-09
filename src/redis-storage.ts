@@ -2,8 +2,15 @@ import { createClient } from "redis";
 import { IStorage } from "@inrupt/solid-client-authn-node";
 
 // TODO remove this copy of StorageUtility method from inrupt's module
-function getKey(userId: string): string {
-  return `solidClientAuthenticationUser:${userId}`;
+function getWebIdKey(webId: string): string {
+  return `solidClientAuthenticationUser:${webId}`;
+}
+function getCookieSessionIdKey(cookieSessionId: string): string {
+  return getWebIdKey(cookieSessionId)
+}
+
+function getClientIdKey(clientId: string): string {
+  return `clientId:${clientId}`;
 }
 
 export class RedisStorage implements IStorage {
@@ -30,40 +37,45 @@ export class RedisStorage implements IStorage {
   }
 
   async delete(key: string): Promise<void> {
-    try {
-      const result = await this.client.del(key).then();
-      if (result > 0) return;
-      else {
-        return; // ??
-      }
-    } catch (e) {
-      return;
+    const result = await this.client.del(key).then();
+    if (result > 0) return;
+    else {
+      return; // ??
     }
   }
 
   async get(key: string): Promise<string | undefined> {
-    try {
       const value = await this.client.get(key);
       return value || undefined;
-    } catch (e) {
-      return undefined;
-    }
   }
 
   async set(key: string, value: string): Promise<void> {
-    try {
-      const result = await this.client.set(key, value);
-      if (result == "OK") return;
-    } catch (e) {
-      return;
-    }
+    const result = await this.client.set(key, value);
+    if (result == "OK") return;
   }
 
-  async rename(from: string, to: string) {
-    const value = await this.get(getKey(from))
+  async getClientId(webId: string): Promise<string | undefined> {
+    const value = await this.get(webId)
+    return value ? JSON.parse(value).clientId : undefined
+  }
+
+  async getWebId(clientId: string): Promise<string | undefined> {
+    return this.get(getClientIdKey(clientId))
+  }
+
+  // If there is a oidcSession for given WebID there will be ClientID -> WebID mapping as well
+  async rename(cookieSessionId: string, webId: string) {
+    const value = await this.get(getCookieSessionIdKey(cookieSessionId))
     if (value) {
-      await this.set(getKey(to), value)
-      await this.delete(from)
+      // Previous session can exist if user logged in from another browser or device
+      // In that case discard the new one and keep using the old one with original ClientID -> WebID mapping
+      const existingOidcSession = await this.get(getWebIdKey(webId))
+      if (!existingOidcSession) {
+        await this.set(getWebIdKey(webId), value)
+        const clientId = JSON.parse(value).clientId
+        await this.set(getClientIdKey(clientId), webId)
+      }
+      await this.delete(getCookieSessionIdKey(cookieSessionId))
     }
   }
 }

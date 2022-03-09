@@ -1,7 +1,11 @@
+import { randomUUID } from "crypto";
 import express, { Response, Request } from "express";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 
 import { RedisStorage } from "./redis-storage";
+import { uuid2clientId } from "./sai-session-storage";
+
+export const redirectUrl = `${process.env.BASE_URL}/auth/handleLoginRedirect`
 
 const router = express.Router({ caseSensitive: false });
 
@@ -25,10 +29,12 @@ router.post("/login", async (req: Request, res: Response) => {
   const redirectToIdp = (url: string) => {
     res.send(url);
   };
+
   await oidcSession.login({
-    redirectUrl: `${process.env.BASE_URL}/auth/handleLoginRedirect`,
+    redirectUrl,
     oidcIssuer: idp,
     clientName: process.env.APP_NAME,
+    clientId: uuid2clientId(randomUUID()),
     handleRedirect: redirectToIdp,
   });
 });
