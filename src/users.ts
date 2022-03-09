@@ -41,37 +41,28 @@ usersRouter.get("/:webIdB64", async (req: Request, res: Response) => {
     throw new Error(message);
   }
 
-  let registrationIri: string
+  let registrationIri: string | undefined
   if (webIdFromAgent === webIdFromToken) {
-    // registration owner wants to discover application registrataion
-    // TODO sai-js: provide sai.findApplicationRegistration(clientId)
-    for await (const registration of sai.applicationRegistrations) {
-      if (registration.registeredAgent === applicationId) {
-        registrationIri = registration.iri
-        break;
-      }
+    if(!applicationId) {
+      throw Error('no client_id present in the token')
+    } else {
+      registrationIri = (await sai.findApplicationRegistration(applicationId))?.iri
     }
   } else {
-    // another end-end user wants to discover social agent registartion
-    // TODO sai-js: provide sai.findSocialAgentRegistration(webId)
-    for await (const registration of sai.socialAgentRegistrations) {
-      if (registration.registeredAgent === webIdFromToken) {
-        registrationIri = registration.iri
-        break;
-      }
-    }
+      registrationIri = (await sai.findSocialAgentRegistration(webIdFromToken))?.iri
   }
 
-  // TODO: if (!registrationIri)
   res
     .status(200)
     .header("content-type", "text/turtle")
-    .header(
+  if (registrationIri) {
+    res.header(
       "Link",
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      `<${applicationId}>; anchor="${registrationIri!}"; rel="${INTEROP.registeredAgent.value}"`
+      `<${applicationId}>; anchor="${registrationIri}"; rel="${INTEROP.registeredAgent.value}"`
     )
-    .send();
+  }
+  res.send();
 });
 
 export default usersRouter;
