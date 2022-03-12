@@ -16,10 +16,8 @@ router.post("/login", async (req: Request, res: Response) => {
     return;
   }
 
-  const storage = RedisStorage.instance;
-
   const oidcSession = new Session({
-    storage,
+    storage: RedisStorage.instance
   });
 
   req.session["sessionId"] = oidcSession.info.sessionId;
