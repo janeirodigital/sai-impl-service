@@ -41,6 +41,4 @@ server.all("*", (req: Request, res: Response) => {
   res.status(404).send();
 });
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
-});
+export default server

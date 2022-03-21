@@ -66,6 +66,7 @@ agentsRouter.get("/:uuid", async (req: Request, res: Response) => {
       `<${applicationId}>; anchor="${registrationIri}"; rel="${INTEROP.registeredAgent.value}"`
     )
   }
+  res.contentType('application/ld+json')
   res.send(clientIddocument);
 });
 
