@@ -13,14 +13,14 @@ export function uuid2clientId(uuid: string) {
 }
 
 // TODO remove this copy of StorageUtility method from inrupt's module
-function getWebIdKey(webId: string): string {
+export function getWebIdKey(webId: string): string {
   return `solidClientAuthenticationUser:${webId}`;
 }
 function getCookieSessionIdKey(cookieSessionId: string): string {
   return getWebIdKey(cookieSessionId)
 }
 
-function getClientIdKey(clientId: string): string {
+export function getClientIdKey(clientId: string): string {
   return `clientId:${clientId}`;
 }
 
@@ -53,7 +53,7 @@ const storage = {
     return webId ? storage.get(webId) : undefined
   },
   getClientId: async (webId: string): Promise<string | undefined> => {
-    const value = await RedisStorage.instance.get(webId)
+    const value = await RedisStorage.instance.get(getWebIdKey(webId))
     return value ? JSON.parse(value).clientId : undefined
   },
   getWebId: async (clientId: string): Promise<string | undefined> => {
