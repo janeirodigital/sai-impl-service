@@ -4,7 +4,16 @@ import "dotenv/config";
 
 import { RedisStorage } from "../src/redis-storage";
 jest.mock('../src/redis-storage')
-import storage, { getClientIdKey, getWebIdKey, uuid2clientId } from '../src/sai-session-storage'
+import storage, { getClientIdKey, getWebIdKey, uuid2clientId, getCookieSessionIdKey } from '../src/sai-session-storage'
+
+beforeEach(() => {
+  // @ts-ignore
+  RedisStorage.instance.get.mockReset()
+  // @ts-ignore
+  RedisStorage.instance.set.mockReset()
+  // @ts-ignore
+  RedisStorage.instance.delete.mockReset()
+})
 
 describe('getWebId', () => {
   test('should return WebID based on ClientId', async () => {
@@ -48,4 +57,65 @@ describe('getFromUuid', () => {
     expect(getSpy).toBeCalledWith(webId)
 
   })
+})
+
+describe('changeKey', () => {
+  const sessionKey = 'some-seesion-key'
+  const clientId = 'some-client-id'
+  const sessionValue = JSON.stringify({ clientId })
+  const webId = 'https://alice.example/'
+  const oidcSessionValue = JSON.stringify({})
+
+  test('if session does not exist error is thrown', async () => {
+    // @ts-ignore
+    await expect(async () => await storage.changeKey(sessionKey, webId)).rejects.toThrow(`session with id=${sessionKey} does not exist`)
+    expect(RedisStorage.instance.get).toBeCalledTimes(1)
+    expect(RedisStorage.instance.get).toBeCalledWith(getCookieSessionIdKey(sessionKey))
+    expect(RedisStorage.instance.set).not.toBeCalled()
+    expect(RedisStorage.instance.delete).not.toBeCalled()
+
+  })
+
+ test('if oidc session exists only deletes cookie session', async () => {
+  // @ts-ignore
+  RedisStorage.instance.get.mockImplementationOnce((key) => {
+    expect(key).toBe(getCookieSessionIdKey(sessionKey))
+    return sessionValue
+  })
+  // @ts-ignore
+  RedisStorage.instance.get.mockImplementationOnce((key) => {
+    expect(key).toBe(getWebIdKey(webId))
+    return oidcSessionValue
+  })
+  await storage.changeKey(sessionKey, webId)
+  expect(RedisStorage.instance.get).toBeCalledTimes(2)
+  expect(RedisStorage.instance.delete).toBeCalledTimes(1)
+  expect(RedisStorage.instance.set).not.toBeCalled()
+ })
+
+ test('if oidc sessions does not exists creates new one based on the cookie session', async () => {
+  // @ts-ignore
+  RedisStorage.instance.get.mockImplementationOnce((key) => {
+    expect(key).toBe(getCookieSessionIdKey(sessionKey))
+    return sessionValue
+  })
+  // @ts-ignore
+  RedisStorage.instance.get.mockImplementationOnce((key) => {
+    expect(key).toBe(getWebIdKey(webId))
+  })
+  // @ts-ignore
+  RedisStorage.instance.set.mockImplementationOnce((key, value) => {
+    expect(key).toBe(getWebIdKey(webId))
+    expect(value).toBe(sessionValue)
+  })
+  // @ts-ignore
+  RedisStorage.instance.set.mockImplementationOnce((key, value) => {
+    expect(key).toBe(getClientIdKey(clientId))
+    expect(value).toBe(webId)
+  })
+  await storage.changeKey(sessionKey, webId)
+  expect(RedisStorage.instance.get).toBeCalledTimes(2)
+  expect(RedisStorage.instance.set).toBeCalledTimes(2)
+  expect(RedisStorage.instance.delete).toBeCalledTimes(1)
+ })
 })
