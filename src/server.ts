@@ -6,9 +6,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 
-import sessionGuard from "./session.js";
-import authRouter from "./auth.js";
-import usersRouter from "./users";
+import sessionGuard from "./session";
+import authRouter from "./auth";
+import agentsRouter from "./agents";
 import apiRouter from "./api";
 
 const server = express();
@@ -32,7 +32,7 @@ server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(morgan(process.env.NODE_ENV === "production" ? "common" : "dev"));
 
-server.use("/users", usersRouter);
+server.use("/agents", agentsRouter);
 server.use("/auth", authRouter);
 server.use(sessionGuard);
 server.use("/api", apiRouter);
@@ -41,6 +41,4 @@ server.all("*", (req: Request, res: Response) => {
   res.status(404).send();
 });
 
-server.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
-});
+export default server

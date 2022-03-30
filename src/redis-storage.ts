@@ -1,11 +1,6 @@
 import { createClient } from "redis";
 import { IStorage } from "@inrupt/solid-client-authn-node";
 
-// TODO remove this copy of StorageUtility method from inrupt's module
-function getKey(userId: string): string {
-  return `solidClientAuthenticationUser:${userId}`;
-}
-
 export class RedisStorage implements IStorage {
   private client;
   private static _instance: RedisStorage;
@@ -30,40 +25,20 @@ export class RedisStorage implements IStorage {
   }
 
   async delete(key: string): Promise<void> {
-    try {
-      const result = await this.client.del(key).then();
-      if (result > 0) return;
-      else {
-        return; // ??
-      }
-    } catch (e) {
-      return;
+    const result = await this.client.del(key).then();
+    if (result > 0) return;
+    else {
+      return; // ??
     }
   }
 
   async get(key: string): Promise<string | undefined> {
-    try {
       const value = await this.client.get(key);
       return value || undefined;
-    } catch (e) {
-      return undefined;
-    }
   }
 
   async set(key: string, value: string): Promise<void> {
-    try {
-      const result = await this.client.set(key, value);
-      if (result == "OK") return;
-    } catch (e) {
-      return;
-    }
-  }
-
-  async rename(from: string, to: string) {
-    const value = await this.get(getKey(from))
-    if (value) {
-      await this.set(getKey(to), value)
-      await this.delete(from)
-    }
+    const result = await this.client.set(key, value);
+    if (result == "OK") return;
   }
 }
