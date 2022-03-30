@@ -7,13 +7,13 @@ jest.mock('../src/redis-storage')
 import { Session } from '@inrupt/solid-client-authn-node'
 jest.mock('@inrupt/solid-client-authn-node')
 
+const MockedSession = Session as jest.MockedFunction<any>
 
 const loginMock = jest.fn((loginOptions: any) => {
     loginOptions.handleRedirect('some.iri')
   }
 )
-// @ts-ignore
-Session.mockImplementation(() => {
+MockedSession.mockImplementation(() => {
   return {
     info: { sessionId: 'some-session-id'},
     login: loginMock
