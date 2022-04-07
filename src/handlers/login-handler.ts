@@ -12,19 +12,21 @@ export class LoginHandler extends HttpHandler {
     console.log("LoginHandler::constructor");
   }
 
-  handle(input: HttpHandlerContext): Observable<HttpHandlerResponse> {
-    console.log("LoginHandler::handle");
-    if (input.route?.path === "login") {
-      return this.handleLogin(input);
+  handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
+    console.log("LoginHandler::handle::input");
+    const requestPath = context.request.url.pathname;
+    if (requestPath === "/login") {
+      return this.handleLogin(context);
     } /* if (input.route?.path === 'handleLoginRedirect') */ else {
-      return this.handleRedirect(input);
+      return this.handleRedirect(context);
     }
   }
 
-  private handleLogin(input: HttpHandlerContext): Observable<HttpHandlerResponse> {
-    const idp = input.request.body["idp"];
+  private handleLogin(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
+    console.log("LoginHandler::handleLogin");
+    const idp = context.request.body["idp"];
     // @ts-ignore TODO change the type of request to use the types that include the session
-    const session = input.request.session;
+    const session = context.request.session;
 
     if (!idp || !session) {
       return of({
@@ -57,15 +59,15 @@ export class LoginHandler extends HttpHandler {
     );
   }
 
-  private handleRedirect(input: HttpHandlerContext): Observable<HttpHandlerResponse> {
+  private handleRedirect(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
     // @ts-ignore
-    const session: CookieSessionObject = input.request.session;
+    const session: CookieSessionObject = context.request.session;
 
     if (!session || !session["sessionId"]) {
       return of({ body: {}, status: 300, headers: { location: String(process.env.BASE_URL) } });
     }
 
-    return from(this.handleRedirectPromise(session["sessionId"], input.request.url.pathname));
+    return from(this.handleRedirectPromise(session["sessionId"], context.request.url.pathname));
   }
 
   private async handleRedirectPromise(

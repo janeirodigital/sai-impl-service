@@ -16,35 +16,39 @@
         "httpHandler": {
           "@type": "HttpCorsRequestHandler",
           "handler": {
-            "@type": "RoutedHttpRequestHandler",
-            "handlerControllerList": [
-              {
-                "@type": "HttpHandlerController",
-                "label": "Http Controller",
-                "routes": [
-                  {
-                    "@type": "HttpHandlerRoute",
-                    "path":  "/login",
-                    "operations": [
-                      {
-                        "@type": "HttpHandlerOperation",
-                        "method": "GET",
-                        "publish": false
-                      }
-                    ],
-                    "handler": {
-                      "@type": "LoginHandler",
-                      "sessionManager": {
-                        "@type": "SessionManager",
-                        "storage": {
-                          "type":"RedisSolidStorage"
+            "@type":"UrlEncodedBodyParser",
+            "handler": {
+              "@type": "RoutedHttpRequestHandler",
+              "handlerControllerList": [
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "Http Controller",
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path":  "/login",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "POST",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginHandler",
+                        "sessionManager": {
+                          "@type": "SessionManager",
+                          "storage": {
+                            "@id": "urn:ssv:RedisStorage",
+                            "@type":"RedisSolidStorage"
+                          }
                         }
                       }
                     }
-                  }
-                ]
-              }
-            ]
+                  ]
+                }
+              ]
+            }
           }
         }
       }
