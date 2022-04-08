@@ -1,24 +1,34 @@
 import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
-import { firstValueFrom, from, lastValueFrom, map, Observable, of } from "rxjs";
+import { from, map, Observable, of } from "rxjs";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager, uuid2clientId } from "../sai-session-storage";
 import { randomUUID } from "crypto";
 import { redirectUrl } from "../auth";
 import CookieSessionObject = CookieSessionInterfaces.CookieSessionObject;
+import { MiddlewareHttpHandler } from "./middleware-http-handler";
 
 export class LoginHandler extends HttpHandler {
-  constructor(private sessionManager: SessionManager) {
+  constructor(
+    private sessionManager: SessionManager,
+    private middleware: MiddlewareHttpHandler[] = []
+  ) {
     super();
     console.log("LoginHandler::constructor");
   }
 
   handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
     console.log("LoginHandler::handle::input");
+
+    this.middleware.forEach((handler) => (context = handler.handle(context)));
+
     const requestPath = context.request.url.pathname;
+
     if (requestPath === "/login") {
       return this.handleLogin(context);
-    } /* if (input.route?.path === 'handleLoginRedirect') */ else {
+    } else if (context.route?.path === "/handleLoginRedirect") {
       return this.handleRedirect(context);
+    } else {
+      return of({ body: {}, status: 500, headers: {} });
     }
   }
 

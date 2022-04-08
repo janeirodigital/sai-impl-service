@@ -1,20 +1,17 @@
-import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
-import { Observable } from "rxjs";
+import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import { MiddlewareHttpHandler } from "./middleware-http-handler";
 
-export class UrlEncodedBodyParser implements HttpHandler {
-  constructor(private handler: HttpHandler) {}
-
-  public handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
+export class UrlEncodedBodyParser implements MiddlewareHttpHandler {
+  public handle(context: HttpHandlerContext): HttpHandlerContext {
     const body = decodeURIComponent(context.request.body);
 
     if (!body) {
-      return this.handler.handle(context);
+      return context;
     }
 
-    const decodedBody = decodeURIComponent(body);
     const pairs: { [key: string]: string } = {};
 
-    decodedBody.split("&").forEach((pair) => {
+    body.split("&").forEach((pair) => {
       const { [0]: key, [1]: value } = pair.split("=");
       pairs[key] = decodeURIComponent(value);
     });
@@ -27,6 +24,6 @@ export class UrlEncodedBodyParser implements HttpHandler {
       },
     };
 
-    return this.handler.handle(newContext);
+    return newContext;
   }
 }

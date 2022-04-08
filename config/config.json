@@ -15,8 +15,6 @@
         "@type": "NodeHttpRequestResponseHandler",
         "httpHandler": {
           "@type": "HttpCorsRequestHandler",
-          "handler": {
-            "@type":"UrlEncodedBodyParser",
             "handler": {
               "@type": "RoutedHttpRequestHandler",
               "handlerControllerList": [
@@ -25,15 +23,20 @@
                   "label": "Http Controller",
                   "routes": [
                     {
-                      "@type": "HttpHandlerRoute",
-                      "path":  "/login",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "POST",
-                          "publish": false
-                        }
-                      ],
+                    "@type": "HttpHandlerRoute",
+                    "path":  "/login",
+                    "operations": [
+                      {
+                        "@type": "HttpHandlerOperation",
+                        "method": "POST",
+                        "publish": false
+                      }
+                    ],
+                    "handler": {
+                      "@type": "HttpSequenceHandler",
+                      "middleware": [{
+                        "@type": "UrlEncodedBodyParser"
+                      }],
                       "handler": {
                         "@type": "LoginHandler",
                         "sessionManager": {
@@ -45,10 +48,10 @@
                         }
                       }
                     }
-                  ]
-                }
-              ]
-            }
+                  }
+                ]
+              }
+            ]
           }
         }
       }
