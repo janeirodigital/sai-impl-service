@@ -7,6 +7,14 @@
   ],
   "@graph": [
     {
+      "@id": "urn:ssv:SessionManager",
+      "@type": "SessionManager",
+      "storage": {
+        "@id": "urn:ssv:RedisStorage",
+        "@type":"RedisSolidStorage"
+      }
+    },
+    {
       "@id": "urn:solid:authorization-agent:default:Service",
       "@type": "NodeHttpServer",
       "port": "4000",
@@ -15,6 +23,16 @@
         "@type": "NodeHttpRequestResponseHandler",
         "httpHandler": {
           "@type": "HttpCorsRequestHandler",
+          "handler": {
+            "@type": "HttpSequenceHandler",
+            "middleware": [
+              {"@type": "UrlEncodedBodyParser"},
+              {"@type": "CookieSessionMiddleware"},
+              {
+                "@type": "SolidSessionMiddleware",
+                "manager": {"@id":"urn:ssv:SessionManager" }
+              }
+            ],
             "handler": {
               "@type": "RoutedHttpRequestHandler",
               "handlerControllerList": [
@@ -23,35 +41,24 @@
                   "label": "Http Controller",
                   "routes": [
                     {
-                    "@type": "HttpHandlerRoute",
-                    "path":  "/login",
-                    "operations": [
-                      {
-                        "@type": "HttpHandlerOperation",
-                        "method": "POST",
-                        "publish": false
-                      }
-                    ],
-                    "handler": {
-                      "@type": "HttpSequenceHandler",
-                      "middleware": [{
-                        "@type": "UrlEncodedBodyParser"
-                      }],
+                      "@type": "HttpHandlerRoute",
+                      "path":  "/login",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "POST",
+                          "publish": false
+                        }
+                      ],
                       "handler": {
                         "@type": "LoginHandler",
-                        "sessionManager": {
-                          "@type": "SessionManager",
-                          "storage": {
-                            "@id": "urn:ssv:RedisStorage",
-                            "@type":"RedisSolidStorage"
-                          }
-                        }
+                        "sessionManager": { "@id": "urn:ssv:SessionManager" }
                       }
                     }
-                  }
-                ]
-              }
-            ]
+                  ]
+                }
+              ]
+            }
           }
         }
       }
