@@ -1,4 +1,4 @@
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
 import { HandlerArgumentError } from "@digita-ai/handlersjs-core";
 import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { MiddlewareHttpHandler } from "./middleware-http-handler";
@@ -10,11 +10,11 @@ export class HttpSequenceHandler<C extends HttpHandlerContext> implements HttpHa
     }
   }
 
-  handle(input: HttpHandlerContext): Observable<HttpHandlerResponse> {
+  handle(ctx: HttpHandlerContext): Observable<HttpHandlerResponse> {
     for (const middleware of this.middleware) {
-      input = middleware.handle(input);
+      middleware.handle(ctx).subscribe((newCtx) => (ctx = newCtx));
     }
 
-    return this.handler.handle(input);
+    return this.handler.handle(ctx);
   }
 }

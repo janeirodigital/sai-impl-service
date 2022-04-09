@@ -1,9 +1,10 @@
-import { HttpHandlerContext, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
-
-export interface SolidHttpRequest extends HttpHandlerRequest {
-  webId: string;
-}
+import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import { Session } from "@inrupt/solid-client-authn-node";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 
 export interface HttpSolidContext extends HttpHandlerContext {
-  request: SolidHttpRequest;
+  webId?: string;
+  sessionId?: string;
+  oidcSession?: Session;
+  saiSession?: AuthorizationAgent;
 }

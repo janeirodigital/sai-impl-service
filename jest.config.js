@@ -1,20 +1,6 @@
-const config = {
-  extensionsToTreatAsEsm: ['.ts'],
-  testEnvironment: 'node',
-  testRegex: '/test/.*-test.ts$',
-  moduleFileExtensions: ['js', 'ts'],
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: './tsconfig.json',
-      useESM: true
-    }
-  }
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "node",
+  testRegex: "/test/.*-test.ts$",
 };
-
-export default config;

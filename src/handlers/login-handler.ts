@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { redirectUrl } from "../auth";
 import CookieSessionObject = CookieSessionInterfaces.CookieSessionObject;
 import { MiddlewareHttpHandler } from "./middleware-http-handler";
+import { HttpSolidContext } from "../models/http-solid-context";
 
 export class LoginHandler extends HttpHandler {
   constructor(
@@ -19,7 +20,7 @@ export class LoginHandler extends HttpHandler {
   handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
     console.log("LoginHandler::handle::input");
 
-    this.middleware.forEach((handler) => (context = handler.handle(context)));
+    this.middleware.forEach((handler) => handler.handle(context));
 
     const requestPath = context.request.url.pathname;
 
@@ -32,15 +33,15 @@ export class LoginHandler extends HttpHandler {
     }
   }
 
-  private handleLogin(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
+  private handleLogin(context: HttpSolidContext): Observable<HttpHandlerResponse> {
     console.log("LoginHandler::handleLogin");
     const idp = context.request.body["idp"];
     // @ts-ignore TODO change the type of request to use the types that include the session
-    const session = context.request.session;
+    let session: string = context.request.sessionId;
 
-    if (!idp || !session) {
+    if (!idp && !session) {
       return of({
-        body: { message: "No Identity Provided sent with the request" },
+        body: { message: "No Identity or Identity Provider sent with the request" },
         status: 400,
         headers: {},
       });
@@ -50,7 +51,7 @@ export class LoginHandler extends HttpHandler {
       storage: this.sessionManager.storage,
     });
 
-    session["sessionId"] = oidcSession.info.sessionId;
+    session = oidcSession.info.sessionId;
 
     const redirectToIdp = (url: string) =>
       of({ body: {}, status: 300, headers: { location: url } });
@@ -65,7 +66,7 @@ export class LoginHandler extends HttpHandler {
       })
     ).pipe(
       // TODO this should never be reached, however the static analysis requires it.
-      map((r) => ({ body: {}, status: 500, headers: {} }))
+      map(() => ({ body: { message: "This should never happen" }, status: 200, headers: {} }))
     );
   }
 

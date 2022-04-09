@@ -80,9 +80,7 @@ export const storage = {
 };
 
 export class SessionManager {
-  constructor(public storage: IStorage) {
-    console.log("SessionManager::constructor");
-  }
+  constructor(public storage: IStorage) {}
 
   async get(webId: string): Promise<AuthorizationAgent | undefined> {
     const cached = cache.get(webId);
