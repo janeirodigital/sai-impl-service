@@ -1,7 +1,7 @@
 import { SolidSessionMiddleware } from "../../src";
 import { SessionManager } from "../../src";
 import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
-import { HttpSolidContext } from "../../dist";
+import { HttpSolidContext } from "../../src";
 
 jest.mock("../../src/sai-session-storage");
 jest.mock("@inrupt/solid-client-authn-node");
