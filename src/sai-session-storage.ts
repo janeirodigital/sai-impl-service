@@ -37,6 +37,7 @@ async function buildSaiSession(
 
 export const storage = {
   oidcStorage: RedisStorage.instance,
+  clearCache: () => { cache.clear() },
   get: async (webId: string): Promise<AuthorizationAgent | undefined> => {
     const cached = cache.get(webId);
     if (cached) return cached;
