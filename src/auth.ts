@@ -4,15 +4,14 @@ import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node"
 
 import { storage, uuid2clientId } from "./sai-session-storage";
 
-export const redirectUrl = `${process.env.BASE_URL}/auth/handleLoginRedirect`;
+export const redirectUrl = `${process.env.BASE_URL}/auth/handleLoginRedirect`
 
 const router = express.Router({ caseSensitive: false });
 
 router.post("/login", async (req: Request, res: Response) => {
-  console.log("[POST][LOGIN] /login handler");
   const idp = req.body["idp"];
 
-  if (!idp || !req.session) {
+  if (!idp) {
     res.status(400).json({
       message: "No Identity Provided sent with the request",
     });
@@ -20,10 +19,10 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 
   const oidcSession = new Session({
-    storage: storage.oidcStorage,
+    storage: storage.oidcStorage
   });
 
-  req.session["sessionId"] = oidcSession.info.sessionId;
+  req.session!["sessionId"] = oidcSession.info.sessionId;
 
   const redirectToIdp = (url: string) => {
     res.send(url);
@@ -39,27 +38,29 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 router.get("/handleLoginRedirect", async (req: Request, res: Response) => {
-  if (!req.session || !req.session["sessionId"]) {
+  if (!req.session!["sessionId"]) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.redirect(process.env.BASE_URL!);
     return;
   }
 
-  const oidcSession = await getSessionFromStorage(req.session["sessionId"], storage.oidcStorage);
+  const oidcSession = await getSessionFromStorage(req.session!["sessionId"], storage.oidcStorage);
 
   if (!oidcSession) {
-    res.redirect(401, process.env.BASE_URL + "/login");
+    res.redirect(process.env.BASE_URL!);
     return;
   }
 
   await oidcSession.handleIncomingRedirect(process.env.BASE_URL + "/auth" + req.url);
 
   if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
-    await storage.changeKey(req.session["sessionId"], oidcSession.info.webId);
-    delete req.session["sessionId"];
-    req.session["webId"] = oidcSession.info.webId;
+    await storage.changeKey(req.session!["sessionId"], oidcSession.info.webId)
+    delete req.session!["sessionId"]
+    req.session!["webId"] = oidcSession.info.webId;
     res.redirect(200, process.env.BASE_URL + "/dashboard");
+    return;
   }
+  // TODO: we may need some catch all here - eg. refresh token was revoked
 });
 
 export default router;
