@@ -39,8 +39,4 @@ server.use("/auth", authRouter);
 server.use(sessionGuard);
 server.use("/api", apiRouter);
 
-server.all("*", (req: Request, res: Response) => {
-  res.status(404).send();
-});
-
 export default server

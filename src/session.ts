@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
-import { storage as SaiSessionStorage } from "./sai-session-storage";
+import { storage } from "./sai-session-storage";
 
 const sessionGuard = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.session?.webId) return rejectNoSessionProvided(res);
 
   try {
-    const sai = await SaiSessionStorage.get(req.session.webId);
+    const sai = await storage.get(req.session.webId);
     if (!sai) {
       return rejectNoSessionFound(res);
     } else req.sai = sai;
