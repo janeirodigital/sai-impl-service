@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { from, map, Observable, of } from "rxjs";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";

@@ -35,7 +35,7 @@
   "dependencies": {
     "@digita-ai/handlersjs-core": "^0.8.5",
     "@digita-ai/handlersjs-http": "^0.8.5",
-    "@inrupt/solid-client-authn-node": "^1.11.3",
+    "@inrupt/solid-client-authn-node": "^1.11.7",
     "@janeirodigital/interop-authorization-agent": "1.0.0-rc.6",
     "@janeirodigital/interop-data-model": "1.0.0-rc.6",
     "@janeirodigital/interop-namespaces": "1.0.0-rc.6",
