@@ -3,10 +3,10 @@ import { from, map, Observable, of } from "rxjs";
 import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager, uuid2clientId } from "../sai-session-storage";
 import { randomUUID } from "crypto";
-import { redirectUrl } from "../auth";
 import CookieSessionObject = CookieSessionInterfaces.CookieSessionObject;
 import { MiddlewareHttpHandler } from "./middleware-http-handler";
 import { HttpSolidContext } from "../models/http-solid-context";
+import 'dotenv/config';
 
 export class LoginHandler extends HttpHandler {
   constructor(
@@ -58,7 +58,7 @@ export class LoginHandler extends HttpHandler {
 
     return from(
       oidcSession.login({
-        redirectUrl,
+        redirectUrl: process.env.REDIRECT_URL,
         oidcIssuer: idp,
         clientName: process.env.APP_NAME,
         clientId: uuid2clientId(randomUUID()),

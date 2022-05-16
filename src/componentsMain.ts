@@ -1,6 +1,5 @@
 import path from "path";
 import { ComponentsManager, IComponentsManagerBuilderOptions } from "componentsjs";
-import { Service } from "./service";
 import { Server } from "@digita-ai/handlersjs-http";
 import type { NodeHttpServer } from "@digita-ai/handlersjs-http";
 
@@ -13,7 +12,7 @@ export async function createServer(): Promise<Server> {
 
   const modulePath = process.cwd();
 
-  const managerProperties: IComponentsManagerBuilderOptions<Service> = {
+  const managerProperties: IComponentsManagerBuilderOptions<Server> = {
     mainModulePath: modulePath,
     dumpErrorState: false,
     logLevel: "debug",

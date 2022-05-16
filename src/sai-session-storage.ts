@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { RedisStorage } from "./redis-storage";
 
 type WebId = string;
 
@@ -35,50 +34,50 @@ async function buildSaiSession(
   });
 }
 
-export const storage = {
-  oidcStorage: RedisStorage.instance,
-  clearCache: () => { cache.clear() },
-  get: async (webId: string): Promise<AuthorizationAgent | undefined> => {
-    const cached = cache.get(webId);
-    if (cached) return cached;
+// export const storage = {
+//   oidcStorage: RedisStorage.instance,
+//   clearCache: () => { cache.clear() },
+//   get: async (webId: string): Promise<AuthorizationAgent | undefined> => {
+//     const cached = cache.get(webId);
+//     if (cached) return cached;
 
-    const oidcSession = await getSessionFromStorage(webId, RedisStorage.instance);
-    if (oidcSession) {
-      const clientId = await storage.getClientId(oidcSession.info.webId!);
-      const saiSession = await buildSaiSession(oidcSession, clientId!);
-      cache.set(webId, saiSession);
-      return saiSession;
-    }
-  },
-  getFromUuid: async (uuid: string): Promise<AuthorizationAgent | undefined> => {
-    const clientId = uuid2clientId(uuid);
-    const webId = await storage.getWebId(clientId);
-    return webId ? storage.get(webId) : undefined;
-  },
-  getClientId: async (webId: string): Promise<string | undefined> => {
-    const value = await RedisStorage.instance.get(getWebIdKey(webId));
-    return value ? JSON.parse(value).clientId : undefined;
-  },
-  getWebId: async (clientId: string): Promise<string | undefined> => {
-    return RedisStorage.instance.get(getClientIdKey(clientId));
-  },
-  // If there is a oidcSession for given WebID there will be ClientID -> WebID mapping as well
-  changeKey: async (cookieSessionId: string, webId: string) => {
-    const value = await RedisStorage.instance.get(getCookieSessionIdKey(cookieSessionId));
-    if (!value) {
-      throw new Error(`session with id=${cookieSessionId} does not exist`);
-    }
-    // Previous session can exist if user logged in from another browser or device
-    // In that case discard the new one and keep using the old one with original ClientID -> WebID mapping
-    const existingOidcSession = await RedisStorage.instance.get(getWebIdKey(webId));
-    if (!existingOidcSession) {
-      await RedisStorage.instance.set(getWebIdKey(webId), value);
-      const clientId = JSON.parse(value).clientId;
-      await RedisStorage.instance.set(getClientIdKey(clientId), webId);
-    }
-    await RedisStorage.instance.delete(getCookieSessionIdKey(cookieSessionId));
-  },
-};
+//     const oidcSession = await getSessionFromStorage(webId, RedisStorage.instance);
+//     if (oidcSession) {
+//       const clientId = await storage.getClientId(oidcSession.info.webId!);
+//       const saiSession = await buildSaiSession(oidcSession, clientId!);
+//       cache.set(webId, saiSession);
+//       return saiSession;
+//     }
+//   },
+//   getFromUuid: async (uuid: string): Promise<AuthorizationAgent | undefined> => {
+//     const clientId = uuid2clientId(uuid);
+//     const webId = await storage.getWebId(clientId);
+//     return webId ? storage.get(webId) : undefined;
+//   },
+//   getClientId: async (webId: string): Promise<string | undefined> => {
+//     const value = await RedisStorage.instance.get(getWebIdKey(webId));
+//     return value ? JSON.parse(value).clientId : undefined;
+//   },
+//   getWebId: async (clientId: string): Promise<string | undefined> => {
+//     return RedisStorage.instance.get(getClientIdKey(clientId));
+//   },
+//   // If there is a oidcSession for given WebID there will be ClientID -> WebID mapping as well
+//   changeKey: async (cookieSessionId: string, webId: string) => {
+//     const value = await RedisStorage.instance.get(getCookieSessionIdKey(cookieSessionId));
+//     if (!value) {
+//       throw new Error(`session with id=${cookieSessionId} does not exist`);
+//     }
+//     // Previous session can exist if user logged in from another browser or device
+//     // In that case discard the new one and keep using the old one with original ClientID -> WebID mapping
+//     const existingOidcSession = await RedisStorage.instance.get(getWebIdKey(webId));
+//     if (!existingOidcSession) {
+//       await RedisStorage.instance.set(getWebIdKey(webId), value);
+//       const clientId = JSON.parse(value).clientId;
+//       await RedisStorage.instance.set(getClientIdKey(clientId), webId);
+//     }
+//     await RedisStorage.instance.delete(getCookieSessionIdKey(cookieSessionId));
+//   },
+// };
 
 export class SessionManager {
   constructor(public storage: IStorage) {}
@@ -98,8 +97,8 @@ export class SessionManager {
 
   async getFromUuid(uuid: string): Promise<AuthorizationAgent | undefined> {
     const clientId = uuid2clientId(uuid);
-    const webId = await storage.getWebId(clientId);
-    return webId ? storage.get(webId) : undefined;
+    const webId = await this.getWebId(clientId);
+    return webId ? this.get(webId) : undefined;
   }
 
   async getClientId(webId: string): Promise<string | undefined> {
@@ -108,12 +107,12 @@ export class SessionManager {
   }
 
   async getWebId(clientId: string): Promise<string | undefined> {
-    return RedisStorage.instance.get(getClientIdKey(clientId));
+    return this.storage.get(getClientIdKey(clientId));
   }
 
   // If there is a oidcSession for given WebID there will be ClientID -> WebID mapping as well
   async changeKey(cookieSessionId: string, webId: string) {
-    const value = await RedisStorage.instance.get(getCookieSessionIdKey(cookieSessionId));
+    const value = await this.storage.get(getCookieSessionIdKey(cookieSessionId));
     if (!value) {
       throw new Error(`session with id=${cookieSessionId} does not exist`);
     }
