@@ -1,7 +1,5 @@
-import { AgentsHandler, HttpSolidContext, SessionManager } from "../../src";
+import { AgentsHandler, HttpSolidContext, SessionManager, agentRedirectUrl } from "../../src";
 import { jest } from '@jest/globals';
-
-import 'dotenv/config';
 
 jest.mock('../../src/sai-session-storage', () => {
   const originalModule = jest.requireActual('../../src/sai-session-storage') as object;
@@ -42,7 +40,7 @@ describe('unauthenticated request', () => {
 
     agentsHandler.handle(ctx).subscribe(response => {
       expect(response.body.client_id).toContain(uuid);
-      expect(response.body.redirect_uris).toContain(process.env.REDIRECT_URL);
+      expect(response.body.redirect_uris).toContain(agentRedirectUrl(uuid));
       expect(response.body.grant_types).toEqual(expect.arrayContaining(['authorization_code', 'refresh_token']));
       done()
     })

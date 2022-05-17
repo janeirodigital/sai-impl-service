@@ -1,7 +1,8 @@
-import { MiddlewareHttpHandler } from "./middleware-http-handler";
+import { from, Observable } from "rxjs";
+import { createSolidTokenVerifier, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { from, map, Observable, of } from "rxjs";
-import { createSolidTokenVerifier, DPoPOptions, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
+import { baseUrl } from "../url-templates"
+import { MiddlewareHttpHandler } from "./middleware-http-handler";
 
 /**
  * Uses  access-token-verifier and sets authn on the context if token was provided
@@ -13,7 +14,6 @@ import { createSolidTokenVerifier, DPoPOptions, RequestMethod, SolidAccessTokenP
 export class AuthnMiddleware implements MiddlewareHttpHandler {
 
   handle(context: HttpSolidContext): Observable<HttpSolidContext> {
-    const verifier = createSolidTokenVerifier()
     return from(this.handleAsync(context))
   }
 
@@ -35,7 +35,7 @@ export class AuthnMiddleware implements MiddlewareHttpHandler {
         {
           header: dpop as string,
           method: method as RequestMethod,
-          url: `${process.env.BASE_URL}${context.request.url}`,
+          url: `${baseUrl}${context.request.url}`,
         }
       );
       return {

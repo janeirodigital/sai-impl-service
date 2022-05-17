@@ -27,7 +27,6 @@
             "@type": "HttpSequenceHandler",
             "middleware": [
               {"@type": "UrlEncodedBodyParser"},
-              {"@type": "CookieSessionMiddleware"},
               {"@type": "AuthnMiddleware"},
               {
                 "@type": "SolidSessionMiddleware",
@@ -68,6 +67,21 @@
                       ],
                       "handler": {
                         "@type": "AgentsHandler",
+                        "sessionManager": { "@id": "urn:ssv:SessionManager" }
+                      }
+                    },
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path":  "/agents/:uuid/redirect",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginRedirectHandler",
                         "sessionManager": { "@id": "urn:ssv:SessionManager" }
                       }
                     }

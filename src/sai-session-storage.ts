@@ -1,14 +1,11 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import { agentUrl } from "./url-templates"
 
 type WebId = string;
 
 const cache = new Map<WebId, AuthorizationAgent>();
-
-export function uuid2clientId(uuid: string) {
-  return `${process.env.BASE_URL!}/agents/${uuid}`;
-}
 
 export function getClientIdKey(clientId: string): string {
   return `clientId:${clientId}`;
@@ -41,12 +38,16 @@ export class SessionManager {
   }
 
   async getFromUuid(uuid: string): Promise<AuthorizationAgent | undefined> {
-    const clientId = uuid2clientId(uuid);
+    const clientId = agentUrl(uuid);
     const webId = await this.getWebId(clientId);
     return webId ? this.get(webId) : undefined;
   }
 
   async getWebId(clientId: string): Promise<string | undefined> {
     return this.storage.get(getClientIdKey(clientId));
+  }
+
+  async setClientId2WebIdMapping (clientId: string, webId: string): Promise<void> {
+    await this.storage.set(getClientIdKey(clientId), webId)
   }
 }

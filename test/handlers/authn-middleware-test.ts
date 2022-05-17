@@ -1,7 +1,5 @@
-import { AuthnMiddleware, HttpSolidContext } from "../../src";
 import { jest } from '@jest/globals';
-
-import 'dotenv/config';
+import { AuthnMiddleware, HttpSolidContext, baseUrl } from "../../src";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
 jest.mock('@solid/access-token-verifier', () => {
@@ -89,7 +87,7 @@ describe('authenticated request', () => {
         expect(dpop).toEqual({
           header: dpopProof,
           method: 'GET',
-          url: `${process.env.BASE_URL}${url}`
+          url: `${baseUrl}${url}`
         })
         return { webid: webId, client_id: clientId } as SolidAccessTokenPayload
       } as SolidTokenVerifierFunction

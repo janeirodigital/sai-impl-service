@@ -1,13 +1,11 @@
 import { jest } from '@jest/globals';
-import 'dotenv/config';
 import { InMemoryStorage, Session } from '@inrupt/solid-client-authn-node';
+
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
 jest.mock('@janeirodigital/interop-authorization-agent');
-
 const MockedAuthorizationAgent = AuthorizationAgent as jest.MockedFunction<any>
 
 import { getSessionFromStorage } from '@inrupt/solid-client-authn-node';
-
 jest.mock('@inrupt/solid-client-authn-node', () => {
   const originalModule = jest.requireActual('@inrupt/solid-client-authn-node') as object;
 
@@ -16,10 +14,10 @@ jest.mock('@inrupt/solid-client-authn-node', () => {
     getSessionFromStorage: jest.fn()
   }
 })
-
 const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction<any>;
 
-import {SessionManager, getClientIdKey, uuid2clientId } from '../src/sai-session-storage';
+import { SessionManager, getClientIdKey } from '../src/sai-session-storage';
+import { agentUrl } from '../src/url-templates'
 
 let manager: SessionManager
 
@@ -45,7 +43,7 @@ describe('getFromUuid', () => {
   test('should try to get using correct WebId', async () => {
     const uuid = '8c4b1081-bc98-44ef-af57-271bac06d95f';
     const webId = 'https://alice.example/';
-    manager.storage.set(getClientIdKey(uuid2clientId(uuid)), webId)
+    manager.storage.set(getClientIdKey(agentUrl(uuid)), webId)
     const getSpy = jest.spyOn(manager, 'get').mockImplementationOnce(async () => ({} as AuthorizationAgent));
     await manager.getFromUuid(uuid);
     expect(getSpy).toBeCalledTimes(1);

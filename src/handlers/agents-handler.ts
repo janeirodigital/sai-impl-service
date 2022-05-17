@@ -1,12 +1,10 @@
-import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
-import { catchError, from, iif, map, mergeMap, Observable, of, switchMap } from "rxjs";
-import { getSessionFromStorage, Session } from "@inrupt/solid-client-authn-node";
-import { SessionManager, uuid2clientId } from "../sai-session-storage";
-import { randomUUID } from "crypto";
-import { MiddlewareHttpHandler } from "./middleware-http-handler";
-import { HttpSolidContext } from "../models/http-solid-context";
+import { from, Observable } from "rxjs";
+import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
-import 'dotenv/config';
+import { HttpSolidContext } from "../models/http-solid-context";
+import { SessionManager } from "../sai-session-storage";
+import { agentUrl, agentRedirectUrl } from "../url-templates";
+
 export class AgentsHandler extends HttpHandler {
   constructor(
     private sessionManager: SessionManager,
@@ -26,9 +24,10 @@ export class AgentsHandler extends HttpHandler {
   }
 
   async handleAsync(context: HttpSolidContext): Promise<HttpHandlerResponse> {
+    const agentUuid = context.request.parameters!.uuid
     if (!context.authn) {
       return {
-        body: this.clientIdDocument(context.request.parameters!.uuid),
+        body: this.clientIdDocument(agentUuid),
         status: 200,
         headers: { 'Content-Type': 'application/ld+json' }
       }
@@ -38,7 +37,6 @@ export class AgentsHandler extends HttpHandler {
       // throw Error('no client_id present in the token')
       return { status: 401, headers: {} }
     }
-    const agentUuid = context.request.parameters!.uuid
     const registrationIri = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUuid)
     const headers : { [key: string]: string} = {}
     if (registrationIri) {
@@ -52,9 +50,9 @@ export class AgentsHandler extends HttpHandler {
   clientIdDocument (agentUuid: string) {
     return {
       '@context': 'https://www.w3.org/ns/solid/oidc-context.jsonld',
-      client_id: uuid2clientId(agentUuid),
+      client_id: agentUrl(agentUuid),
       client_name: 'Solid Authorization Agent',
-      redirect_uris: [ process.env.REDIRECT_URL ],
+      redirect_uris: [ agentRedirectUrl(agentUuid) ],
       grant_types : ['refresh_token','authorization_code']
     }
   }
