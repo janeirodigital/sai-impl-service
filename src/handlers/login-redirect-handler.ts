@@ -3,7 +3,7 @@ import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../session-manager";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { frontendUrl, uuid2agentUrl, agentRedirectUrl } from "../url-templates";
+import { frontendUrl, uuid2agentUrl, baseUrl } from "../url-templates";
 
 export class LoginRedirectHandler extends HttpHandler {
   constructor(
@@ -32,8 +32,7 @@ export class LoginRedirectHandler extends HttpHandler {
       return { body: {}, status: 500, headers: {} };
     }
 
-    // TODO test if proper url is passed
-    await oidcSession.handleIncomingRedirect(agentRedirectUrl(agentUrl) + context.request.url.pathname);
+    await oidcSession.handleIncomingRedirect(baseUrl + context.request.url.pathname + context.request.url.search);
 
     if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
       return { body: {}, status: 300, headers: { location: frontendUrl } };
