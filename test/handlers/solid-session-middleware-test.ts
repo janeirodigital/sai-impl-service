@@ -32,19 +32,19 @@ describe("SolidSessionMiddleware", () => {
   });
 
   test("middleware retrieves the right session from manager", (done) => {
-    manager.get = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
+    manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
 
     const webId = "http://me.id",
       sessionId = "session";
     const ctx = { sessionId, webId } as HttpSolidContext;
     middleware.handle(ctx).subscribe(() => {
-      expect(manager.get).toBeCalledWith(webId);
+      expect(manager.getSaiSession).toBeCalledWith(webId);
       done();
     });
   });
 
   test("middleware adds the session to the new context", (done) => {
-    manager.get = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
+    manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
     const webId = "http://me.id",
       sessionId = "session";
 
