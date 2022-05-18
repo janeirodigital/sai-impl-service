@@ -12,7 +12,7 @@ export class SolidSessionMiddleware implements MiddlewareHttpHandler {
   handle(context: HttpSolidContext): Observable<HttpSolidContext> {
     if (!context.webId || !context.sessionId) return of(context);
 
-    const saiSession$ = from(this.manager.get(context.webId));
+    const saiSession$ = from(this.manager.getSaiSession(context.webId));
 
     return saiSession$.pipe(map((saiSession) => ({ saiSession, ...context })));
   }

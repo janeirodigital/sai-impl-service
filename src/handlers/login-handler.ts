@@ -16,8 +16,6 @@ export class LoginHandler extends HttpHandler {
   }
 
   async handleAsync (context: HttpSolidContext): Promise<HttpHandlerResponse> {
-    const idp = context.request.body["idp"];
-
     if (!context.authn) {
       return {
         status: 401,
@@ -25,6 +23,7 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
+    const idp = context.request.body?.idp;
     if (!idp) {
       return {
         body: { message: "No Identity or Identity Provider sent with the request" },
@@ -33,32 +32,27 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
-    let clientId: string
+    let agentUrl: string
 
     const webId = context.authn!.webId
 
     // see if authorization agent exists for that WebID use it
-    const existingOidcSession  = await this.sessionManager.getOidcSession(webId)
+    let oidcSession = await this.sessionManager.getOidcSession(webId)
 
-    if (existingOidcSession) {
-      clientId = existingOidcSession.info.clientAppId!
+    if (oidcSession) {
+      agentUrl = oidcSession.info.clientAppId!
     } else {
-      clientId = uuid2agentUrl(randomUUID())
+      agentUrl = uuid2agentUrl(randomUUID())
+      oidcSession = new Session({ storage: this.sessionManager.storage, }, webId);
+      await this.sessionManager.setAgentUrl2WebIdMapping(agentUrl, webId)
     }
 
-    const oidcSession = existingOidcSession ||
-      new Session({
-        storage: this.sessionManager.storage,
-      }, webId);
-
-    await this.sessionManager.setClientId2WebIdMapping(clientId, webId)
-
     const completeRedirectUrl: string = await new Promise((resolve, reject) => {
-      oidcSession.login({
-        redirectUrl: agentRedirectUrl(clientId),
+      oidcSession!.login({
+        redirectUrl: agentRedirectUrl(agentUrl),
         oidcIssuer: idp,
         clientName: process.env.APP_NAME,
-        clientId,
+        clientId: agentUrl,
         handleRedirect: (url) => {
           resolve(url)
         }

@@ -40,10 +40,15 @@ export class AgentsHandler extends HttpHandler {
     const registrationIri = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUrl)
     const headers : { [key: string]: string} = {}
     if (registrationIri) {
+        headers['Content-Type'] = 'application/ld+json'
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         headers['Link'] = `<${context.authn.clientId}>; anchor="${registrationIri}"; rel="${INTEROP.registeredAgent.value}"`
     }
-    return { status: 200, headers, body: this.clientIdDocument(agentUrl)}
+    return {
+      body: this.clientIdDocument(agentUrl),
+      status: 200,
+      headers
+    }
   }
 
 
