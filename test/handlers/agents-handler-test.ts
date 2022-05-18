@@ -1,8 +1,8 @@
 import { AgentsHandler, HttpSolidContext, SessionManager, agentRedirectUrl, uuid2agentUrl } from "../../src";
 import { jest } from '@jest/globals';
 
-jest.mock('../../src/sai-session-storage', () => {
-  const originalModule = jest.requireActual('../../src/sai-session-storage') as object;
+jest.mock('../../src/session-manager', () => {
+  const originalModule = jest.requireActual('../../src/session-manager') as object;
 
   return {
     ...originalModule,

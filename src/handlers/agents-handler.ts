@@ -2,7 +2,7 @@ import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { SessionManager } from "../sai-session-storage";
+import { SessionManager } from "../session-manager";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 
 export class AgentsHandler extends HttpHandler {

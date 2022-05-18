@@ -1,7 +1,7 @@
 import { from, map, Observable, of } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-import { SessionManager } from "../sai-session-storage";
+import { SessionManager } from "../session-manager";
 import { HttpSolidContext } from "../models/http-solid-context";
 import { frontendUrl, uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 

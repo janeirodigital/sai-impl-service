@@ -4,8 +4,8 @@ import { InMemoryStorage, Session } from '@inrupt/solid-client-authn-node';
 import { HttpHandlerRequest } from '@digita-ai/handlersjs-http';
 import { HttpSolidContext, LoginHandler, agentUuid, agentRedirectUrl } from '../../src';
 
-import { SessionManager } from '../../src/sai-session-storage'
-jest.mock('../../src/sai-session-storage', () => {
+import { SessionManager } from '../../src/session-manager'
+jest.mock('../../src/session-manager', () => {
   return {
     SessionManager: jest.fn(() => {
       return {

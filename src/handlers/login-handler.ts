@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { from, map, Observable, of } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { Session } from "@inrupt/solid-client-authn-node";
-import { SessionManager } from "../sai-session-storage";
+import { SessionManager } from "../session-manager";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 import { HttpSolidContext } from "../models/http-solid-context";
 

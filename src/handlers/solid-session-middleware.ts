@@ -1,6 +1,6 @@
 import { MiddlewareHttpHandler } from "./middleware-http-handler";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { SessionManager } from "../sai-session-storage";
+import { SessionManager } from "../session-manager";
 import { from, map, Observable, of } from "rxjs";
 
 /**

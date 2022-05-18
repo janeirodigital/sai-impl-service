@@ -13,4 +13,4 @@ export * from "./handlers/url-encoded-body-parser";
 
 // Models
 export * from "./models/http-solid-context";
-export * from "./sai-session-storage";
+export * from "./session-manager";
