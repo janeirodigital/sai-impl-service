@@ -3,7 +3,7 @@ import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../sai-session-storage";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { frontendUrl, agentUrl, agentRedirectUrl } from "../url-templates";
+import { frontendUrl, uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 
 export class LoginRedirectHandler extends HttpHandler {
   constructor(
@@ -19,8 +19,8 @@ export class LoginRedirectHandler extends HttpHandler {
   }
 
   private async handleAsync(context: HttpSolidContext): Promise<HttpHandlerResponse> {
-    const agentUuid = context.request.parameters!.uuid
-    const webId = await this.sessionManager.getWebId(agentUrl(agentUuid))
+    const agentUrl = uuid2agentUrl(context.request.parameters!.uuid)
+    const webId = await this.sessionManager.getWebId(agentUrl)
 
     if (!webId) {
       return { body: {}, status: 404, headers: {} };
@@ -33,7 +33,7 @@ export class LoginRedirectHandler extends HttpHandler {
     }
 
     // TODO test if proper url is passed
-    await oidcSession.handleIncomingRedirect(agentRedirectUrl(agentUuid) + context.request.url.pathname);
+    await oidcSession.handleIncomingRedirect(agentRedirectUrl(agentUrl) + context.request.url.pathname);
 
     if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
       return { body: {}, status: 300, headers: { location: frontendUrl } };

@@ -1,4 +1,4 @@
-import { AgentsHandler, HttpSolidContext, SessionManager, agentRedirectUrl } from "../../src";
+import { AgentsHandler, HttpSolidContext, SessionManager, agentRedirectUrl, uuid2agentUrl } from "../../src";
 import { jest } from '@jest/globals';
 
 jest.mock('../../src/sai-session-storage', () => {
@@ -8,7 +8,7 @@ jest.mock('../../src/sai-session-storage', () => {
     ...originalModule,
     SessionManager: jest.fn(() => {
       return {
-        getFromUuid: jest.fn()
+        getFromAgentUrl: jest.fn()
       }
     })
   }
@@ -20,13 +20,14 @@ import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
 import { HttpHandlerRequest } from "@digita-ai/handlersjs-http";
 
 const uuid = '75340942-4225-42e0-b897-5f36278166de';
+const agentUrl = uuid2agentUrl(uuid)
 
 const manager = jest.mocked(new SessionManager(new InMemoryStorage()))
 let agentsHandler: AgentsHandler
 
 
 beforeEach(() => {
-  manager.getFromUuid.mockReset();
+  manager.getFromAgentUrl.mockReset();
   agentsHandler = new AgentsHandler(manager)
 })
 
@@ -54,8 +55,8 @@ describe('authenticated request', () => {
   test('application registration discovery', (done) => {
     const applicationRegistrationIri = 'https://some.example/application-registration'
 
-    manager.getFromUuid.mockImplementation(async (id) => {
-      expect(id).toBe(uuid)
+    manager.getFromAgentUrl.mockImplementation(async (url) => {
+      expect(url).toBe(agentUrl)
       return {
         webId,
         findApplicationRegistration: async (applicationId) => {
@@ -84,8 +85,8 @@ describe('authenticated request', () => {
     const differentWebId = 'https://different-user.example/'
     const socialAgentRegistrationIri = 'https://some.example/application-registration'
 
-    manager.getFromUuid.mockImplementation(async (id) => {
-      expect(id).toBe(uuid)
+    manager.getFromAgentUrl.mockImplementation(async (url) => {
+      expect(url).toBe(agentUrl)
       return {
         webId,
         findSocialAgentRegistration: async (webid) => {

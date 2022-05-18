@@ -17,7 +17,7 @@ jest.mock('@inrupt/solid-client-authn-node', () => {
 const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction<any>;
 
 import { SessionManager, getClientIdKey } from '../src/sai-session-storage';
-import { agentUrl } from '../src/url-templates'
+import { uuid2agentUrl } from '../src/url-templates'
 
 let manager: SessionManager
 
@@ -39,20 +39,22 @@ describe('getWebId', () => {
   });
 });
 
-describe('getFromUuid', () => {
+describe('getFromAgentUrl', () => {
   test('should try to get using correct WebId', async () => {
     const uuid = '8c4b1081-bc98-44ef-af57-271bac06d95f';
+    const agentUrl = uuid2agentUrl(uuid)
     const webId = 'https://alice.example/';
-    manager.storage.set(getClientIdKey(agentUrl(uuid)), webId)
+    manager.storage.set(getClientIdKey(agentUrl), webId)
     const getSpy = jest.spyOn(manager, 'get').mockImplementationOnce(async () => ({} as AuthorizationAgent));
-    await manager.getFromUuid(uuid);
+    await manager.getFromAgentUrl(agentUrl);
     expect(getSpy).toBeCalledTimes(1);
     expect(getSpy).toBeCalledWith(webId);
   });
 
   test('should return undefined when using unregistered clientId', async () => {
     const uuid = 'fff8be42-8946-4759-b758-40a026ac7a06';
-    const authAgent = await manager.getFromUuid(uuid);
+    const agentUrl = uuid2agentUrl(uuid)
+    const authAgent = await manager.getFromAgentUrl(agentUrl);
     expect(authAgent).toBeUndefined()
   });
 });

@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { agentUrl } from "./url-templates"
 
 type WebId = string;
 
@@ -29,7 +28,7 @@ export class SessionManager {
   async get(webId: string): Promise<AuthorizationAgent | undefined> {
     const cached = cache.get(webId);
     if (cached) return cached;
-    const oidcSession = await getSessionFromStorage(webId, this.storage);
+    const oidcSession = await this.getOidcSession(webId)
     if (oidcSession) {
       const saiSession = await buildSaiSession(oidcSession, oidcSession.info.clientAppId!);
       cache.set(webId, saiSession);
@@ -37,9 +36,12 @@ export class SessionManager {
     }
   }
 
-  async getFromUuid(uuid: string): Promise<AuthorizationAgent | undefined> {
-    const clientId = agentUrl(uuid);
-    const webId = await this.getWebId(clientId);
+  async getOidcSession(webId: string): Promise<Session | undefined> {
+    return getSessionFromStorage(webId, this.storage);
+  }
+
+  async getFromAgentUrl(agentUrl: string): Promise<AuthorizationAgent | undefined> {
+    const webId = await this.getWebId(agentUrl);
     return webId ? this.get(webId) : undefined;
   }
 

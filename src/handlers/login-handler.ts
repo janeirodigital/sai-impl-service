@@ -4,7 +4,7 @@ import { from, map, Observable, of } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../sai-session-storage";
-import { agentUrl, agentRedirectUrl } from "../url-templates";
+import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 import { HttpSolidContext } from "../models/http-solid-context";
 
 export class LoginHandler extends HttpHandler {
@@ -33,19 +33,29 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
-    const webId = context.authn!.webId
-    const agentUuid = randomUUID()
-    const clientId = agentUrl(agentUuid)
+    let clientId: string
 
-    const oidcSession = new Session({
-      storage: this.sessionManager.storage,
-    }, webId);
+    const webId = context.authn!.webId
+
+    // see if authorization agent exists for that WebID use it
+    const existingOidcSession  = await this.sessionManager.getOidcSession(webId)
+
+    if (existingOidcSession) {
+      clientId = existingOidcSession.info.clientAppId!
+    } else {
+      clientId = uuid2agentUrl(randomUUID())
+    }
+
+    const oidcSession = existingOidcSession ||
+      new Session({
+        storage: this.sessionManager.storage,
+      }, webId);
 
     await this.sessionManager.setClientId2WebIdMapping(clientId, webId)
 
     const completeRedirectUrl: string = await new Promise((resolve, reject) => {
       oidcSession.login({
-        redirectUrl: agentRedirectUrl(agentUuid),
+        redirectUrl: agentRedirectUrl(clientId),
         oidcIssuer: idp,
         clientName: process.env.APP_NAME,
         clientId,
@@ -54,7 +64,7 @@ export class LoginHandler extends HttpHandler {
         }
       })
     })
-    return { body: {}, status: 300, headers: { location: completeRedirectUrl } }
+    return { body: { redirectUrl: completeRedirectUrl }, status: 200, headers: {} }
 
   }
 
