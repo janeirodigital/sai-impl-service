@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router, Request, Response } from "express";
 import { getAccessConsents, getAccessNeeds, getApplications, getDescriptions } from "./services";
 

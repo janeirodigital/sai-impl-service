@@ -7,4 +7,8 @@ export interface HttpSolidContext extends HttpHandlerContext {
   sessionId?: string;
   oidcSession?: Session;
   saiSession?: AuthorizationAgent;
+  authn?: {
+    webId: string;
+    clientId?: string;
+  }
 }

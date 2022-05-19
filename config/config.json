@@ -26,8 +26,7 @@
           "handler": {
             "@type": "HttpSequenceHandler",
             "middleware": [
-              {"@type": "UrlEncodedBodyParser"},
-              {"@type": "CookieSessionMiddleware"},
+              {"@type": "AuthnMiddleware"},
               {
                 "@type": "SolidSessionMiddleware",
                 "manager": {"@id":"urn:ssv:SessionManager" }
@@ -52,6 +51,36 @@
                       ],
                       "handler": {
                         "@type": "LoginHandler",
+                        "sessionManager": { "@id": "urn:ssv:SessionManager" }
+                      }
+                    },
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path":  "/agents/:uuid",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "AgentsHandler",
+                        "sessionManager": { "@id": "urn:ssv:SessionManager" }
+                      }
+                    },
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path":  "/agents/:uuid/redirect",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginRedirectHandler",
                         "sessionManager": { "@id": "urn:ssv:SessionManager" }
                       }
                     }
