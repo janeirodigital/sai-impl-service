@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import path from "path";
 import { ComponentsManager, IComponentsManagerBuilderOptions } from "componentsjs";
 import { Server } from "@digita-ai/handlersjs-http";
@@ -18,7 +20,7 @@ export async function createServer(): Promise<Server> {
     logLevel: "debug",
   };
 
-  const configFile = path.join(modulePath, "config/config.json");
+  const configFile = path.join(modulePath, "config/alt-config.json");
 
   // Setup ComponentsJS
   const componentsManager = await ComponentsManager.build(managerProperties);

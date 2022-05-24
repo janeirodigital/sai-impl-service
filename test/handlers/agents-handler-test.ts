@@ -1,4 +1,12 @@
-import { AgentsHandler, HttpSolidContext, SessionManager, agentRedirectUrl, uuid2agentUrl } from "../../src";
+import {
+  AgentsHandler,
+  OidcContext,
+  SessionManager,
+  agentRedirectUrl,
+  uuid2agentUrl,
+  AuthnContext,
+  HttpSolidContext
+} from "../../src";
 import { jest } from '@jest/globals';
 
 jest.mock('../../src/session-manager', () => {

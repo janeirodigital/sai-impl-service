@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { InMemoryStorage, IStorage } from '@inrupt/solid-client-authn-node';
 import { HttpHandlerRequest } from '@digita-ai/handlersjs-http';
-import { HttpSolidContext, LoginRedirectHandler, frontendUrl } from '../../src';
+import { OidcContext, LoginRedirectHandler, frontendUrl } from '../../src';
 
 import { SessionManager } from '../../src/session-manager'
 jest.mock('../../src/session-manager', () => {
@@ -45,7 +45,7 @@ test('respond 404 if agent does not exist', (done) => {
     headers: {},
     parameters: { uuid }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpSolidContext;
+  const ctx = { request } as OidcContext;
 
   loginRedirectHandler.handle(ctx).subscribe(response => {
     expect(response.status).toBe(404)
@@ -58,7 +58,7 @@ test('respond 500 if session does not exist', (done) => {
     headers: {},
     parameters: { uuid }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpSolidContext;
+  const ctx = { request } as OidcContext;
 
   manager.getWebId.mockImplementationOnce(async (agentUrl: string) => {
     return aliceWebId
@@ -85,7 +85,7 @@ test('redirects to frontend after handing a valid redirect', (done) => {
       search: 'code=some-code&state=some-state'
     }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpSolidContext;
+  const ctx = { request } as OidcContext;
 
   manager.getWebId.mockImplementationOnce(async (agentUrl: string) => {
     return aliceWebId

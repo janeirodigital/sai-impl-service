@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { AuthnMiddleware, HttpSolidContext, baseUrl } from "../../src";
+import { AuthnContextHandler, OidcContext, baseUrl } from "../../src";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
 jest.mock('@solid/access-token-verifier', () => {
@@ -14,11 +14,11 @@ import { HttpHandlerRequest, HttpHandlerResponse } from "@digita-ai/handlersjs-h
 
 const url = '/some/';
 
-let authnMiddleware: AuthnMiddleware
+let authnContextHandler: AuthnContextHandler
 
 
 beforeEach(() => {
-  authnMiddleware = new AuthnMiddleware()
+  authnContextHandler = new AuthnContextHandler()
   mockedCreateSolidTokenVerifier.mockReset()
 })
 
@@ -27,9 +27,9 @@ describe('unauthenticated request', () => {
     const request = {
       headers: {}
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as HttpSolidContext;
+    const ctx = { request } as OidcContext;
 
-    authnMiddleware.handle(ctx).subscribe(nextContext => {
+    authnContextHandler.handle(ctx).subscribe(nextContext => {
       expect(nextContext.authn).toBeUndefined()
       done()
     })
@@ -44,9 +44,9 @@ test('should respond 401 when authorization is undefined and dpop is present', (
       DPoP: 'some-proof'
     }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpSolidContext;
+  const ctx = { request } as OidcContext;
 
-  authnMiddleware.handle(ctx).subscribe({
+  authnContextHandler.handle(ctx).subscribe({
     error: (response: HttpHandlerResponse) => {
       expect(response.status).toBe(400)
       done()
@@ -62,9 +62,9 @@ test('should respond 401 when dpop is undefined and authorization is present', (
       Authorization: 'DPoP some-token'
     }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpSolidContext;
+  const ctx = { request } as OidcContext;
 
-  authnMiddleware.handle(ctx).subscribe({
+  authnContextHandler.handle(ctx).subscribe({
     error: (response: HttpHandlerResponse) => {
       expect(response.status).toBe(400)
       done()
@@ -101,9 +101,9 @@ describe('authenticated request', () => {
         DPoP: dpopProof
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as HttpSolidContext;
+    const ctx = { request } as OidcContext;
 
-    authnMiddleware.handle(ctx).subscribe(nextContext => {
+    authnContextHandler.handle(ctx).subscribe(nextContext => {
       expect(nextContext.authn!.webId).toBe(webId)
       expect(nextContext.authn!.clientId).toBe(clientId)
       done()
@@ -127,9 +127,9 @@ describe('authenticated request', () => {
         DPoP: dpopProof
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as HttpSolidContext;
+    const ctx = { request } as OidcContext;
 
-    authnMiddleware.handle(ctx).subscribe({
+    authnContextHandler.handle(ctx).subscribe({
       error: response => {
         expect(response.status).toBe(401)
         done()

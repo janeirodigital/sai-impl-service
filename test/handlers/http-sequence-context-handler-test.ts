@@ -1,15 +1,15 @@
 import { HandlerArgumentError } from "@digita-ai/handlersjs-core";
-import { HttpHandler, HttpHandlerContext, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
+import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { Observable, of } from "rxjs";
-import { HttpSequenceHandler, HttpSolidContext, MiddlewareHttpHandler } from "../../src";
+import { HttpContextHandler, HttpSequenceContextHandler, OidcContext } from "../../src";
 
-interface TestHttpSolidContext extends HttpSolidContext {
+interface TestHttpSolidContext extends OidcContext {
   first: boolean;
   second: boolean;
   throw: boolean;
 }
 
-abstract class Boilerplate implements MiddlewareHttpHandler {
+abstract class Boilerplate implements HttpContextHandler {
   executed = false
   previousContext: TestHttpSolidContext = {} as TestHttpSolidContext
   handle(context: TestHttpSolidContext): Observable<TestHttpSolidContext> {
@@ -56,7 +56,7 @@ describe('constructor', () => {
   test('error is thrown when no middleware provided', (done) => {
     try {
       // @ts-ignore
-      new HttpSequenceHandler(undefined, undefined)
+      new HttpSequenceContextHandler(undefined, undefined)
     } catch(error) {
       expect(error).toBeInstanceOf(HandlerArgumentError)
        // @ts-ignore
@@ -72,7 +72,7 @@ describe('handle', () => {
     const secondMiddleware = new SecondMiddleware()
     const middlewares = [firstMiddleware, secondMiddleware]
     const httpHandler = new TestHandler();
-    const httpSequenceHandler = new HttpSequenceHandler<TestHttpSolidContext>(middlewares, httpHandler)
+    const httpSequenceHandler = new HttpSequenceContextHandler<TestHttpSolidContext>(middlewares)
 
     httpSequenceHandler.handle({} as TestHttpSolidContext).subscribe(response => {
       expect(firstMiddleware.executed).toBeTruthy()
@@ -92,7 +92,7 @@ describe('handle', () => {
     const secondMiddleware = new SecondMiddleware()
     const middlewares = [firstMiddleware, throwMiddleware, secondMiddleware]
     const httpHandler = new TestHandler();
-    const httpSequenceHandler = new HttpSequenceHandler<TestHttpSolidContext>(middlewares, httpHandler)
+    const httpSequenceHandler = new HttpSequenceContextHandler<TestHttpSolidContext>(middlewares)
 
     httpSequenceHandler.handle({} as TestHttpSolidContext).subscribe(response => {
       expect(firstMiddleware.executed).toBeTruthy()

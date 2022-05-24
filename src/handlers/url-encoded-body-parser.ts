@@ -1,8 +1,8 @@
 import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
-import { MiddlewareHttpHandler } from "./middleware-http-handler";
+import { HttpContextHandler } from "./middleware-http-handler";
 import { Observable, of } from "rxjs";
 
-export class UrlEncodedBodyParser implements MiddlewareHttpHandler {
+export class UrlEncodedBodyParser implements HttpContextHandler {
   public handle(context: HttpHandlerContext): Observable<HttpHandlerContext> {
     const body = decodeURIComponent(context.request.body);
 

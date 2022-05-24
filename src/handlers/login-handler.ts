@@ -1,11 +1,11 @@
-import 'dotenv/config';
+import "dotenv/config";
 import { randomUUID } from "crypto";
-import { from, map, Observable, of } from "rxjs";
+import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../session-manager";
-import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
-import { HttpSolidContext } from "../models/http-solid-context";
+import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
+import { AuthnContext } from "../models/http-solid-context";
 
 export class LoginHandler extends HttpHandler {
   constructor(
@@ -15,7 +15,7 @@ export class LoginHandler extends HttpHandler {
     console.log("LoginHandler::constructor");
   }
 
-  async handleAsync (context: HttpSolidContext): Promise<HttpHandlerResponse> {
+  async handleAsync (context: AuthnContext): Promise<HttpHandlerResponse> {
     if (!context.authn) {
       return {
         status: 401,
@@ -23,7 +23,7 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
-    const idp = context.request.body?.idp;
+    const idp = JSON.parse(context.request.body)['idp'];
     if (!idp) {
       return {
         body: { message: "No Identity or Identity Provider sent with the request" },
@@ -32,20 +32,21 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
-    let agentUrl: string
+    // const agentUrl: string
 
     const webId = context.authn!.webId
 
     // see if authorization agent exists for that WebID use it
     let oidcSession = await this.sessionManager.getOidcSession(webId)
 
-    if (oidcSession) {
-      agentUrl = oidcSession.info.clientAppId!
-    } else {
-      agentUrl = uuid2agentUrl(randomUUID())
+    // if (oidcSession && oidcSession.info.isLoggedIn) {
+    //   // SKIP
+    //   agentUrl = oidcSession.info.clientAppId!
+    // } else {
+      const agentUrl = uuid2agentUrl(randomUUID())
       oidcSession = new Session({ storage: this.sessionManager.storage, }, webId);
       await this.sessionManager.setAgentUrl2WebIdMapping(agentUrl, webId)
-    }
+    // }
 
     const completeRedirectUrl: string = await new Promise((resolve, reject) => {
       oidcSession!.login({
@@ -59,10 +60,9 @@ export class LoginHandler extends HttpHandler {
       })
     })
     return { body: { redirectUrl: completeRedirectUrl }, status: 200, headers: {} }
-
   }
 
-  handle(context: HttpSolidContext): Observable<HttpHandlerResponse> {
+  handle(context: AuthnContext): Observable<HttpHandlerResponse> {
     console.log("LoginHandler::handle");
     return from(this.handleAsync(context))
   }

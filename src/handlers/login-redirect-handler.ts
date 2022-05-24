@@ -32,7 +32,11 @@ export class LoginRedirectHandler extends HttpHandler {
       return { body: {}, status: 500, headers: {} };
     }
 
-    await oidcSession.handleIncomingRedirect(baseUrl + context.request.url.pathname + context.request.url.search);
+    try {
+      await oidcSession.handleIncomingRedirect(context.request.url.toString());
+    } catch (e: any) {
+      return { body: {message: e.message}, status: 500, headers: {} };
+    }
 
     if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
       return { body: {}, status: 300, headers: { location: frontendUrl } };

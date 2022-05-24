@@ -1,6 +1,10 @@
 import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
 import { Observable } from "rxjs";
+import { Handler } from "@digita-ai/handlersjs-core";
 
-export abstract class MiddlewareHttpHandler<C extends HttpHandlerContext = HttpHandlerContext> {
-  abstract handle(context: C): Observable<C>;
+/**
+ * Acts based on the given HttpHandlerContext.
+ */
+export abstract class HttpContextHandler<T extends HttpHandlerContext = HttpHandlerContext> extends Handler<T, T> {
+  abstract handle(context: T): Observable<T>;
 }

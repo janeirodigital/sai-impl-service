@@ -1,27 +1,27 @@
 import { from, Observable } from "rxjs";
 import { createSolidTokenVerifier, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
-import { HttpSolidContext } from "../models/http-solid-context";
-import { baseUrl } from "../url-templates"
-import { MiddlewareHttpHandler } from "./middleware-http-handler";
+import { AuthnContext } from "../models/http-solid-context";
+import { HttpContextHandler } from "./middleware-http-handler";
+import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
 
 /**
- * Uses  access-token-verifier and sets authn on the context if token was provided
- * context.autn {
+ * Uses  access-token-verifier and sets authn on the context if token was provided,
+ * throws a 400 response if the token is not provided or fails verification.
+ *
+ * context.authn {
  *   webId: string
  *   clientId: string
  * }
  */
-export class AuthnMiddleware implements MiddlewareHttpHandler {
+export class AuthnContextHandler implements HttpContextHandler {
 
-  handle(context: HttpSolidContext): Observable<HttpSolidContext> {
+  handle(context: HttpHandlerContext): Observable<AuthnContext> {
     return from(this.handleAsync(context))
   }
 
-  async handleAsync(context: HttpSolidContext): Promise<HttpSolidContext> {
-    const { headers: { Authorization: authorization, DPoP: dpop }, method } = context.request;
-    if (!authorization && !dpop) {
-      return context
-    }
+  async handleAsync(context: HttpHandlerContext): Promise<AuthnContext> {
+    // TODO check for alternative casing on the header names
+    const { headers: { authorization, dpop }, method } = context.request;
 
     if (!authorization || !dpop) {
       throw { headers: {}, status: 400 }
@@ -35,14 +35,14 @@ export class AuthnMiddleware implements MiddlewareHttpHandler {
         {
           header: dpop as string,
           method: method as RequestMethod,
-          url: `${baseUrl}${context.request.url}`,
+          url: context.request.url.toString(),
         }
       );
       return {
         ...context,
         authn: {
           webId: token.webid,
-          clientId: token.client_id
+          clientId: token.client_id,
         }
       }
     } catch (error: unknown) {
