@@ -20,7 +20,7 @@ export async function createServer(): Promise<Server> {
     logLevel: "debug",
   };
 
-  const configFile = path.join(modulePath, "config/alt-config.json");
+  const configFile = path.join(modulePath, "config/config.json");
 
   // Setup ComponentsJS
   const componentsManager = await ComponentsManager.build(managerProperties);
