@@ -16,14 +16,9 @@ export class LoginHandler extends HttpHandler {
   }
 
   async handleAsync (context: AuthnContext): Promise<HttpHandlerResponse> {
-    if (!context.authn) {
-      return {
-        status: 401,
-        headers: {},
-      };
-    }
-
     const idp = JSON.parse(context.request.body)['idp'];
+    console.log("LoginHandler::handleAsync  idp:", idp);
+
     if (!idp) {
       return {
         body: { message: "No Identity or Identity Provider sent with the request" },
@@ -32,21 +27,21 @@ export class LoginHandler extends HttpHandler {
       };
     }
 
-    // const agentUrl: string
+    let agentUrl: string
 
-    const webId = context.authn!.webId
+    const webId = context.authn.webId
 
     // see if authorization agent exists for that WebID use it
     let oidcSession = await this.sessionManager.getOidcSession(webId)
 
-    // if (oidcSession && oidcSession.info.isLoggedIn) {
-    //   // SKIP
-    //   agentUrl = oidcSession.info.clientAppId!
-    // } else {
-      const agentUrl = uuid2agentUrl(randomUUID())
+    if (oidcSession && oidcSession.info.isLoggedIn) {
+      // SKIP TODO redirectUrl content?
+      return { body: { redirectUrl: '' }, status: 200, headers: {} }
+    } else {
+      agentUrl = uuid2agentUrl(randomUUID())
       oidcSession = new Session({ storage: this.sessionManager.storage, }, webId);
       await this.sessionManager.setAgentUrl2WebIdMapping(agentUrl, webId)
-    // }
+    }
 
     const completeRedirectUrl: string = await new Promise((resolve, reject) => {
       oidcSession!.login({
@@ -58,7 +53,8 @@ export class LoginHandler extends HttpHandler {
           resolve(url)
         }
       })
-    })
+    });
+
     return { body: { redirectUrl: completeRedirectUrl }, status: 200, headers: {} }
   }
 

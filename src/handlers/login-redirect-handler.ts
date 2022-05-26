@@ -1,9 +1,9 @@
-import { from, map, Observable, of } from "rxjs";
+import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../session-manager";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { frontendUrl, uuid2agentUrl, baseUrl } from "../url-templates";
+import { frontendUrl, uuid2agentUrl } from "../url-templates";
 
 export class LoginRedirectHandler extends HttpHandler {
   constructor(
@@ -39,7 +39,7 @@ export class LoginRedirectHandler extends HttpHandler {
     }
 
     if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
-      return { body: {}, status: 300, headers: { location: frontendUrl } };
+      return { body: {}, status: 302, headers: { location: frontendUrl } };
     }
 
     // TODO unreachable point?

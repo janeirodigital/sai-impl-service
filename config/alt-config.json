@@ -67,11 +67,7 @@
                 "preResponseHandler": {
                   "@type": "HttpSequenceContextHandler",
                   "contextHandlers": [
-                    {"@type": "AuthnContextHandler"},
-                    {
-                      "@type": "OidcSessionContextHandler",
-                      "manager": {"@id":"urn:ssv:SessionManager" }
-                    }
+                    {"@type": "AuthnContextHandler"}
                   ]
                 },
                 "routes": [
@@ -86,7 +82,10 @@
                       }
                     ],
                     "handler":  {
-                      "@type":  "SessionCheckHandler"
+                      "@type":  "SessionCheckHandler",
+                      "storage": {
+                        "@id": "urn:ssv:RedisStorage"
+                      }
                     }
                   }
                 ]
