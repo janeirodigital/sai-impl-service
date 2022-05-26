@@ -6,6 +6,7 @@ import { Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../session-manager";
 import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
 import { AuthnContext } from "../models/http-solid-context";
+import { validateContentType } from "../utils/http-validators";
 
 export class LoginHandler extends HttpHandler {
   constructor(
@@ -16,8 +17,10 @@ export class LoginHandler extends HttpHandler {
   }
 
   async handleAsync (context: AuthnContext): Promise<HttpHandlerResponse> {
-    const idp = JSON.parse(context.request.body)['idp'];
-    console.log("LoginHandler::handleAsync  idp:", idp);
+
+    validateContentType(context, 'application/json');
+
+    const idp: string = context.request.body.idp;
 
     if (!idp) {
       return {
