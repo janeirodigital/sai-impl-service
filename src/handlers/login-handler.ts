@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { randomUUID } from "crypto";
 import { from, Observable } from "rxjs";
-import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
+import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { SessionManager } from "../session-manager";
 import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
@@ -20,14 +20,10 @@ export class LoginHandler extends HttpHandler {
 
     validateContentType(context, 'application/json');
 
-    const idp: string = context.request.body.idp;
+    const idp: string = context.request.body?.idp;
 
     if (!idp) {
-      return {
-        body: { message: "No Identity or Identity Provider sent with the request" },
-        status: 400,
-        headers: {},
-      };
+      throw new BadRequestHttpError('No Identity or Identity Provider sent with the request')
     }
 
     let agentUrl: string
@@ -46,7 +42,7 @@ export class LoginHandler extends HttpHandler {
       await this.sessionManager.setAgentUrl2WebIdMapping(agentUrl, webId)
     }
 
-    const completeRedirectUrl: string = await new Promise((resolve, reject) => {
+    const completeRedirectUrl: string = await new Promise((resolve) => {
       oidcSession!.login({
         redirectUrl: agentRedirectUrl(agentUrl),
         oidcIssuer: idp,

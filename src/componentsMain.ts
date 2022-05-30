@@ -4,6 +4,7 @@ import path from "path";
 import { ComponentsManager, IComponentsManagerBuilderOptions } from "componentsjs";
 import { Server } from "@digita-ai/handlersjs-http";
 import type { NodeHttpServer } from "@digita-ai/handlersjs-http";
+import { ConsoleLoggerFactory, getLoggerFor, setLogger, setLoggerFactory } from '@digita-ai/handlersjs-logging';
 
 export async function createServer(): Promise<Server> {
   // FIXME using path.dirname results in a url with a `file://` scheme which is not usable by the components
@@ -25,6 +26,9 @@ export async function createServer(): Promise<Server> {
   // Setup ComponentsJS
   const componentsManager = await ComponentsManager.build(managerProperties);
   await componentsManager.configRegistry.register(configFile);
+
+  setLoggerFactory(new ConsoleLoggerFactory());
+  setLogger(getLoggerFor('HTTP', 6, 6));
 
   const service = "urn:solid:authorization-agent:default:Service";
   return await componentsManager.instantiate<NodeHttpServer>(service);
