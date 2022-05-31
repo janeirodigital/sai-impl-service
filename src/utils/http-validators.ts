@@ -2,8 +2,7 @@ import { BadRequestHttpError, HttpHandlerContext } from "@digita-ai/handlersjs-h
 
 export const validateContentType = (ctx: HttpHandlerContext, contentType: string): void => {
   if (
-    ctx.request.headers['content-type'] &&
-    ctx.request.headers['content-type'].toLowerCase() === contentType.toLowerCase()
+    ctx.request.headers['content-type']?.startsWith(contentType.toLowerCase())
   ) {
     return;
   }
