@@ -2,7 +2,7 @@ import { from, Observable } from "rxjs";
 import { createSolidTokenVerifier, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
 import { AuthnContext } from "../models/http-solid-context";
 import { HttpContextHandler } from "./middleware-http-handler";
-import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import { BadRequestHttpError, HttpHandlerContext, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 
 /**
  * Uses  access-token-verifier and sets authn on the context if token was provided,
@@ -24,7 +24,7 @@ export class AuthnContextHandler implements HttpContextHandler {
     const { headers: { authorization, dpop }, method } = context.request;
 
     if (!authorization || !dpop) {
-      throw { headers: {}, status: 400 }
+      throw new BadRequestHttpError();
     }
 
     const verifier = createSolidTokenVerifier()
@@ -48,7 +48,7 @@ export class AuthnContextHandler implements HttpContextHandler {
     } catch (error: unknown) {
       // TODO: add logging
       // const message = `Error verifying WebID via DPoP-bound access token: ${(error as Error).message}`;
-      throw { status: 401, headers: {} }
+      throw new UnauthorizedHttpError();
     }
   }
 }

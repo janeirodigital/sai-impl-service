@@ -1,109 +1,65 @@
-import { HandlerArgumentError } from "@digita-ai/handlersjs-core";
-import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
-import { Observable, of } from "rxjs";
-import { HttpContextHandler, HttpSequenceContextHandler, OidcContext } from "../../src";
+import { BadRequestHttpError, HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import { of } from "rxjs";
+import { HttpSequenceContextHandler } from "../../src";
 
-interface TestHttpSolidContext extends OidcContext {
-  first: boolean;
-  second: boolean;
-  throw: boolean;
-}
+describe('HttpSequenceContextHandler', () => {
 
-abstract class Boilerplate implements HttpContextHandler {
-  executed = false
-  previousContext: TestHttpSolidContext = {} as TestHttpSolidContext
-  handle(context: TestHttpSolidContext): Observable<TestHttpSolidContext> {
-    this.executed = true
-    this.previousContext = context
-    return this.spy(context)
-  }
-  abstract spy(context: TestHttpSolidContext): Observable<TestHttpSolidContext>;
-}
-
-class FirstMiddleware extends Boilerplate {
-  spy(context: TestHttpSolidContext): Observable<TestHttpSolidContext> {
-    return new Observable<TestHttpSolidContext>(subscribe => {
-      setTimeout(() => subscribe.next({ ...context, first: true }), 100)
-    })
-  }
-}
-
-class SecondMiddleware extends Boilerplate {
-  spy(context: TestHttpSolidContext): Observable<TestHttpSolidContext> {
-    return of({ ...context, second: true })
-  }
-}
-
-class ThrowMiddleware extends Boilerplate {
-  spy(context: TestHttpSolidContext): Observable<TestHttpSolidContext> {
-    return new Observable<TestHttpSolidContext>(subscribe => {
-      throw { status: 500, headers: {} }
-    })
-  }
-}
-
-class TestHandler extends HttpHandler<TestHttpSolidContext> {
-  executed = false
-  previousContext: TestHttpSolidContext = {} as TestHttpSolidContext
-  handle(context: TestHttpSolidContext): Observable<HttpHandlerResponse> {
-    this.executed = true
-    this.previousContext = context
-    return of ( { status: 200, body: {}, headers: {} } as HttpHandlerResponse)
-  }
-}
-
-describe('constructor', () => {
-  test('error is thrown when no middleware provided', (done) => {
-    try {
-      // @ts-ignore
-      new HttpSequenceContextHandler(undefined, undefined)
-    } catch(error) {
-      expect(error).toBeInstanceOf(HandlerArgumentError)
-       // @ts-ignore
-      expect(error.message).toMatch('Argument handlers should be set.')
-      done()
+  test("executes all context handlers once on each request", (done) => {
+    const firstHandler = {
+      handle: jest.fn().mockReturnValueOnce(of({first: true})),
     }
-  })
-})
 
-describe('handle', () => {
-  test('executes middlewares sequentially passing modified context', (done) => {
-    const firstMiddleware = new FirstMiddleware()
-    const secondMiddleware = new SecondMiddleware()
-    const middlewares = [firstMiddleware, secondMiddleware]
-    const httpHandler = new TestHandler();
-    const httpSequenceHandler = new HttpSequenceContextHandler<TestHttpSolidContext>(middlewares)
+    const secondHandler = {
+      handle: jest.fn().mockReturnValueOnce(of({second: true})),
+    }
 
-    httpSequenceHandler.handle({} as TestHttpSolidContext).subscribe(response => {
-      expect(firstMiddleware.executed).toBeTruthy()
-      expect(secondMiddleware.executed).toBeTruthy()
-      expect(httpHandler.executed).toBeTruthy()
+    const seqHandler = new HttpSequenceContextHandler([firstHandler, secondHandler]);
+    seqHandler.handle({} as HttpHandlerContext).subscribe(() => {
+      expect(firstHandler.handle.mock.calls.length).toEqual(1)
+      expect(secondHandler.handle.mock.calls.length).toEqual(1)
+      done();
+    })
+  });
 
-      expect(secondMiddleware.previousContext).toEqual({first: true})
-      expect(httpHandler.previousContext).toEqual({first: true, second: true})
-      expect(response).toEqual({ status: 200, body: {}, headers: {} })
-      done()
+  test("executes context handlers in the same order as passed in the constructors", done => {
+    const firstHandler = {
+      handle: jest.fn().mockImplementation((ctx: any) => of({...ctx, pristine: false, first: true}))
+    }
+
+    const secondHandler = {
+      handle: jest.fn().mockImplementation((ctx: any) => of({...ctx, pristine: true, second: true}))
+    }
+
+    const seqHandler = new HttpSequenceContextHandler([firstHandler, secondHandler]);
+
+    seqHandler.handle({pristine: true} as unknown as HttpHandlerContext).subscribe((nextContext) => {
+      expect(firstHandler.handle.mock.calls[0][0]['pristine']).toBe(true);
+      expect(secondHandler.handle.mock.calls[0][0]['pristine']).toBe(false);
+      expect(nextContext).toEqual({pristine: true, first: true, second: true});
+      done();
     })
   })
 
-  test('when previous middleware throws second is not executed', (done) => {
-    const firstMiddleware = new FirstMiddleware()
-    const throwMiddleware = new ThrowMiddleware()
-    const secondMiddleware = new SecondMiddleware()
-    const middlewares = [firstMiddleware, throwMiddleware, secondMiddleware]
-    const httpHandler = new TestHandler();
-    const httpSequenceHandler = new HttpSequenceContextHandler<TestHttpSolidContext>(middlewares)
-
-    httpSequenceHandler.handle({} as TestHttpSolidContext).subscribe(response => {
-      expect(firstMiddleware.executed).toBeTruthy()
-      expect(throwMiddleware.executed).toBeTruthy()
-      expect(secondMiddleware.executed).toBeFalsy()
-      expect(httpHandler.executed).toBeFalsy()
-
-      expect(throwMiddleware.previousContext).toEqual({first: true})
-
-      expect(response).toEqual({ status: 500, headers: {} })
-      done()
+  test("aborts if any handler throws", done => {
+    const firstHandler = {
+      handle: jest.fn().mockImplementation((ctx: any) => of({...ctx, pristine: false, first: true}))
+    }
+    const secondHandler = {
+      handle: jest.fn().mockImplementation((ctx: any) => {
+        throw new BadRequestHttpError();
+      })
+    }
+    const thirdHandler = {
+      handle: jest.fn().mockImplementation((ctx: any) => of({...ctx, pristine: false, third: true}))
+    }
+    const seqHandler = new HttpSequenceContextHandler([firstHandler, secondHandler, thirdHandler]);
+    seqHandler.handle({pristine: true} as unknown as HttpHandlerContext).subscribe({
+      error(e: Error) {
+        expect(firstHandler.handle.mock.calls[0][0]['pristine']).toBe(true);
+        expect(e).toBeInstanceOf(BadRequestHttpError);
+        expect(thirdHandler.handle.mock.calls.length).toEqual(0);
+        done()
+      }
     })
   })
 })

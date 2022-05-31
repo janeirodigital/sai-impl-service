@@ -23,11 +23,6 @@ export class HttpSequenceContextHandler<T extends HttpHandlerContext = HttpHandl
       )
     }
 
-    return observable.pipe(
-      catchError(err => {
-        // TODO if (err instanceof HttpErrorResponse)
-        return of(err)
-      })
-    )
+    return observable;
   }
 }

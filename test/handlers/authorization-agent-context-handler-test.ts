@@ -1,5 +1,6 @@
 import { AuthnContext, AuthorizationAgentContextHandler, SessionManager } from "../../src";
 import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
+import { InternalServerError, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 
 jest.mock("../../src/session-manager");
 jest.mock("@inrupt/solid-client-authn-node");
@@ -12,17 +13,17 @@ describe("AuthorizationAgentContextHandler", () => {
     authorizationAgentContextHandler = new AuthorizationAgentContextHandler(manager);
   });
 
-  test("authorizationAgentContextHandler throws if the ctx does not provide a webid", (done) => {
+  test("throws with UnauthorizedRequest if the ctx does not provide a webid", (done) => {
     const ctx = { authn: { webId: undefined } } as unknown as AuthnContext;
     authorizationAgentContextHandler.handle(ctx).subscribe({
       error(e: Error) {
-        expect(e.message).toEqual("Authentication not provided");
+        expect(e).toBeInstanceOf(UnauthorizedHttpError);
         done();
       }
     });
   });
 
-  test("authorizationAgentContextHandler retrieves the right session from manager", (done) => {
+  test("retrieves the right session from manager", (done) => {
     manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
 
     const webId = "http://me.id";
@@ -33,14 +34,28 @@ describe("AuthorizationAgentContextHandler", () => {
     });
   });
 
-  test("authorizationAgentContextHandler adds the session to the new context", (done) => {
+  test("adds the session to the new context", (done) => {
     manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
     const webId = "http://me.id";
 
     const ctx = { authn: { webId } } as AuthnContext;
-    authorizationAgentContextHandler.handle(ctx).subscribe((innerCtx) => {
-      expect(innerCtx.saiSession).toEqual(Object());
+    authorizationAgentContextHandler.handle(ctx).subscribe((nextCtx) => {
+      expect(nextCtx.saiSession).toEqual(Object());
       done();
+    });
+  });
+
+  test("throws with InternalServerError if the session is not found", (done) => {
+    manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(undefined));
+    const webId = "http://me.id";
+
+    const ctx = { authn: { webId } } as AuthnContext;
+
+    authorizationAgentContextHandler.handle(ctx).subscribe({
+      error(e: Error) {
+        expect(e).toBeInstanceOf(InternalServerError);
+        done();
+      }
     });
   });
 });
