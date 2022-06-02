@@ -11,7 +11,7 @@
       "@type": "SessionManager",
       "storage": {
         "@id": "urn:ssv:RedisStorage",
-        "@type":"RedisSolidStorage"
+        "@type": "RedisSolidStorage"
       }
     },
     {
@@ -24,100 +24,114 @@
         "httpHandler": {
           "@type": "HttpCorsRequestHandler",
           "handler": {
-            "@type": "RoutedHttpRequestHandler",
-            "handlerControllerList": [
-              {
-                "@type": "HttpHandlerController",
-                "label": "Static Id Document Controller",
-                "routes": [
-                  {
-                    "@type":  "HttpHandlerRoute",
-                    "path":   "/agents/:uuid",
-                    "operations":  [
-                      {
-                        "@type":  "HttpHandlerOperation",
-                        "method":  "GET",
-                        "publish":  false
+            "@type": "ErrorHandler",
+            "nestedHandler": {
+              "@type": "RoutedHttpRequestHandler",
+              "handlerControllerList": [
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "Static Id Document Controller",
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/agents/:uuid",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "AgentsHandler",
+                        "sessionManager": {
+                          "@id": "urn:ssv:SessionManager"
+                        }
                       }
-                    ],
-                    "handler":  {
-                      "@type":  "AgentsHandler",
-                      "sessionManager":  { "@id": "urn:ssv:SessionManager" }
-                    }
-                  },{
-                    "@type":  "HttpHandlerRoute",
-                    "path":   "/agents/:uuid/redirect",
-                    "operations":  [
-                      {
-                        "@type":  "HttpHandlerOperation",
-                        "method":  "GET",
-                        "publish":  false
+                    },
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/agents/:uuid/redirect",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginRedirectHandler",
+                        "sessionManager": {
+                          "@id": "urn:ssv:SessionManager"
+                        }
                       }
-                    ],
-                    "handler":  {
-                      "@type":  "LoginRedirectHandler",
-                      "sessionManager":  { "@id": "urn:ssv:SessionManager" }
                     }
-                  }
-                ]
-              },
-              {
-                "@type": "HttpHandlerController",
-                "label": "SessionCheck Controller",
-                "preResponseHandler": {
-                  "@type": "HttpSequenceContextHandler",
-                  "contextHandlers": [
-                    {"@type": "AuthnContextHandler"}
                   ]
                 },
-                "routes": [
-                  {
-                    "@type":  "HttpHandlerRoute",
-                    "path":   "/session",
-                    "operations":  [
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "SessionCheck Controller",
+                  "preResponseHandler": {
+                    "@type": "HttpSequenceContextHandler",
+                    "contextHandlers": [
                       {
-                        "@type":  "HttpHandlerOperation",
-                        "method":  "GET",
-                        "publish":  false
+                        "@type": "AuthnContextHandler"
                       }
-                    ],
-                    "handler":  {
-                      "@type":  "SessionCheckHandler",
-                      "storage": {
-                        "@id": "urn:ssv:RedisStorage"
+                    ]
+                  },
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/session",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "SessionCheckHandler",
+                        "storage": {
+                          "@id": "urn:ssv:RedisStorage"
+                        }
                       }
                     }
-                  }
-                ]
-              },
-              {
-                "@type": "HttpHandlerController",
-                "label": "Default Controller",
-                "preResponseHandler": {
-                  "@type": "HttpSequenceContextHandler",
-                  "contextHandlers": [
-                    {"@type": "AuthnContextHandler"}
                   ]
                 },
-                "routes": [
-                  {
-                    "@type":  "HttpHandlerRoute",
-                    "path":   "/login",
-                    "operations":  [
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "Default Controller",
+                  "preResponseHandler": {
+                    "@type": "HttpSequenceContextHandler",
+                    "contextHandlers": [
                       {
-                        "@type":  "HttpHandlerOperation",
-                        "method":  "POST",
-                        "publish":  false
+                        "@type": "AuthnContextHandler"
                       }
-                    ],
-                    "handler":  {
-                      "@type":  "LoginHandler",
-                      "sessionManager":  { "@id": "urn:ssv:SessionManager" }
+                    ]
+                  },
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/login",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "POST",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginHandler",
+                        "sessionManager": {
+                          "@id": "urn:ssv:SessionManager"
+                        }
+                      }
                     }
-                  }
-                ]
-              }
-            ]
+                  ]
+                }
+              ]
+            }
           }
         }
       }
