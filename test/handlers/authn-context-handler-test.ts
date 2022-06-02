@@ -1,7 +1,8 @@
 import { jest } from '@jest/globals';
-import { AuthnContextHandler, OidcContext, baseUrl } from "../../src";
+import { AuthnContextHandler } from "../../src";
 
-import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
+import { createSolidTokenVerifier, SolidAccessTokenPayload } from '@solid/access-token-verifier';
+
 jest.mock('@solid/access-token-verifier', () => {
   return {
     createSolidTokenVerifier: jest.fn()
@@ -10,7 +11,11 @@ jest.mock('@solid/access-token-verifier', () => {
 
 const mockedCreateSolidTokenVerifier = jest.mocked(createSolidTokenVerifier)
 
-import { HttpHandlerRequest, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
+import {
+  BadRequestHttpError, HttpError,
+  HttpHandlerContext,
+  HttpHandlerRequest, UnauthorizedHttpError
+} from "@digita-ai/handlersjs-http";
 
 const url = '/some/';
 
@@ -22,118 +27,119 @@ beforeEach(() => {
   mockedCreateSolidTokenVerifier.mockReset()
 })
 
-describe('unauthenticated request', () => {
-  test('should not set authn on the context', (done) => {
+describe('Unauthenticated request', () => {
+  test('should throw with BadRequest if no authentication is provided', (done) => {
     const request = {
       headers: {}
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as OidcContext;
+    const ctx = { request } as HttpHandlerContext;
 
-    authnContextHandler.handle(ctx).subscribe(nextContext => {
-      expect(nextContext.authn).toBeUndefined()
-      done()
+    authnContextHandler.handle(ctx).subscribe(
+      {
+        error(e: HttpError) {
+          expect(e).toBeInstanceOf(BadRequestHttpError);
+          done();
+      }
+    })
+  });
+
+  test('should throw with BadRequest if only DPoP headers are provided', (done) => {
+    const request = {
+      url,
+      method: 'GET',
+      headers: {
+        DPoP: 'some-proof'
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request } as HttpHandlerContext;
+
+    authnContextHandler.handle(ctx).subscribe({
+      error: (e: HttpError) => {
+        expect(e).toBeInstanceOf(BadRequestHttpError);
+        done();
+      }
+    })
+  });
+
+  test('should throw with BadRequest when `DPoP` is not present and `authorization` is present', (done) => {
+    const request = {
+      url,
+      method: 'GET',
+      headers: {
+        Authorization: 'DPoP some-token'
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request } as HttpHandlerContext;
+
+    authnContextHandler.handle(ctx).subscribe({
+      error: (e: HttpError) => {
+        expect(e).toBeInstanceOf(BadRequestHttpError);
+        done()
+      }
+    })
+  });
+
+  test('should throw with UnauthorizedRequest when verification of DPoP-bound access token fails', (done) => {
+    const authorization = 'DPoP some-token'
+    const dpopProof = 'some-proof'
+
+    mockedCreateSolidTokenVerifier.mockImplementation(() => {
+      return async function verifier() {
+        return Promise.reject(new Error());
+      }
+    })
+
+    const request = {
+      url,
+      method: 'GET',
+      // TODO: check if handler makes headers lowercase
+      headers: {
+        authorization,
+        dpop: dpopProof
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request } as HttpHandlerContext;
+
+    authnContextHandler.handle(ctx).subscribe({
+      error(e: HttpError) {
+        expect(e).toBeInstanceOf(UnauthorizedHttpError);
+        done()
+      }
     })
   });
 });
 
-test('should respond 401 when authorization is undefined and dpop is present', (done) => {
-  const request = {
-    url,
-    method: 'GET',
-    headers: {
-      DPoP: 'some-proof'
-    }
-  } as unknown as HttpHandlerRequest
-  const ctx = { request } as OidcContext;
-
-  authnContextHandler.handle(ctx).subscribe({
-    error: (response: HttpHandlerResponse) => {
-      expect(response.status).toBe(400)
-      done()
-    }
-  })
-});
-
-test('should respond 401 when dpop is undefined and authorization is present', (done) => {
-  const request = {
-    url,
-    method: 'GET',
-    headers: {
-      Authorization: 'DPoP some-token'
-    }
-  } as unknown as HttpHandlerRequest
-  const ctx = { request } as OidcContext;
-
-  authnContextHandler.handle(ctx).subscribe({
-    error: (response: HttpHandlerResponse) => {
-      expect(response.status).toBe(400)
-      done()
-    }
-  })
-});
-
-describe('authenticated request', () => {
+describe('Authenticated request', () => {
   const authorization = 'DPoP some-token'
   const dpopProof = 'some-proof'
   const webId = 'https://user.example/'
   const clientId = 'https://client.example/'
 
   test('should set proper authn on the context', (done) => {
-    const applicationRegistrationIri = 'https://some.example/application-registration'
-
     mockedCreateSolidTokenVerifier.mockImplementation(() => {
-      return async function verifier (authorizationHeader, dpop) {
-        expect(authorizationHeader).toBe(authorization)
-        expect(dpop).toEqual({
-          header: dpopProof,
-          method: 'GET',
-          url: `${baseUrl}${url}`
-        })
-        return { webid: webId, client_id: clientId } as SolidAccessTokenPayload
-      } as SolidTokenVerifierFunction
+      const response = {webid: webId, client_id: clientId} as SolidAccessTokenPayload;
+      return async function verifier () {
+        return Promise.resolve(response);
+      };
     })
+
     const request = {
       url,
       method: 'GET',
-      // TODO: check if handler makes headers lowercased
+      // TODO: check if handler makes headers lowercase
       headers: {
-        Authorization: authorization,
-        DPoP: dpopProof
+        authorization,
+        dpop: dpopProof
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as OidcContext;
+    const ctx = { request } as HttpHandlerContext;
 
     authnContextHandler.handle(ctx).subscribe(nextContext => {
-      expect(nextContext.authn!.webId).toBe(webId)
-      expect(nextContext.authn!.clientId).toBe(clientId)
+      expect(mockedCreateSolidTokenVerifier.mock.calls.length).toEqual(1);
+      expect(nextContext.authn.webId).toBe(webId)
+      expect(nextContext.authn.clientId).toBe(clientId)
       done()
     })
   });
 
-  test('should respond 401 when verification of DPoP-bound access token fails', (done) => {
-    const socialAgentRegistrationIri = 'https://some.example/application-registration'
-    mockedCreateSolidTokenVerifier.mockImplementation(() => {
-      return async function verifier() {
-        throw new Error('boom')
-      }
-    })
-
-    const request = {
-      url,
-      method: 'GET',
-      // TODO: check if handler makes headers lowercased
-      headers: {
-        Authorization: authorization,
-        DPoP: dpopProof
-      }
-    } as unknown as HttpHandlerRequest
-    const ctx = { request } as OidcContext;
-
-    authnContextHandler.handle(ctx).subscribe({
-      error: response => {
-        expect(response.status).toBe(401)
-        done()
-      }
-    })
-  });
 });
