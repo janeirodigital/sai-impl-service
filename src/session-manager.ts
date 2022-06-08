@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import { ISessionManager } from "./interfaces/i-session-manager";
 
 type WebId = string;
 
@@ -22,7 +23,7 @@ async function buildSaiSession(
   });
 }
 
-export class SessionManager {
+export class SessionManager implements ISessionManager {
   constructor(public storage: IStorage) {}
 
   async getSaiSession(webId: string): Promise<AuthorizationAgent | undefined> {

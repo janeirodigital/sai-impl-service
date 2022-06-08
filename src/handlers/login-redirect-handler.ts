@@ -1,13 +1,13 @@
 import { from, Observable } from "rxjs";
-import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
+import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-import { SessionManager } from "../session-manager";
 import { HttpSolidContext } from "../models/http-solid-context";
 import { frontendUrl, uuid2agentUrl } from "../url-templates";
+import { ISessionManager } from "../interfaces/i-session-manager";
 
 export class LoginRedirectHandler extends HttpHandler {
   constructor(
-    private sessionManager: SessionManager
+    private sessionManager: ISessionManager
   ) {
     super();
     console.log("LoginRedirectHandler::constructor");
@@ -23,7 +23,7 @@ export class LoginRedirectHandler extends HttpHandler {
     const webId = await this.sessionManager.getWebId(agentUrl)
 
     if (!webId) {
-      return { body: {}, status: 404, headers: {} };
+      throw new NotFoundHttpError()
     }
 
     const oidcSession = await getSessionFromStorage(webId, this.sessionManager.storage);

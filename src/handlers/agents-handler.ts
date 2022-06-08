@@ -2,12 +2,12 @@ import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { HttpSolidContext } from "../models/http-solid-context";
-import { SessionManager } from "../session-manager";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
+import { ISessionManager } from "../interfaces/i-session-manager";
 
 export class AgentsHandler extends HttpHandler {
   constructor(
-    private sessionManager: SessionManager,
+    private sessionManager: ISessionManager,
   ) {
     super();
   }

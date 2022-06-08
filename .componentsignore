@@ -1,4 +1,5 @@
 
 [
-    "IStorage"
+    "IStorage",
+    "ISessionManager"
 ]

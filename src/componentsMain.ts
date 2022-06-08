@@ -21,7 +21,7 @@ export async function createServer(): Promise<Server> {
     logLevel: "debug",
   };
 
-  const configFile = path.join(modulePath, "config/config.json");
+  const configFile = path.join(modulePath, "config/development.json");
 
   // Setup ComponentsJS
   const componentsManager = await ComponentsManager.build(managerProperties);

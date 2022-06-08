@@ -1,10 +1,8 @@
 import {
   AgentsHandler,
-  OidcContext,
   SessionManager,
   agentRedirectUrl,
   uuid2agentUrl,
-  AuthnContext,
   HttpSolidContext
 } from "../../src";
 import { jest } from '@jest/globals';

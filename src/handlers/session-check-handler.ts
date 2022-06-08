@@ -1,7 +1,8 @@
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { from, Observable } from "rxjs";
 import { AuthnContext } from "../models/http-solid-context";
-import { getSessionFromStorage, IStorage } from "@inrupt/solid-client-authn-node";
+import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
+import { ISessionManager } from "../interfaces/i-session-manager";
 
 
 /**
@@ -10,7 +11,7 @@ import { getSessionFromStorage, IStorage } from "@inrupt/solid-client-authn-node
 export class SessionCheckHandler implements HttpHandler {
 
   constructor(
-    private storage: IStorage,
+    private sessionManager: ISessionManager,
   ) {}
 
   handle(ctx: AuthnContext): Observable<HttpHandlerResponse> {
@@ -19,7 +20,7 @@ export class SessionCheckHandler implements HttpHandler {
 
   private async handleAsync(ctx: AuthnContext): Promise<HttpHandlerResponse> {
 
-    const session = await getSessionFromStorage(ctx.authn.webId, this.storage);
+    const session = await getSessionFromStorage(ctx.authn.webId, this.sessionManager.storage);
     const found = !!(session && session.info.isLoggedIn);
 
     return {

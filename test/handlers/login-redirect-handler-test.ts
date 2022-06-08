@@ -20,7 +20,6 @@ let loginRedirectHandler: LoginRedirectHandler
 const manager = jest.mocked(new SessionManager(new InMemoryStorage()))
 
 import { getSessionFromStorage } from '@inrupt/solid-client-authn-node';
-import { url } from 'inspector';
 jest.mock('@inrupt/solid-client-authn-node', () => {
   const originalModule = jest.requireActual('@inrupt/solid-client-authn-node') as object;
 
