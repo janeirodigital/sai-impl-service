@@ -1,7 +1,7 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-import { HttpSolidContext } from "../models/http-solid-context";
+import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
 import { frontendUrl, uuid2agentUrl } from "../url-templates";
 import { ISessionManager } from "../interfaces/i-session-manager";
 
@@ -12,13 +12,13 @@ export class LoginRedirectHandler extends HttpHandler {
     super();
     console.log("LoginRedirectHandler::constructor");
   }
-  handle(context: HttpSolidContext): Observable<HttpHandlerResponse> {
+  handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
     console.log("LoginRedirectHandler::handle");
     return from(this.handleAsync(context))
 
   }
 
-  private async handleAsync(context: HttpSolidContext): Promise<HttpHandlerResponse> {
+  private async handleAsync(context: HttpHandlerContext): Promise<HttpHandlerResponse> {
     const agentUrl = uuid2agentUrl(context.request.parameters!.uuid)
     const webId = await this.sessionManager.getWebId(agentUrl)
 
@@ -33,6 +33,7 @@ export class LoginRedirectHandler extends HttpHandler {
     }
 
     try {
+      console.log(context.request.url)
       await oidcSession.handleIncomingRedirect(context.request.url.toString());
     } catch (e: any) {
       return { body: {message: e.message}, status: 500, headers: {} };

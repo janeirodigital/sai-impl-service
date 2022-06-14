@@ -34,8 +34,9 @@ export class LoginHandler extends HttpHandler {
     let oidcSession = await this.sessionManager.getOidcSession(webId)
 
     if (oidcSession && oidcSession.info.isLoggedIn) {
-      // SKIP TODO redirectUrl content?
-      return { body: { redirectUrl: '' }, status: 200, headers: {} }
+      return { status: 204, headers: {} }
+    } else if (oidcSession) {
+      agentUrl = oidcSession.info.clientAppId!
     } else {
       agentUrl = uuid2agentUrl(randomUUID())
       oidcSession = new Session({ storage: this.sessionManager.storage, }, webId);

@@ -37,7 +37,7 @@ describe('Unauthenticated request', () => {
     authnContextHandler.handle(ctx).subscribe(
       {
         error(e: HttpError) {
-          expect(e).toBeInstanceOf(BadRequestHttpError);
+          expect(e).toBeInstanceOf(UnauthorizedHttpError);
           done();
       }
     })
@@ -48,7 +48,7 @@ describe('Unauthenticated request', () => {
       url,
       method: 'GET',
       headers: {
-        DPoP: 'some-proof'
+        dpop: 'some-proof'
       }
     } as unknown as HttpHandlerRequest
     const ctx = { request } as HttpHandlerContext;
@@ -66,7 +66,7 @@ describe('Unauthenticated request', () => {
       url,
       method: 'GET',
       headers: {
-        Authorization: 'DPoP some-token'
+        authorization: 'DPoP some-token'
       }
     } as unknown as HttpHandlerRequest
     const ctx = { request } as HttpHandlerContext;

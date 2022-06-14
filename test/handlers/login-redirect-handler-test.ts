@@ -1,7 +1,12 @@
 import { jest } from '@jest/globals';
 import { InMemoryStorage, IStorage } from '@inrupt/solid-client-authn-node';
-import { HttpHandlerRequest } from '@digita-ai/handlersjs-http';
-import { OidcContext, LoginRedirectHandler, frontendUrl } from '../../src';
+import {
+  HttpError,
+  HttpHandlerContext,
+  HttpHandlerRequest, NotFoundHttpError
+} from "@digita-ai/handlersjs-http";
+
+import { LoginRedirectHandler, frontendUrl, baseUrl } from '../../src';
 
 import { SessionManager } from '../../src/session-manager'
 jest.mock('../../src/session-manager', () => {
@@ -44,11 +49,13 @@ test('respond 404 if agent does not exist', (done) => {
     headers: {},
     parameters: { uuid }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as OidcContext;
+  const ctx = { request } as HttpHandlerContext;
 
-  loginRedirectHandler.handle(ctx).subscribe(response => {
-    expect(response.status).toBe(404)
-    done()
+  loginRedirectHandler.handle(ctx).subscribe({
+    error: (e: HttpError) => {
+      expect(e).toBeInstanceOf(NotFoundHttpError);
+      done();
+    }
   })
 })
 
@@ -57,7 +64,7 @@ test('respond 500 if session does not exist', (done) => {
     headers: {},
     parameters: { uuid }
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as OidcContext;
+  const ctx = { request } as HttpHandlerContext;
 
   manager.getWebId.mockImplementationOnce(async (agentUrl: string) => {
     return aliceWebId
@@ -76,15 +83,14 @@ test('respond 500 if session does not exist', (done) => {
 })
 
 test('redirects to frontend after handing a valid redirect', (done) => {
+  const pathname = '/agents/123/redirect'
+  const search = 'code=some-code&state=some-state'
   const request = {
     headers: {},
     parameters: { uuid },
-    url: {
-      pathname: '/agents/123/redirect',
-      search: 'code=some-code&state=some-state'
-    }
+    url: new URL( pathname + search, baseUrl)
   } as unknown as HttpHandlerRequest
-  const ctx = { request } as OidcContext;
+  const ctx = { request } as HttpHandlerContext;
 
   manager.getWebId.mockImplementationOnce(async (agentUrl: string) => {
     return aliceWebId
@@ -106,11 +112,12 @@ test('redirects to frontend after handing a valid redirect', (done) => {
   })
 
   loginRedirectHandler.handle(ctx).subscribe(response => {
-    expect(response.status).toBe(300)
-    expect(response.headers.location).toBe(frontendUrl)
     expect(manager.getWebId).toBeCalledTimes(1)
     expect(mockedGetSessionFromStorage).toBeCalledTimes(1)
     expect(handleIncomingRedirectMock).toBeCalledTimes(1)
+    console.log(response)
+    expect(response.status).toBe(302)
+    expect(response.headers.location).toBe(frontendUrl)
     done()
   })
 

@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { Mock } from "jest-mock";
 import { InMemoryStorage, Session } from "@inrupt/solid-client-authn-node";
-import { HttpHandlerRequest } from "@digita-ai/handlersjs-http";
+import { HttpError, BadRequestHttpError, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
 import { agentRedirectUrl, agentUuid, AuthnContext, LoginHandler } from "../../src";
 
 import { SessionManager } from "../../src/session-manager";
@@ -28,20 +28,6 @@ beforeEach(() => {
   loginHandler = new LoginHandler(manager)
 })
 
-describe('unauthenticated request', () => {
-  test('should respond with 401', (done) => {
-    const request = {
-      headers: {}
-    } as unknown as HttpHandlerRequest
-    const ctx = { request } as AuthnContext;
-
-    loginHandler.handle(ctx).subscribe(response => {
-      expect(response.status).toBe(401)
-      done()
-    })
-  });
-});
-
 describe('authenticated request', () => {
   const aliceWebId = 'https://alice.example'
   const authn = {
@@ -62,21 +48,69 @@ describe('authenticated request', () => {
     loginHandler = new LoginHandler(manager)
   })
 
-  test('should respond with 400 if not idp provided', (done) => {
+  test('should respond with 400 if not application/json', (done) => {
     const request = {
       headers: {},
     } as unknown as HttpHandlerRequest
     const ctx = { request, authn } as AuthnContext;
 
-    loginHandler.handle(ctx).subscribe(response => {
-      expect(response.status).toBe(400)
-      done()
+    loginHandler.handle(ctx).subscribe({
+      error: (e: HttpError) => {
+        expect(e).toBeInstanceOf(BadRequestHttpError);
+        done();
+      }
     })
   });
 
+  test('should respond with 400 if not idp provided', (done) => {
+    const request = {
+      headers: {
+        'content-type': 'application/json'
+      },
+    } as unknown as HttpHandlerRequest
+    const ctx = { request, authn } as AuthnContext;
+
+    loginHandler.handle(ctx).subscribe({
+      error: (e: HttpError) => {
+        expect(e).toBeInstanceOf(BadRequestHttpError);
+        done();
+      }
+    })
+  });
+
+  test('should respond 204 if already logged in', (done) => {
+    const request = {
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: { idp }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request, authn } as AuthnContext;
+    manager.getOidcSession.mockImplementationOnce(async (webId) => {
+      expect(webId).toBe(aliceWebId)
+      return {
+        info: {
+          webId: aliceWebId,
+          clientAppId: agentUrl,
+          isLoggedIn: true
+        },
+        login: loginMock
+      } as unknown as Session
+    })
+    loginHandler.handle(ctx).subscribe(response => {
+      expect(response.status).toBe(204)
+      expect(response.body).toBeUndefined()
+      expect(manager.getOidcSession).toBeCalledTimes(1)
+      expect(loginMock).toHaveBeenCalledTimes(0)
+      done()
+    })
+  })
+
   test('should reuse existing agent if exists for the webId', (done) => {
     const request = {
-      headers: {},
+      headers: {
+        'content-type': 'application/json'
+      },
       body: { idp }
     } as unknown as HttpHandlerRequest
     const ctx = { request, authn } as AuthnContext;
@@ -107,7 +141,9 @@ describe('authenticated request', () => {
 
   test('should create new agent if none exists for the webId', (done) => {
     const request = {
-      headers: {},
+      headers: {
+        'content-type': 'application/json'
+      },
       body: { idp }
     } as unknown as HttpHandlerRequest
     const ctx = { request, authn } as AuthnContext;
