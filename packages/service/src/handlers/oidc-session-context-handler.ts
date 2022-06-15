@@ -1,8 +1,8 @@
-import { HttpContextHandler } from "./middleware-http-handler";
-import { AuthnContext, OidcContext } from "../models/http-solid-context";
-import { SessionManager } from "../session-manager";
 import { from, Observable } from "rxjs";
 import { Session } from "@inrupt/solid-client-authn-node";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import { HttpContextHandler } from "./middleware-http-handler";
+import { AuthnContext, OidcContext } from "../models/http-solid-context";
 
 /**
  * Looks for a corresponding OIDC session on the server. Depending on the value
@@ -10,7 +10,7 @@ import { Session } from "@inrupt/solid-client-authn-node";
  */
 export class OidcSessionContextHandler implements HttpContextHandler {
   constructor(
-     private manager: SessionManager,
+     private sessionManager: ISessionManager,
      private strict: boolean = true,
      ) {}
 
@@ -20,7 +20,7 @@ export class OidcSessionContextHandler implements HttpContextHandler {
 
 
   private async handleAsync(ctx: AuthnContext): Promise<OidcContext> {
-    const oidcSession = await this.manager.getOidcSession(ctx.authn.webId);
+    const oidcSession = await this.sessionManager.getOidcSession(ctx.authn.webId);
 
     if (!oidcSession && !this.strict) {
       const fake = oidcSession as unknown as Session;

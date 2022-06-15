@@ -16,7 +16,3 @@ export * from "./handlers/session-check-handler";
 export * from "./models/http-solid-context";
 export * from "./session-manager";
 export * from "./in-memory-storage"
-// Mocks
-// TODO how to get rid of it and still have components generated? it breaks npm start
-export * from "./mocked-storage";
-export * from "./mocked-session-manager";

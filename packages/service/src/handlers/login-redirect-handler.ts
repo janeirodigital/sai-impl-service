@@ -3,7 +3,7 @@ import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
 import { frontendUrl, uuid2agentUrl } from "../url-templates";
-import { ISessionManager } from "../interfaces/i-session-manager";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 
 export class LoginRedirectHandler extends HttpHandler {
   constructor(

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { ISessionManager } from "./interfaces/i-session-manager";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces"
 
 type WebId = string;
 

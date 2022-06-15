@@ -1,8 +1,8 @@
 import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { from, Observable } from "rxjs";
-import { AuthnContext } from "../models/http-solid-context";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-import { ISessionManager } from "../interfaces/i-session-manager";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import { AuthnContext } from "../models/http-solid-context";
 
 
 /**

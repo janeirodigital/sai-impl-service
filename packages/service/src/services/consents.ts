@@ -1,10 +1,10 @@
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
-import { ReadableAccessConsent } from "@janeirodigital/interop-data-model";
+import { ReadableAccessAuthorization } from "@janeirodigital/interop-data-model";
 
 export const getAccessConsents = async (agent: AuthorizationAgent, applicationId: string) => {
   const consents = [];
-  for await (const consent of agent.accessConsents) {
+  for await (const consent of agent.accessAuthorizations) {
     if (consent.grantee !== applicationId) continue;
 
     const id = consent.iri;
@@ -17,12 +17,12 @@ export const getAccessConsents = async (agent: AuthorizationAgent, applicationId
   return consents;
 };
 
-const buildDataConsents = async (consent: ReadableAccessConsent) => {
+const buildDataConsents = async (consent: ReadableAccessAuthorization) => {
   const dataConsents = [];
-  for await (const dataConsent of consent.dataConsents) {
+  for await (const dataConsent of consent.dataAuthorizations) {
     const id = dataConsent.iri;
     const accessNeed = dataConsent.getObject(INTEROP.satisfiesAccessNeed)?.value;
-    const scope = dataConsent.scopeOfConsent;
+    const scope = dataConsent.scopeOfAuthorization;
     dataConsents.push({ id, scope, accessNeed });
   }
 

@@ -13,7 +13,8 @@ export async function createServer(): Promise<Server> {
   //   .dirname(import.meta.url)
   //   .substring(0, path.dirname(import.meta.url).lastIndexOf("/"));
 
-  const modulePath = process.cwd();
+  const modulePath = path.join(__dirname, '..')
+  const configFile = path.join(modulePath, "config/development.json");
 
   const managerProperties: IComponentsManagerBuilderOptions<Server> = {
     mainModulePath: modulePath,
@@ -21,7 +22,6 @@ export async function createServer(): Promise<Server> {
     logLevel: "debug",
   };
 
-  const configFile = path.join(modulePath, "config/development.json");
 
   // Setup ComponentsJS
   const componentsManager = await ComponentsManager.build(managerProperties);

@@ -6,7 +6,7 @@ import { DatasetCore, Term } from "@rdfjs/types";
 export const getAccessNeeds = async (agent: AuthorizationAgent, applicationId: string) => {
   const needs = [];
 
-  for await (const consent of agent.accessConsents) {
+  for await (const consent of agent.accessAuthorizations) {
     if (consent.grantee !== applicationId) continue;
 
     const graph = await agent.fetch(consent.hasAccessNeedGroup).then((r) => r.dataset());

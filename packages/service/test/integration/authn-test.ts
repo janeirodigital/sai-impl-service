@@ -1,10 +1,10 @@
 import { jest } from '@jest/globals';
 import { ComponentsManager } from 'componentsjs';
-import { createTestServer } from "./components-builder";
 import { lastValueFrom } from 'rxjs'
 import { Server } from '@digita-ai/handlersjs-http';
+import { MockedSessionManager } from '@janeirodigital/sai-server-mocks'
 import { baseUrl, agentRedirectUrl, uuid2agentUrl } from '../../src/url-templates'
-import { MockedSessionManager } from '../../src/mocked-session-manager'
+import { createTestServer } from "./components-builder";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
 jest.mock('@solid/access-token-verifier', () => {

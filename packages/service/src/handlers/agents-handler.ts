@@ -3,7 +3,7 @@ import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { HttpSolidContext } from "../models/http-solid-context";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
-import { ISessionManager } from "../interfaces/i-session-manager";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 
 export class AgentsHandler extends HttpHandler {
   constructor(

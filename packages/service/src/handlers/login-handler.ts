@@ -3,10 +3,10 @@ import { randomUUID } from "crypto";
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
 import { Session } from "@inrupt/solid-client-authn-node";
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
 import { AuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
-import { ISessionManager } from "../interfaces/i-session-manager";
 
 export class LoginHandler extends HttpHandler {
   constructor(

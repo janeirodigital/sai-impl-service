@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals"
 import { IStorage, Session } from "@inrupt/solid-client-authn-node"
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent"
-import { ISessionManager } from "./interfaces/i-session-manager"
+import { ISessionManager } from "@janeirodigital/sai-server-interfaces"
 
 export class MockedSessionManager implements ISessionManager {
   constructor(public storage: IStorage) {}
