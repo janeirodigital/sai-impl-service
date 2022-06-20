@@ -3,7 +3,7 @@ import { ComponentsManager } from 'componentsjs';
 import { lastValueFrom } from 'rxjs'
 import { Server } from '@digita-ai/handlersjs-http';
 import { MockedSessionManager } from '@janeirodigital/sai-server-mocks'
-import { baseUrl, agentRedirectUrl, uuid2agentUrl } from '../../src/url-templates'
+import { baseUrl, agentRedirectUrl, uuid2agentUrl, frontendUrl } from '../../src/url-templates'
 import { createTestServer } from "./components-builder";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
@@ -21,11 +21,9 @@ jest.mock('@inrupt/solid-client-authn-node', () => {
   return {
     ...originalModule,
     Session: jest.fn(),
-    getSessionFromStorage: jest.fn()
   }
 })
 const MockedSession = Session as jest.MockedFunction<any>;
-const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction<any>;
 
 
 let server: Server
@@ -51,6 +49,8 @@ beforeEach(async () => {
   mockedCreateSolidTokenVerifier.mockReset()
 })
 
+
+// This is handled by AuthnContextHandler
 test('should respond 401 for unauthenticated request', async () => {
   const response = await fetch(`${baseUrl}/login`, {
     method: 'POST'
@@ -78,6 +78,7 @@ describe('authenticated request', () => {
         return { webid: webId, client_id: clientId } as SolidAccessTokenPayload
       } as SolidTokenVerifierFunction
     })
+    manager.getOidcSession.mockReset()
   })
 
   test('should respond 400 if not json content type', async () => {
@@ -103,6 +104,38 @@ describe('authenticated request', () => {
     })
     expect(response.ok).toBeFalsy()
     expect(response.status).toBe(400)
+  })
+
+  test('should respond with 204 No Content status when already logged in', async () => {
+    const idp = 'https://op.example'
+    const opRedirectUrl = 'https:/op.example/auth/?something'
+    const loginMock = jest.fn(async (loginOptions: any) => {
+      loginOptions.handleRedirect(opRedirectUrl);
+    });
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
+      expect(sessionId).toBe(webId)
+      return {
+        info: {
+          isLoggedIn: true,
+          sessionId: webId
+        },
+        login: loginMock
+      } as unknown as Session;
+    })
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'DPoP': dpopProof,
+        'Authorization': authorization,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ idp })
+    })
+    expect(response.ok).toBeTruthy()
+    expect(response.status).toBe(204)
+    const payload = await response.text()
+    expect(payload).toBeFalsy()
+    expect(loginMock).toBeCalledTimes(0)
   })
 
   test('should respond with url for redirecting', async () => {
@@ -146,7 +179,7 @@ describe('login-redirect', () => {
 
   beforeEach(() => {
     manager.getWebId.mockReset()
-    mockedGetSessionFromStorage.mockReset()
+    manager.getOidcSession.mockReset()
   })
 
   test('responds 404 if no user associated with given agent', async () => {
@@ -162,16 +195,88 @@ describe('login-redirect', () => {
 
   test('responds 500 if oidc session does not exist for the user of this agent', async () => {
     manager.getWebId.mockImplementationOnce(async (url) => {
-      expect(url).toBe(agentUrl)
       return webId
     })
-    mockedGetSessionFromStorage.mockImplementationOnce((sessionId: string) => {
-      expect(sessionId).toBe(webId)
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
+      return undefined
     })
+
     const response = await fetch(url)
-    expect(manager.getWebId).toBeCalledTimes(1)
-    expect(mockedGetSessionFromStorage).toBeCalledTimes(1)
+    expect(manager.getWebId).toBeCalledWith(agentUrl)
+    expect(manager.getOidcSession).toBeCalledWith(webId)
     expect(response.ok).toBeFalsy()
     expect(response.status).toBe(500)
+  })
+
+  test('responds 500 if oidc session handling throws', async () => {
+    manager.getWebId.mockImplementationOnce(async (url) => {
+      return webId
+    })
+    const handleIncomingRedirectMock = jest.fn(async (url: string) => {
+      throw new Error('boom!')
+    });
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
+      return {
+        handleIncomingRedirect: handleIncomingRedirectMock
+      } as unknown as Session
+    })
+
+    const response = await fetch(url)
+    expect(manager.getWebId).toBeCalledWith(agentUrl)
+    expect(manager.getOidcSession).toBeCalledWith(webId)
+    expect(handleIncomingRedirectMock).toBeCalledTimes(1)
+    expect(response.ok).toBeFalsy()
+    expect(response.status).toBe(500)
+  })
+
+  test('responds 500 if oidc session handling of incoming redirect failed', async () => {
+    manager.getWebId.mockImplementationOnce(async (url) => {
+      return webId
+    })
+    const handleIncomingRedirectMock = jest.fn(async (url: string) => {
+      return undefined
+    });
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
+      return {
+        info: {
+          sessionId,
+          isLoggedIn: false
+        },
+        handleIncomingRedirect: handleIncomingRedirectMock
+      } as unknown as Session
+    })
+
+    const response = await fetch(url)
+    expect(manager.getWebId).toBeCalledWith(agentUrl)
+    expect(manager.getOidcSession).toBeCalledWith(webId)
+    expect(handleIncomingRedirectMock).toBeCalledTimes(1)
+    expect(response.ok).toBeFalsy()
+    expect(response.status).toBe(500)
+  })
+
+  test('responds 302 when successful', async () => {
+    manager.getWebId.mockImplementationOnce(async (url) => {
+      return webId
+    })
+    const handleIncomingRedirectMock = jest.fn(async (url: string) => {
+      return undefined
+    });
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
+      return {
+        info: {
+          sessionId,
+          webId,
+          isLoggedIn: true
+        },
+        handleIncomingRedirect: handleIncomingRedirectMock
+      } as unknown as Session
+    })
+
+    const response = await fetch(url, { redirect: 'manual' })
+    expect(manager.getWebId).toBeCalledWith(agentUrl)
+    expect(manager.getOidcSession).toBeCalledWith(webId)
+    expect(handleIncomingRedirectMock).toBeCalledTimes(1)
+    expect(response.status).toBe(302)
+    expect(response.headers.get('Location')).toBe(frontendUrl)
   })
 })

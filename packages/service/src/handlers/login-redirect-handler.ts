@@ -1,19 +1,24 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/handlersjs-http";
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import { getLoggerFor } from '@digita-ai/handlersjs-logging';
+import { HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
 import { frontendUrl, uuid2agentUrl } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import { SessionManager } from "../session-manager";
 
 export class LoginRedirectHandler extends HttpHandler {
+
+  private logger = getLoggerFor(this, 5, 5);
+
   constructor(
     private sessionManager: ISessionManager
   ) {
     super();
-    console.log("LoginRedirectHandler::constructor");
+    this.logger.info("LoginRedirectHandler::constructor");
   }
   handle(context: HttpHandlerContext): Observable<HttpHandlerResponse> {
-    console.log("LoginRedirectHandler::handle");
+    this.logger.info("LoginRedirectHandler::handle");
     return from(this.handleAsync(context))
 
   }
@@ -25,25 +30,19 @@ export class LoginRedirectHandler extends HttpHandler {
     if (!webId) {
       throw new NotFoundHttpError()
     }
-
-    const oidcSession = await getSessionFromStorage(webId, this.sessionManager.storage);
+    const oidcSession = await this.sessionManager.getOidcSession(webId)
 
     if (!oidcSession) {
-      return { body: {}, status: 500, headers: {} };
+      // TODO clarify this scenario
+      throw new InternalServerError()
     }
+    await oidcSession.handleIncomingRedirect(context.request.url.toString())
 
-    try {
-      console.log(context.request.url)
-      await oidcSession.handleIncomingRedirect(context.request.url.toString());
-    } catch (e: any) {
-      return { body: {message: e.message}, status: 500, headers: {} };
-    }
-
-    if (oidcSession.info.isLoggedIn && oidcSession.info.webId) {
+    if (!oidcSession.info.isLoggedIn || !oidcSession.info.webId) {
+      // TODO clarify this scenario
+      throw new InternalServerError()
+    } else {
       return { body: {}, status: 302, headers: { location: frontendUrl } };
     }
-
-    // TODO unreachable point?
-    return { body: {}, status: 500, headers: {} };
   }
 }
