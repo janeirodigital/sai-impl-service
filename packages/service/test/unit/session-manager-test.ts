@@ -16,8 +16,8 @@ jest.mock('@inrupt/solid-client-authn-node', () => {
 })
 const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction<any>;
 
-import { SessionManager, getAgentUrlKey } from '../src/session-manager';
-import { uuid2agentUrl } from '../src/url-templates'
+import { SessionManager, getAgentUrlKey } from '../../src/session-manager';
+import { uuid2agentUrl } from '../../src/url-templates'
 
 let manager: SessionManager
 

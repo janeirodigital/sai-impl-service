@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { AuthnContextHandler } from "../../src";
+import { AuthnContextHandler } from "../../../src";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload } from '@solid/access-token-verifier';
 

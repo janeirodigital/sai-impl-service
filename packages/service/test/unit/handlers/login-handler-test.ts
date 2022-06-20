@@ -2,11 +2,11 @@ import { jest } from "@jest/globals";
 import { Mock } from "jest-mock";
 import { InMemoryStorage, Session } from "@inrupt/solid-client-authn-node";
 import { HttpError, BadRequestHttpError, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
-import { agentRedirectUrl, agentUuid, AuthnContext, LoginHandler } from "../../src";
+import { agentRedirectUrl, agentUuid, AuthnContext, LoginHandler } from "../../../src";
 
-import { SessionManager } from "../../src/session-manager";
+import { SessionManager } from "../../../src/session-manager";
 
-jest.mock('../../src/session-manager', () => {
+jest.mock('../../../src/session-manager', () => {
   return {
     SessionManager: jest.fn(() => {
       return {

@@ -4,11 +4,11 @@ import {
   agentRedirectUrl,
   uuid2agentUrl,
   HttpSolidContext
-} from "../../src";
+} from "../../../src";
 import { jest } from '@jest/globals';
 
-jest.mock('../../src/session-manager', () => {
-  const originalModule = jest.requireActual('../../src/session-manager') as object;
+jest.mock('../../../src/session-manager', () => {
+  const originalModule = jest.requireActual('../../../src/session-manager',) as object;
 
   return {
     ...originalModule,

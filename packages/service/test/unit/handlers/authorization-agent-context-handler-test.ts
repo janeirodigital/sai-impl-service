@@ -1,8 +1,8 @@
-import { AuthnContext, AuthorizationAgentContextHandler, SessionManager } from "../../src";
+import { AuthnContext, AuthorizationAgentContextHandler, SessionManager } from "../../../src";
 import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
 import { InternalServerError, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 
-jest.mock("../../src/session-manager");
+jest.mock("../../../src/session-manager");
 jest.mock("@inrupt/solid-client-authn-node");
 
 describe("AuthorizationAgentContextHandler", () => {

@@ -6,10 +6,10 @@ import {
   HttpHandlerRequest, NotFoundHttpError
 } from "@digita-ai/handlersjs-http";
 
-import { LoginRedirectHandler, frontendUrl, baseUrl } from '../../src';
+import { LoginRedirectHandler, frontendUrl, baseUrl } from '../../../src';
 
-import { SessionManager } from '../../src/session-manager'
-jest.mock('../../src/session-manager', () => {
+import { SessionManager } from '../../../src/session-manager'
+jest.mock('../../../src/session-manager', () => {
   return {
     SessionManager: jest.fn(() => {
       return {

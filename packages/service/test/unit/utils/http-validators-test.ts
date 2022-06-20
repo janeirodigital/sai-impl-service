@@ -1,5 +1,5 @@
 import { HttpHandlerContext } from '@digita-ai/handlersjs-http'
-import { validateContentType } from '../../src/utils/http-validators'
+import { validateContentType } from '../../../src/utils/http-validators'
 
 describe('validateContentType', () => {
   test('should handle content type with extra parameter', () => {

@@ -1,6 +1,6 @@
 import { BadRequestHttpError, HttpHandlerContext } from "@digita-ai/handlersjs-http";
 import { of } from "rxjs";
-import { HttpSequenceContextHandler } from "../../src";
+import { HttpSequenceContextHandler } from "../../../src";
 
 describe('HttpSequenceContextHandler', () => {
 
