@@ -1,0 +1,25 @@
+{
+  "name": "@janeirodigital/sai-server-interfaces",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && npm run build:ts",
+    "build:ts": "tsc",
+    "clean": "rm -rf dist/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@inrupt/solid-client-authn-node": "^1.11.7",
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.6"
+  },
+  "devDependencies": {
+    "typescript": "^4.5.5"
+  },
+  "volta": {
+    "node": "16.15.1"
+  }
+}

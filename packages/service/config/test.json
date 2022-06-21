@@ -1,0 +1,19 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server-mocks/^0.0.0/components/context.jsonld"
+  ],
+  "import": [
+    "./common.json"
+  ],
+  "@graph": [
+    {
+      "@id": "urn:ssv:SessionManager",
+      "@type": "MockedSessionManager",
+      "storage": {
+        "@id": "urn:ssv:MockedStorage",
+        "@type": "MockedStorage"
+      }
+    }
+  ]
+}
