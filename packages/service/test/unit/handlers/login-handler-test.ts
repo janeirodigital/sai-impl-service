@@ -2,7 +2,7 @@ import { jest } from "@jest/globals";
 import { Mock } from "jest-mock";
 import { InMemoryStorage, Session } from "@inrupt/solid-client-authn-node";
 import { HttpError, BadRequestHttpError, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
-import { agentRedirectUrl, agentUuid, AuthnContext, LoginHandler } from "../../../src";
+import { agentRedirectUrl, agentUuid, AuthenticatedAuthnContext, AuthnContext, LoginHandler } from "../../../src";
 
 import { SessionManager } from "../../../src/session-manager";
 
@@ -52,7 +52,7 @@ describe('authenticated request', () => {
     const request = {
       headers: {},
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthnContext;
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
 
     loginHandler.handle(ctx).subscribe({
       error: (e: HttpError) => {
@@ -68,7 +68,7 @@ describe('authenticated request', () => {
         'content-type': 'application/json'
       },
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthnContext;
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
 
     loginHandler.handle(ctx).subscribe({
       error: (e: HttpError) => {
@@ -85,7 +85,7 @@ describe('authenticated request', () => {
       },
       body: { idp }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthnContext;
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
     manager.getOidcSession.mockImplementationOnce(async (webId) => {
       expect(webId).toBe(aliceWebId)
       return {
@@ -113,7 +113,7 @@ describe('authenticated request', () => {
       },
       body: { idp }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthnContext;
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
     manager.getOidcSession.mockImplementationOnce(async (webId) => {
       expect(webId).toBe(aliceWebId)
       return {
@@ -146,7 +146,7 @@ describe('authenticated request', () => {
       },
       body: { idp }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthnContext;
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
     MockedSession.mockImplementationOnce((sessionOptions: any, sessionId: string) => {
       expect(sessionId).toBe(aliceWebId)
       return {

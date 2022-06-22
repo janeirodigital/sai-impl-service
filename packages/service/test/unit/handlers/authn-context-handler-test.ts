@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { AuthnContextHandler } from "../../../src";
+import { AuthnContextHandler, AuthenticatedAuthnContext, UnauthenticatedAuthnContext, AuthnContext } from "../../../src";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload } from '@solid/access-token-verifier';
 
@@ -28,7 +28,7 @@ beforeEach(() => {
 })
 
 describe('Unauthenticated request', () => {
-  test('should throw with BadRequest if no authentication is provided', (done) => {
+  test('should throw with Unauthorized if no authentication is provided', (done) => {
     const request = {
       headers: {}
     } as unknown as HttpHandlerRequest
@@ -43,6 +43,22 @@ describe('Unauthenticated request', () => {
     })
   });
 
+  test('should return UnauthenticatedAuthnContext if no authentication is provided and strict is false', (done) => {
+    const request = {
+      headers: {}
+    } as unknown as HttpHandlerRequest
+    const ctx = { request } as HttpHandlerContext;
+    const relaxedAuthnContextHandler = new AuthnContextHandler(false)
+    relaxedAuthnContextHandler.handle(ctx).subscribe({
+      next: (nextContext: AuthnContext) => {
+        expect(nextContext.authn.authenticated).toBe(false)
+        done()
+      }
+    })
+  });
+});
+
+describe('Malformatted request', () => {
   test('should throw with BadRequest if only DPoP headers are provided', (done) => {
     const request = {
       url,
@@ -115,18 +131,17 @@ describe('Authenticated request', () => {
   const webId = 'https://user.example/'
   const clientId = 'https://client.example/'
 
-  test('should set proper authn on the context', (done) => {
+  test('should respond 401 when applicationId from token is undefined', (done) => {
     mockedCreateSolidTokenVerifier.mockImplementation(() => {
-      const response = {webid: webId, client_id: clientId} as SolidAccessTokenPayload;
+      const result = { webid: webId } as SolidAccessTokenPayload;
       return async function verifier () {
-        return Promise.resolve(response);
+        return Promise.resolve(result);
       };
     })
 
     const request = {
       url,
       method: 'GET',
-      // TODO: check if handler makes headers lowercase
       headers: {
         authorization,
         dpop: dpopProof
@@ -134,12 +149,42 @@ describe('Authenticated request', () => {
     } as unknown as HttpHandlerRequest
     const ctx = { request } as HttpHandlerContext;
 
-    authnContextHandler.handle(ctx).subscribe(nextContext => {
-      expect(mockedCreateSolidTokenVerifier.mock.calls.length).toEqual(1);
-      expect(nextContext.authn.webId).toBe(webId)
-      expect(nextContext.authn.clientId).toBe(clientId)
-      done()
+    authnContextHandler.handle(ctx).subscribe({
+      error: (e: HttpError) => {
+        expect(e).toBeInstanceOf(UnauthorizedHttpError);
+        done();
+      }
     })
   });
 
+  test('should set proper authn on the context', (done) => {
+    mockedCreateSolidTokenVerifier.mockImplementation(() => {
+      const result = {webid: webId, client_id: clientId} as SolidAccessTokenPayload;
+      return async function verifier () {
+        return Promise.resolve(result);
+      };
+    })
+
+    const request = {
+      url,
+      method: 'GET',
+      headers: {
+        authorization,
+        dpop: dpopProof
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request } as HttpHandlerContext;
+
+    authnContextHandler.handle(ctx).subscribe({
+      next: (nextContext: AuthnContext) => {
+        expect(mockedCreateSolidTokenVerifier.mock.calls.length).toEqual(1);
+        expect(nextContext.authn.authenticated).toBe(true)
+        if (nextContext.authn.authenticated) {
+          expect(nextContext.authn.webId!).toBe(webId)
+          expect(nextContext.authn.clientId!).toBe(clientId)
+        }
+        done()
+      }
+    })
+  });
 });

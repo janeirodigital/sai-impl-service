@@ -1,7 +1,7 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
-import { HttpSolidContext } from "../models/http-solid-context";
+import { AuthnContext } from "../models/http-solid-context";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 
@@ -23,9 +23,9 @@ export class AgentsHandler extends HttpHandler {
     }
   }
 
-  async handleAsync(context: HttpSolidContext): Promise<HttpHandlerResponse> {
+  async handleAsync(context: AuthnContext): Promise<HttpHandlerResponse> {
     const agentUrl = uuid2agentUrl(context.request.parameters!.uuid)
-    if (!context.authn) {
+    if (!context.authn.authenticated) {
       return {
         body: this.clientIdDocument(agentUrl),
         status: 200,
@@ -61,7 +61,7 @@ export class AgentsHandler extends HttpHandler {
     }
   }
 
-  handle(context: HttpSolidContext): Observable<HttpHandlerResponse> {
+  handle(context: AuthnContext): Observable<HttpHandlerResponse> {
     return from(this.handleAsync(context))
   }
 }

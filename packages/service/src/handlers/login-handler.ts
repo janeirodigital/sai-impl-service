@@ -6,7 +6,7 @@ import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { Session } from "@inrupt/solid-client-authn-node";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
-import { AuthnContext } from "../models/http-solid-context";
+import { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 
 export class LoginHandler extends HttpHandler {
@@ -19,7 +19,7 @@ export class LoginHandler extends HttpHandler {
     this.logger.info("LoginHandler::constructor");
   }
 
-  async handleAsync (context: AuthnContext): Promise<HttpHandlerResponse> {
+  async handleAsync (context: AuthenticatedAuthnContext): Promise<HttpHandlerResponse> {
 
     validateContentType(context, 'application/json');
 
@@ -52,7 +52,7 @@ export class LoginHandler extends HttpHandler {
         oidcIssuer: idp,
         clientName: process.env.APP_NAME,
         clientId: agentUrl,
-        handleRedirect: (url) => {
+        handleRedirect: (url: string) => {
           resolve(url)
         }
       })
@@ -61,7 +61,7 @@ export class LoginHandler extends HttpHandler {
     return { body: { redirectUrl: completeRedirectUrl }, status: 200, headers: {} }
   }
 
-  handle(context: AuthnContext): Observable<HttpHandlerResponse> {
+  handle(context: AuthenticatedAuthnContext): Observable<HttpHandlerResponse> {
     this.logger.info("LoginHandler::handle");
     return from(this.handleAsync(context))
   }

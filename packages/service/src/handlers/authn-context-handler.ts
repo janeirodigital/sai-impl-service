@@ -1,19 +1,29 @@
 import { from, Observable } from "rxjs";
 import { createSolidTokenVerifier, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
-import { AuthnContext } from "../models/http-solid-context";
+import { AuthnContext, UnauthenticatedAuthnContext } from "../models/http-solid-context";
 import { HttpContextHandler } from "./middleware-http-handler";
 import { BadRequestHttpError, HttpHandlerContext, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 
 /**
  * Uses  access-token-verifier and sets authn on the context if token was provided,
- * throws a 400 response if the token is not provided or fails verification.
+ * if strict throws a 400 response if the token is not provided or fails verification.
  *
+ * returns AuthenticatedAuthnContext
  * context.authn {
+ *   authenticated: true
  *   webId: string
  *   clientId: string
  * }
+ *
+ * if not strict can return UnauthenticatedAuthnContext
+ *
+ * context.authn {
+ * authenticated: false
+ * }
  */
 export class AuthnContextHandler implements HttpContextHandler {
+
+  constructor(private strict = true) {}
 
   handle(context: HttpHandlerContext): Observable<AuthnContext> {
     return from(this.handleAsync(context))
@@ -25,7 +35,16 @@ export class AuthnContextHandler implements HttpContextHandler {
 
     // when no authn headers present
     if (!authorization && !dpop) {
-      throw new UnauthorizedHttpError('Authentication required')
+      if (this.strict) {
+        throw new UnauthorizedHttpError('Authentication required')
+      } else {
+        return {
+          ...context,
+          authn: {
+            authenticated: false
+          }
+        }
+      }
     }
 
     // when one of the authn headers is missing
@@ -44,9 +63,13 @@ export class AuthnContextHandler implements HttpContextHandler {
           url: context.request.url.toString(),
         }
       );
+      if (!token.client_id) {
+        throw new UnauthorizedHttpError('client_id required')
+      }
       return {
         ...context,
         authn: {
+          authenticated: true,
           webId: token.webid,
           clientId: token.client_id,
         }

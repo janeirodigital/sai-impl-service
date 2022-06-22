@@ -22,6 +22,15 @@
                 {
                   "@type": "HttpHandlerController",
                   "label": "Static Id Document Controller",
+                  "preResponseHandler": {
+                    "@type": "HttpSequenceContextHandler",
+                    "contextHandlers": [
+                      {
+                        "@type": "AuthnContextHandler",
+                        "strict": false
+                      }
+                    ]
+                  },
                   "routes": [
                     {
                       "@type": "HttpHandlerRoute",

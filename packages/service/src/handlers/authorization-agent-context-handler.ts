@@ -1,5 +1,5 @@
 import { HttpContextHandler } from "./middleware-http-handler";
-import { AuthnContext, SaiContext } from "../models/http-solid-context";
+import { AuthenticatedAuthnContext, SaiContext } from "../models/http-solid-context";
 import { SessionManager } from "../session-manager";
 import { from, Observable } from "rxjs";
 import { InternalServerError, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
@@ -10,16 +10,11 @@ import { InternalServerError, UnauthorizedHttpError } from "@digita-ai/handlersj
 export class AuthorizationAgentContextHandler implements HttpContextHandler {
   constructor(private manager: SessionManager) {}
 
-  handle(ctx: AuthnContext): Observable<SaiContext> {
+  handle(ctx: AuthenticatedAuthnContext): Observable<SaiContext> {
     return from(this.handleAsync(ctx));
   }
 
-
-  private async handleAsync(ctx: AuthnContext): Promise<SaiContext> {
-    if (!ctx.authn.webId) {
-      throw new UnauthorizedHttpError();
-    }
-
+  private async handleAsync(ctx: AuthenticatedAuthnContext): Promise<SaiContext> {
     const saiSession = await this.manager.getSaiSession(ctx.authn.webId);
 
     if (!saiSession) {
