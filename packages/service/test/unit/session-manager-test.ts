@@ -102,6 +102,19 @@ describe('getOidcSession', () => {
     });
     expect(await manager.getOidcSession(webId)).toBe(oidcSession)
   });
+
+  test('should return a new oidc session if none exist', async () => {
+    const webId = 'https://user.example/'
+    const clientId = 'https://aa.example/'
+
+    mockedGetSessionFromStorage.mockImplementationOnce((webId: string, IStorage: Storage) => undefined)
+
+    const session = await manager.getOidcSession(webId);
+    expect(session).toBeTruthy();
+    expect(session.info.isLoggedIn).toEqual(false);
+    expect(session.info.sessionId).toEqual(webId);
+  })
+
 });
 
 

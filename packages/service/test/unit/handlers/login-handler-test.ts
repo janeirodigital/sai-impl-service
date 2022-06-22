@@ -2,7 +2,7 @@ import { jest } from "@jest/globals";
 import { Mock } from "jest-mock";
 import { InMemoryStorage, Session } from "@inrupt/solid-client-authn-node";
 import { HttpError, BadRequestHttpError, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
-import { agentRedirectUrl, agentUuid, AuthenticatedAuthnContext, AuthnContext, LoginHandler } from "../../../src";
+import { agentRedirectUrl, agentUuid, AuthenticatedAuthnContext, LoginHandler } from "../../../src";
 
 import { SessionManager } from "../../../src/session-manager";
 
@@ -154,10 +154,12 @@ describe('authenticated request', () => {
         login: loginMock
       };
     });
+
     manager.setAgentUrl2WebIdMapping.mockImplementationOnce(async (agentUrl, webId) => {
       expect(agentUuid(agentUrl)).toBeTruthy()
       expect(webId).toBe(aliceWebId)
     })
+
     loginHandler.handle(ctx).subscribe(response => {
       expect(response.status).toBe(200)
       expect(response.body?.redirectUrl).toBe(opRedirectUrl)
