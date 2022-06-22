@@ -3,7 +3,9 @@ import {
   SessionManager,
   agentRedirectUrl,
   uuid2agentUrl,
-  HttpSolidContext
+  HttpSolidContext,
+  UnauthenticatedAuthnContext,
+  AuthenticatedAuthnContext
 } from "../../../src";
 import { jest } from '@jest/globals';
 
@@ -43,7 +45,10 @@ describe('unauthenticated request', () => {
       headers: {},
       parameters: { uuid }
     } as unknown as HttpHandlerRequest
-    const ctx = { request } as HttpSolidContext;
+    const authn = {
+      authenticated: false
+    }
+    const ctx = { request, authn } as UnauthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
       expect(response.body.client_id).toContain(uuid);
@@ -57,6 +62,12 @@ describe('unauthenticated request', () => {
 describe('authenticated request', () => {
   const webId = 'https://user.example/'
   const clientId = 'https://client.example/'
+
+  const authn = {
+    authenticated: true,
+    webId,
+    clientId
+  }
 
   test('application registration discovery', (done) => {
     const applicationRegistrationIri = 'https://some.example/application-registration'
@@ -75,11 +86,8 @@ describe('authenticated request', () => {
     const request = {
       parameters: { uuid }
     } as unknown as HttpHandlerRequest
-    const authn = {
-      webId,
-      clientId
-    }
-    const ctx = { request, authn } as HttpSolidContext;
+
+    const ctx = { request, authn } as AuthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
       expect(response.headers.Link).toBe(`<${clientId}>; anchor="${applicationRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
@@ -105,26 +113,16 @@ describe('authenticated request', () => {
     const request = {
       parameters: { uuid }
     } as unknown as HttpHandlerRequest
-    const authn = {
-      webId: differentWebId,
-      clientId
+
+    const differentWebIdAuthn = {
+      ...authn,
+      webId: differentWebId
     }
-    const ctx = { request, authn } as HttpSolidContext;
+
+    const ctx = { request, authn: differentWebIdAuthn} as AuthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
       expect(response.headers.Link).toBe(`<${clientId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
-      done()
-    })
-  });
-
-  test('should respond 401 when applicationId from token is undefined', (done) => {
-    const request = {
-      parameters: { uuid }
-    } as unknown as HttpHandlerRequest
-    const authn = { webId }
-    const ctx = { request, authn } as HttpSolidContext;
-    agentsHandler.handle(ctx).subscribe(response => {
-      expect(response.status).toBe(401)
       done()
     })
   });

@@ -1,4 +1,4 @@
-import { AuthnContext, AuthorizationAgentContextHandler, SessionManager } from "../../../src";
+import { AuthenticatedAuthnContext, AuthorizationAgentContextHandler, SessionManager } from "../../../src";
 import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
 import { InternalServerError, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 
@@ -13,21 +13,11 @@ describe("AuthorizationAgentContextHandler", () => {
     authorizationAgentContextHandler = new AuthorizationAgentContextHandler(manager);
   });
 
-  test("throws with UnauthorizedRequest if the ctx does not provide a webid", (done) => {
-    const ctx = { authn: { webId: undefined } } as unknown as AuthnContext;
-    authorizationAgentContextHandler.handle(ctx).subscribe({
-      error(e: Error) {
-        expect(e).toBeInstanceOf(UnauthorizedHttpError);
-        done();
-      }
-    });
-  });
-
   test("retrieves the right session from manager", (done) => {
     manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
 
     const webId = "http://me.id";
-    const ctx = { authn: { webId } } as AuthnContext;
+    const ctx = { authn: { webId, authenticated: true } } as AuthenticatedAuthnContext;
     authorizationAgentContextHandler.handle(ctx).subscribe(() => {
       expect(manager.getSaiSession).toBeCalledWith(webId);
       done();
@@ -38,7 +28,7 @@ describe("AuthorizationAgentContextHandler", () => {
     manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(Object()));
     const webId = "http://me.id";
 
-    const ctx = { authn: { webId } } as AuthnContext;
+    const ctx = { authn: { webId, authenticated: true } } as AuthenticatedAuthnContext;
     authorizationAgentContextHandler.handle(ctx).subscribe((nextCtx) => {
       expect(nextCtx.saiSession).toEqual(Object());
       done();
@@ -49,7 +39,7 @@ describe("AuthorizationAgentContextHandler", () => {
     manager.getSaiSession = jest.fn().mockReturnValueOnce(Promise.resolve(undefined));
     const webId = "http://me.id";
 
-    const ctx = { authn: { webId } } as AuthnContext;
+    const ctx = { authn: { webId, authenticated: true } } as AuthenticatedAuthnContext;
 
     authorizationAgentContextHandler.handle(ctx).subscribe({
       error(e: Error) {
