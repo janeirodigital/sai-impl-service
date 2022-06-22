@@ -61,37 +61,6 @@
                 },
                 {
                   "@type": "HttpHandlerController",
-                  "label": "SessionCheck Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler"
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/session",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "GET",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "SessionCheckHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
                   "label": "Default Controller",
                   "preResponseHandler": {
                     "@type": "HttpSequenceContextHandler",
