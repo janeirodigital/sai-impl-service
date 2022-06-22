@@ -146,7 +146,9 @@ describe('authenticated request', () => {
       },
       body: { idp }
     } as unknown as HttpHandlerRequest
+
     const ctx = { request, authn } as AuthnContext;
+
     MockedSession.mockImplementationOnce((sessionOptions: any, sessionId: string) => {
       expect(sessionId).toBe(aliceWebId)
       return {
@@ -154,10 +156,12 @@ describe('authenticated request', () => {
         login: loginMock
       };
     });
+
     manager.setAgentUrl2WebIdMapping.mockImplementationOnce(async (agentUrl, webId) => {
       expect(agentUuid(agentUrl)).toBeTruthy()
       expect(webId).toBe(aliceWebId)
     })
+
     loginHandler.handle(ctx).subscribe(response => {
       expect(response.status).toBe(200)
       expect(response.body?.redirectUrl).toBe(opRedirectUrl)

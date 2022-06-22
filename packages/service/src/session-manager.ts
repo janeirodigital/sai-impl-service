@@ -37,8 +37,14 @@ export class SessionManager implements ISessionManager {
     }
   }
 
-  async getOidcSession(webId: string): Promise<Session | undefined> {
-    return getSessionFromStorage(webId, this.storage);
+  async getOidcSession(webId: string): Promise<Session> {
+    let session = await getSessionFromStorage(webId, this.storage);
+
+    if (!session) {
+      session = new Session({ storage: this.storage }, webId);
+    }
+
+    return session;
   }
 
   async getFromAgentUrl(agentUrl: string): Promise<AuthorizationAgent | undefined> {
