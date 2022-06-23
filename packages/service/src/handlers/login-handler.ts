@@ -2,6 +2,7 @@ import "dotenv/config";
 import { randomUUID } from "crypto";
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
+import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { Session } from "@inrupt/solid-client-authn-node";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
@@ -9,11 +10,13 @@ import { AuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 
 export class LoginHandler extends HttpHandler {
+  private logger = getLoggerFor(this, 5, 5);
+
   constructor(
     private sessionManager: ISessionManager
   ) {
     super();
-    console.log("LoginHandler::constructor");
+    this.logger.info("LoginHandler::constructor");
   }
 
   async handleAsync (context: AuthnContext): Promise<HttpHandlerResponse> {
@@ -59,7 +62,7 @@ export class LoginHandler extends HttpHandler {
   }
 
   handle(context: AuthnContext): Observable<HttpHandlerResponse> {
-    console.log("LoginHandler::handle");
+    this.logger.info("LoginHandler::handle");
     return from(this.handleAsync(context))
   }
 }
