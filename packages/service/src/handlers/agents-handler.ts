@@ -1,5 +1,5 @@
 import { from, Observable } from "rxjs";
-import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
+import { HttpHandler, HttpHandlerResponse, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { HttpSolidContext } from "../models/http-solid-context";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
@@ -34,8 +34,7 @@ export class AgentsHandler extends HttpHandler {
     }
     if(!context.authn.clientId) {
       // TODO: add logging
-      // throw Error('no client_id present in the token')
-      return { status: 401, headers: {} }
+      throw new UnauthorizedHttpError()
     }
     const registrationIri = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUrl)
     const headers : { [key: string]: string} = {}
