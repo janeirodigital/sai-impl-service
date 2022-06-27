@@ -21,7 +21,7 @@
               "handlerControllerList": [
                 {
                   "@type": "HttpHandlerController",
-                  "label": "Static Id Document Controller",
+                  "label": "Agents Controller",
                   "preResponseHandler": {
                     "@type": "HttpSequenceContextHandler",
                     "contextHandlers": [
@@ -48,29 +48,12 @@
                           "@id": "urn:ssv:SessionManager"
                         }
                       }
-                    },
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/agents/:uuid/redirect",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "GET",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "LoginRedirectHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
                     }
                   ]
                 },
                 {
                   "@type": "HttpHandlerController",
-                  "label": "Default Controller",
+                  "label": "Login Controller",
                   "preResponseHandler": {
                     "@type": "HttpSequenceContextHandler",
                     "contextHandlers": [
@@ -98,7 +81,30 @@
                       }
                     }
                   ]
-                }
+                },
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "Login Redirect Controler",
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/agents/:uuid/redirect",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "GET",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "LoginRedirectHandler",
+                        "sessionManager": {
+                          "@id": "urn:ssv:SessionManager"
+                        }
+                      }
+                    }
+                  ]
+                },
               ]
             }
           }
