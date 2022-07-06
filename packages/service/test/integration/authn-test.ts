@@ -14,17 +14,7 @@ jest.mock('@solid/access-token-verifier', () => {
 })
 const mockedCreateSolidTokenVerifier = jest.mocked(createSolidTokenVerifier)
 
-import { Session, getSessionFromStorage } from "@inrupt/solid-client-authn-node";
-jest.mock('@inrupt/solid-client-authn-node', () => {
-  const originalModule = jest.requireActual('@inrupt/solid-client-authn-node') as object;
-
-  return {
-    ...originalModule,
-    Session: jest.fn(),
-  }
-})
-const MockedSession = Session as jest.MockedFunction<any>;
-
+import { Session } from "@inrupt/solid-client-authn-node";
 
 let server: Server
 let componentsManager: ComponentsManager<Server>
@@ -79,6 +69,7 @@ describe('authenticated request', () => {
       } as SolidTokenVerifierFunction
     })
     manager.getOidcSession.mockReset()
+    manager.getAgentUrlForSession.mockReset()
   })
 
   test('should respond 400 if not json content type', async () => {
@@ -139,18 +130,24 @@ describe('authenticated request', () => {
   })
 
   test('should respond with url for redirecting', async () => {
+    const agentUrl = 'https://aa.example/some'
     const idp = 'https://op.example'
     const opRedirectUrl = 'https:/op.example/auth/?something'
     const loginMock = jest.fn(async (loginOptions: any) => {
       loginOptions.handleRedirect(opRedirectUrl);
     });
-    MockedSession.mockImplementationOnce((sessionOptions: any, sessionId: string) => {
+    const mockedOidcSession = {
+      info: { sessionId: webId },
+      login: loginMock
+    } as unknown as Session;
+    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
       expect(sessionId).toBe(webId)
-      return {
-        info: { sessionId: webId},
-        login: loginMock
-      };
-    });
+      return mockedOidcSession
+    })
+    manager.getAgentUrlForSession.mockImplementation(async (oidcSession: Session) => {
+      expect(oidcSession).toBe(mockedOidcSession)
+      return agentUrl
+    })
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -191,21 +188,6 @@ describe('login-redirect', () => {
     expect(manager.getWebId).toBeCalledTimes(1)
     expect(response.ok).toBeFalsy()
     expect(response.status).toBe(404)
-  })
-
-  test('responds 500 if oidc session does not exist for the user of this agent', async () => {
-    manager.getWebId.mockImplementationOnce(async (url) => {
-      return webId
-    })
-    manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
-      return undefined
-    })
-
-    const response = await fetch(url)
-    expect(manager.getWebId).toBeCalledWith(agentUrl)
-    expect(manager.getOidcSession).toBeCalledWith(webId)
-    expect(response.ok).toBeFalsy()
-    expect(response.status).toBe(500)
   })
 
   test('responds 500 if oidc session handling throws', async () => {

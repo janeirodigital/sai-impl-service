@@ -11,7 +11,7 @@ jest.mock('../../../src/session-manager', () => {
     SessionManager: jest.fn(() => {
       return {
         getOidcSession: jest.fn(),
-        setAgentUrl2WebIdMapping: jest.fn()
+        getAgentUrlForSession: jest.fn()
       }
     })
   }
@@ -40,7 +40,7 @@ describe('authenticated request', () => {
   let loginMock: Mock<Promise<void>>
   beforeEach(() => {
     manager.getOidcSession.mockReset();
-    manager.setAgentUrl2WebIdMapping.mockReset();
+    manager.getAgentUrlForSession.mockReset();
     MockedSession.mockReset();
     loginMock = jest.fn(async (loginOptions: any) => {
       loginOptions.handleRedirect(opRedirectUrl);
@@ -91,7 +91,6 @@ describe('authenticated request', () => {
       return {
         info: {
           webId: aliceWebId,
-          clientAppId: agentUrl,
           isLoggedIn: true
         },
         login: loginMock
@@ -106,7 +105,7 @@ describe('authenticated request', () => {
     })
   })
 
-  test('should reuse existing agent if exists for the webId', (done) => {
+  test('correctly initiate login on oidc session', (done) => {
     const request = {
       headers: {
         'content-type': 'application/json'
@@ -114,15 +113,21 @@ describe('authenticated request', () => {
       body: { idp }
     } as unknown as HttpHandlerRequest
     const ctx = { request, authn } as AuthenticatedAuthnContext;
-    manager.getOidcSession.mockImplementationOnce(async (webId) => {
-      expect(webId).toBe(aliceWebId)
-      return {
+    const mockOidcSession = {
         info: {
-          webId: aliceWebId,
-          clientAppId: agentUrl
+          sessionId: aliceWebId,
+          webId: aliceWebId
         },
         login: loginMock
       } as unknown as Session
+
+    manager.getOidcSession.mockImplementationOnce(async (webId) => {
+      expect(webId).toBe(aliceWebId)
+      return mockOidcSession
+    })
+    manager.getAgentUrlForSession.mockImplementationOnce(async (oidcSession) => {
+      expect(oidcSession).toBe(mockOidcSession)
+      return agentUrl
     })
     loginHandler.handle(ctx).subscribe(response => {
       expect(response.status).toBe(200)
@@ -133,43 +138,6 @@ describe('authenticated request', () => {
           oidcIssuer: idp,
           clientId: agentUrl,
           redirectUrl: agentRedirectUrl(agentUrl)
-        })
-      )
-      done()
-    })
-  })
-
-  test('should create new agent if none exists for the webId', (done) => {
-    const request = {
-      headers: {
-        'content-type': 'application/json'
-      },
-      body: { idp }
-    } as unknown as HttpHandlerRequest
-    const ctx = { request, authn } as AuthenticatedAuthnContext;
-    MockedSession.mockImplementationOnce((sessionOptions: any, sessionId: string) => {
-      expect(sessionId).toBe(aliceWebId)
-      return {
-        info: { sessionId: aliceWebId},
-        login: loginMock
-      };
-    });
-
-    manager.setAgentUrl2WebIdMapping.mockImplementationOnce(async (agentUrl, webId) => {
-      expect(agentUuid(agentUrl)).toBeTruthy()
-      expect(webId).toBe(aliceWebId)
-    })
-
-    loginHandler.handle(ctx).subscribe(response => {
-      expect(response.status).toBe(200)
-      expect(response.body?.redirectUrl).toBe(opRedirectUrl)
-      expect(MockedSession).toBeCalledTimes(1)
-      expect(manager.setAgentUrl2WebIdMapping).toBeCalledTimes(1)
-      expect(loginMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          oidcIssuer: idp,
-          clientId: expect.stringMatching(/agents\/.*$/),
-          redirectUrl: expect.stringMatching(/agents\/.*\/redirect$/)
         })
       )
       done()

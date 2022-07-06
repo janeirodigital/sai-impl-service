@@ -1,9 +1,9 @@
 import { jest } from '@jest/globals';
-import { InMemoryStorage, IStorage, Session } from '@inrupt/solid-client-authn-node';
+import { InMemoryStorage, Session } from '@inrupt/solid-client-authn-node';
 import {
   HttpError,
   HttpHandlerContext,
-  HttpHandlerRequest, InternalServerError, NotFoundHttpError
+  HttpHandlerRequest, NotFoundHttpError
 } from "@digita-ai/handlersjs-http";
 
 import { LoginRedirectHandler, frontendUrl, baseUrl } from '../../../src';
@@ -14,7 +14,6 @@ jest.mock('../../../src/session-manager', () => {
     SessionManager: jest.fn(() => {
       return {
         getOidcSession: jest.fn(),
-        setAgentUrl2WebIdMapping: jest.fn(),
         getWebId: jest.fn()
       }
     })
@@ -26,7 +25,6 @@ const manager = jest.mocked(new SessionManager(new InMemoryStorage()))
 
 const uuid = '75340942-4225-42e0-b897-5f36278166de';
 const aliceWebId = 'https://alice.example'
-const agentUrl =  `${baseUrl}/agents/${uuid}`
 
 beforeEach(() => {
   loginRedirectHandler = new LoginRedirectHandler(manager)
@@ -44,31 +42,6 @@ test('respond 404 if agent does not exist', (done) => {
   loginRedirectHandler.handle(ctx).subscribe({
     error: (e: HttpError) => {
       expect(e).toBeInstanceOf(NotFoundHttpError);
-      done();
-    }
-  })
-})
-
-test('respond 500 if session does not exist', (done) => {
-  const request = {
-    headers: {},
-    parameters: { uuid }
-  } as unknown as HttpHandlerRequest
-  const ctx = { request } as HttpHandlerContext;
-
-  manager.getWebId.mockImplementationOnce(async (agentUrl: string) => {
-    return aliceWebId
-  })
-
-  manager.getOidcSession.mockImplementationOnce(async (id: string) => {
-    return undefined
-  })
-
-  loginRedirectHandler.handle(ctx).subscribe({
-    error: (e: HttpError) => {
-      expect(manager.getWebId).toBeCalledWith(agentUrl)
-      expect(manager.getOidcSession).toBeCalledWith(aliceWebId)
-      expect(e).toBeInstanceOf(InternalServerError);
       done();
     }
   })

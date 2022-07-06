@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { InMemoryStorage, Session } from '@inrupt/solid-client-authn-node';
+import { InMemoryStorage, IStorage, Session } from '@inrupt/solid-client-authn-node';
 
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
 jest.mock('@janeirodigital/interop-authorization-agent');
@@ -16,13 +16,15 @@ jest.mock('@inrupt/solid-client-authn-node', () => {
 })
 const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction<any>;
 
-import { SessionManager, getAgentUrlKey } from '../../src/session-manager';
+import { SessionManager, getAgentUrlKey, getWebIdKey } from '../../src/session-manager';
 import { uuid2agentUrl } from '../../src/url-templates'
 
 let manager: SessionManager
+let storage: IStorage
 
 beforeEach(() => {
-  manager = new SessionManager(new InMemoryStorage())
+  storage = new InMemoryStorage()
+  manager = new SessionManager(storage)
   mockedGetSessionFromStorage.mockReset();
 });
 
@@ -34,7 +36,7 @@ describe('getWebId', () => {
   test('should return WebID based on ClientId', async () => {
     const webId = 'https://alice.example/';
     const clientId = 'https://sai.example/agents/0a0b5f5c-a352-4d8e-b5f4-d031afff0f23';
-    manager.storage.set(getAgentUrlKey(clientId), webId)
+    storage.set(getAgentUrlKey(clientId), webId)
     expect(await manager.getWebId(clientId)).toEqual(webId);
   });
 });
@@ -44,7 +46,7 @@ describe('getFromAgentUrl', () => {
     const uuid = '8c4b1081-bc98-44ef-af57-271bac06d95f';
     const agentUrl = uuid2agentUrl(uuid)
     const webId = 'https://alice.example/';
-    manager.storage.set(getAgentUrlKey(agentUrl), webId)
+    storage.set(getAgentUrlKey(agentUrl), webId)
     const getSpy = jest.spyOn(manager, 'getSaiSession').mockImplementationOnce(async () => ({} as AuthorizationAgent));
     await manager.getFromAgentUrl(agentUrl);
     expect(getSpy).toBeCalledTimes(1);
@@ -64,9 +66,12 @@ describe('getSaiSession', () => {
     const webId = 'https://user.example/'
     const clientId = 'https://aa.example/'
     const oidcSession = {
-      info: { webId, clientAppId: clientId },
+      info: { webId, sessionId: webId },
       fetch: () => {}
     } as unknown as Session
+
+    // set expected mapping in storage
+    storage.set(getWebIdKey(webId), clientId)
 
     mockedGetSessionFromStorage.mockImplementationOnce((webId: string, iStorage: Storage) => {
       return oidcSession
@@ -91,9 +96,8 @@ describe('getSaiSession', () => {
 describe('getOidcSession', () => {
   test('should return existing oidc session', async () => {
     const webId = 'https://user.example/'
-    const clientId = 'https://aa.example/'
     const oidcSession = {
-      info: { webId, clientAppId: clientId },
+      info: { webId },
       fetch: () => {}
     } as unknown as Session
 
@@ -105,7 +109,6 @@ describe('getOidcSession', () => {
 
   test('should return a new oidc session if none exist', async () => {
     const webId = 'https://user.example/'
-    const clientId = 'https://aa.example/'
 
     mockedGetSessionFromStorage.mockImplementationOnce((webId: string, IStorage: Storage) => undefined)
 
@@ -113,16 +116,36 @@ describe('getOidcSession', () => {
     expect(session).toBeTruthy();
     expect(session.info.isLoggedIn).toEqual(false);
     expect(session.info.sessionId).toEqual(webId);
+
+    // mapping between webId and agentUrl should be set
+    const agentUrl = await storage.get(getWebIdKey(webId))
+    expect(agentUrl).toBeTruthy();
+    expect(await storage.get(getAgentUrlKey(agentUrl!))).toEqual(webId);
   })
 
 });
 
+describe('getAgentUrlForSession', () => {
+  test('should agentUrl based on mapping', async () => {
+    const webId = 'https://user.example/'
+    const oidcSession = {
+      info: { sessionId: webId },
+      fetch: () => {}
+    } as unknown as Session
+    expect(manager.getAgentUrlForSession(oidcSession)).rejects.toThrow(`agentUrl not found for: ${webId}`)
+  });
 
-describe('setAgentUrl2BewIdMapping', () => {
-  test('should return WebID based on agentUrl', async () => {
-    const webId = 'https://alice.example/';
-    const agentUrl = 'https://sai.example/agents/0a0b5f5c-a352-4d8e-b5f4-d031afff0f23';
-    await manager.setAgentUrl2WebIdMapping(agentUrl, webId)
-    expect(await manager.storage.get(getAgentUrlKey(agentUrl))).toEqual(webId);
+  test('should throw if agentUrl not found', async () => {
+    const webId = 'https://user.example/'
+    const clientId = 'https://aa.example/'
+    const oidcSession = {
+      info: { sessionId: webId },
+      fetch: () => {}
+    } as unknown as Session
+
+    // set expected mapping in storage
+    storage.set(getWebIdKey(webId), clientId)
+
+    expect(await manager.getAgentUrlForSession(oidcSession)).toBe(clientId)
   });
 });

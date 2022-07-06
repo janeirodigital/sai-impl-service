@@ -1,10 +1,9 @@
 import "dotenv/config";
-import { randomUUID } from "crypto";
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
-import { agentRedirectUrl, uuid2agentUrl } from "../url-templates";
+import { agentRedirectUrl } from "../url-templates";
 import { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 
@@ -36,10 +35,7 @@ export class LoginHandler extends HttpHandler {
       return { status: 204, headers: {} }
     }
 
-    // TODO I think this should aso go into the manager, however I couldn't find
-    //      the right way to go about it
-    const agentUrl = uuid2agentUrl(randomUUID());
-    await this.sessionManager.setAgentUrl2WebIdMapping(agentUrl, webId)
+    const agentUrl = await this.sessionManager.getAgentUrlForSession(oidcSession)
 
     const completeRedirectUrl: string = await new Promise((resolve) => {
       oidcSession.login({

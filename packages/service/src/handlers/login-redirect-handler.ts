@@ -30,12 +30,10 @@ export class LoginRedirectHandler extends HttpHandler {
     if (!webId) {
       throw new NotFoundHttpError()
     }
-    const oidcSession = await this.sessionManager.getOidcSession(webId)
 
-    if (!oidcSession) {
-      // TODO clarify this scenario
-      throw new InternalServerError()
-    }
+    const oidcSession = await this.sessionManager.getOidcSession(webId)
+    // TODO clarify scenario if new a session was just created
+
     await oidcSession.handleIncomingRedirect(context.request.url.toString())
 
     if (!oidcSession.info.isLoggedIn || !oidcSession.info.webId) {

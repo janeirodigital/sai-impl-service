@@ -9,5 +9,5 @@ export class MockedSessionManager implements ISessionManager {
   getOidcSession = jest.fn (async(webId: string): Promise<Session> => { return undefined as unknown as Session })
   getFromAgentUrl = jest.fn (async(agentUrl: string): Promise<AuthorizationAgent | undefined> => { return undefined })
   getWebId = jest.fn (async(agentUrl: string): Promise<string | undefined> => { return undefined })
-  setAgentUrl2WebIdMapping = jest.fn (async(agentUrl: string, webId: string): Promise<void> => { return undefined })
+  getAgentUrlForSession = jest.fn(async (oidcSession: Session): Promise<string> => {return undefined as unknown as string})
 }
