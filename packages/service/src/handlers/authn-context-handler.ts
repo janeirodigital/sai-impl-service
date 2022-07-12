@@ -75,7 +75,7 @@ export class AuthnContextHandler implements HttpContextHandler {
         }
       }
     } catch (error: unknown) {
-      throw new UnauthorizedHttpError('Error verifying WebID via DPoP-bound access token: ${(error as Error).message}')
+      throw new UnauthorizedHttpError(`Error verifying WebID via DPoP-bound access token: ${(error as Error).message}`)
     }
   }
 }
