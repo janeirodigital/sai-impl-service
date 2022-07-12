@@ -44,7 +44,7 @@
     "@janeirodigital/sai-server-interfaces": "^0.1.0",
     "@janeirodigital/sai-server-mocks": "^0.1.0",
     "@janeirodigital/solid-redis-token-storage": "^0.0.5",
-    "@solid/access-token-verifier": "^1.2.0",
+    "@solid/access-token-verifier": "^2.0.3",
     "componentsjs": "^5.2.0",
     "dotenv": "^15.0.0",
     "n3": "^1.13.0",
