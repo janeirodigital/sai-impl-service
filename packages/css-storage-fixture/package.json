@@ -1,0 +1,19 @@
+{
+  "name": "css-storage-fixture",
+  "private": true,
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "community-solid-server -c @css:config/file.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@solid/community-server": "^5.0.0"
+  },
+  "volta": {
+    "node": "16.16.0"
+  }
+}

@@ -5,3 +5,6 @@ yarn.lock
 .idea
 .vscode
 .DS_Store
+packages/css-storage-fixture/.internal/idp
+packages/css-storage-fixture/.internal/locks
+packages/css-storage-fixture/.internal/forgot-password
