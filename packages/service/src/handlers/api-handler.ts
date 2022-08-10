@@ -2,17 +2,8 @@ import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { SaiContext } from "../models/http-solid-context";
+import { MessageTypes } from "@janeirodigital/sai-api-messages";
 import { getApplications } from "../services";
-
-const ActionTypes = {
-  APPLICATIONS_REQUESTED: '[APPLICATION PROFILES] Application Profiles Requested',
-  APPLICATIONS_PROVIDED: '[APPLICATION PROFILES] Application Profiles Received'
-}
-
-interface Application {
-  name: string;
-  description: string;
-}
 
 export class ApiHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
@@ -26,10 +17,10 @@ export class ApiHandler extends HttpHandler {
   async handleAsync (context: SaiContext): Promise<HttpHandlerResponse> {
 
     switch(context.request.body?.type) {
-      case ActionTypes.APPLICATIONS_REQUESTED:
+      case MessageTypes.APPLICATIONS_REQUEST:
         return { body: {
-          type: ActionTypes.APPLICATIONS_PROVIDED,
-          profiles: await getApplications(context.saiSession)
+          type: MessageTypes.APPLICATIONS_RESPONSE,
+          payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
       default:
         throw new BadRequestHttpError()
