@@ -20,6 +20,7 @@ export class ApiHandler extends HttpHandler {
       case MessageTypes.APPLICATIONS_REQUEST:
         return { body: {
           type: MessageTypes.APPLICATIONS_RESPONSE,
+          // TODO push down to sai-js to directly use an array from  context.saiSession.applicationRegistrations
           payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
       default:
