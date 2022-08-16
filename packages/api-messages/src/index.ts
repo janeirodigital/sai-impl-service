@@ -13,6 +13,8 @@ type Keys = keyof typeof MessageTypes
 
 export type Message = ApplicationsRequest | ApplicationsResponse
 
+export type IRI = string;
+
 export class ApplicationsRequest {
   public type = MessageTypes.APPLICATIONS_REQUEST
 }
@@ -30,23 +32,23 @@ export class ApplicationsResponse {
 }
 
 export interface UniqueId {
-  id: string;
+  id: IRI;
 };
 
 export interface Application extends UniqueId {
   name: string;
   description: string;
-  author?: string;
-  thumbnail?: string;
+  author?: IRI;
+  thumbnail?: IRI;
   authorizationDate: string; // interop:registeredAt
   lastUpdateDate?: string;    // interop:updatedAt
-  accessNeedGroup: string    // interop:hasAccessNeedGroup
+  accessNeedGroup: IRI    // interop:hasAccessNeedGroup
 }
 
 export interface Description extends UniqueId {
   label: string;
   description?: string;
-  needId: string;
+  needId: IRI;
 };
 
 
@@ -61,6 +63,6 @@ export interface AccessNeed extends UniqueId {
   title: string;
   description: string;
   required: boolean;
-  // TODO (angel) type the array
-  access: Array<string>;
+  // IRIs for the access modes
+  access: Array<IRI>;
 }
