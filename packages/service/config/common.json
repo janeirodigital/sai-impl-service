@@ -105,6 +105,40 @@
                     }
                   ]
                 },
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "API Controller",
+                  "preResponseHandler": {
+                    "@type": "HttpSequenceContextHandler",
+                    "contextHandlers": [
+                      {
+                        "@type": "AuthnContextHandler"
+                      },
+                      {
+                        "@type": "AuthorizationAgentContextHandler",
+                        "sessionManager": {
+                          "@id": "urn:ssv:SessionManager"
+                        }
+                      }
+                    ]
+                  },
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/api",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "POST",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "ApiHandler"
+                      }
+                    }
+                  ]
+                }
               ]
             }
           }
