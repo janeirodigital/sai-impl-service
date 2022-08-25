@@ -4,6 +4,7 @@ import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { AuthnContext } from "../models/http-solid-context";
 import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import { NotFoundHttpError } from "@digita-ai/handlersjs-http";
 
 export class AgentsHandler extends HttpHandler {
   constructor(
@@ -14,12 +15,13 @@ export class AgentsHandler extends HttpHandler {
 
   async findAgentRegistration(webid: string, applicationId: string, agentUrl: string): Promise<string | undefined> {
     const sai = await this.sessionManager.getFromAgentUrl(agentUrl);
-    if (sai) {
-      if (sai.webId === webid) {
-         return (await sai.findApplicationRegistration(applicationId))?.iri
-      } else {
-         return (await sai.findSocialAgentRegistration(webid))?.iri
-      }
+
+    if (!sai) throw new NotFoundHttpError("Session ID does not belong to any known agent");
+
+    if (sai.webId === webid) {
+       return (await sai.findApplicationRegistration(applicationId))?.iri
+    } else {
+       return (await sai.findSocialAgentRegistration(webid))?.iri
     }
   }
 
