@@ -11,4 +11,5 @@ PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 
     a foaf:Person;
     solid:oidcIssuer <http://localhost:3000/>;
-    interop:hasRegistrySet <http://localhost:3000/alice/registrySet>.
+    interop:hasRegistrySet <http://localhost:3000/alice/registrySet>;
+    interop:hasAuthorizationAgent <http://localhost:4000/agents/UUID_TO_DO>.

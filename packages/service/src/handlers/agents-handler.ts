@@ -54,7 +54,8 @@ export class AgentsHandler extends HttpHandler {
       client_id: agentUrl,
       client_name: 'Solid Authorization Agent',
       redirect_uris: [ agentRedirectUrl(agentUrl) ],
-      grant_types : ['refresh_token','authorization_code']
+      grant_types : ['refresh_token','authorization_code'],
+      authorization_redirect_uri: 'TODO fronted redirect uri'
     }
   }
 
