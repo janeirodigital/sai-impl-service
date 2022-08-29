@@ -9,6 +9,8 @@ import { INTEROP } from '@janeirodigital/interop-namespaces';
 import { baseUrl, agentRedirectUrl, uuid2agentUrl } from '../../src/url-templates'
 import { createTestServer } from "./components-builder";
 
+jest.setTimeout(20000)
+
 jest.mock('@solid/access-token-verifier', () => {
   return {
     createSolidTokenVerifier: jest.fn()

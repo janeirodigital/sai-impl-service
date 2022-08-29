@@ -5,8 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "community-solid-server -c @css:config/file.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "community-solid-server -c @css:config/file.json"
   },
   "author": "",
   "license": "MIT",
