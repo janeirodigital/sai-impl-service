@@ -6,7 +6,7 @@ import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFu
 import { MockedSessionManager } from '@janeirodigital/sai-server-mocks'
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
 import { INTEROP } from '@janeirodigital/interop-namespaces';
-import { baseUrl, agentRedirectUrl, uuid2agentUrl } from '../../src/url-templates'
+import { baseUrl, agentRedirectUrl, encodeWebId, webId2agentUrl } from '../../src/url-templates'
 import { createTestServer } from "./components-builder";
 
 jest.setTimeout(20000)
@@ -23,11 +23,12 @@ let componentsManager: ComponentsManager<Server>
 let manager: MockedSessionManager
 
 const webId = 'https://alice.example'
-const agentUuid = '75340942-4225-42e0-b897-5f36278166de';
+const encodedWebId = encodeWebId(webId);
+const agentUrl = webId2agentUrl(webId)
+const redirectUrl = agentRedirectUrl(agentUrl)
 const dpopProof = 'dpop-proof'
 const authorization = 'DPoP some-token'
 const clientId = 'https://projectron.example'
-const agentUrl = uuid2agentUrl(agentUuid)
 
 beforeAll(async () => {
   const created = await createTestServer()
@@ -47,7 +48,7 @@ beforeEach(async () => {
 })
 
 describe("unauthenticated request", () => {
-  const path = `/agents/${agentUuid}`
+  const path = `/agents/${encodedWebId}`
   const url = `${baseUrl}${path}`
 
   test('should contain valid Client ID Document', async() => {
@@ -59,15 +60,15 @@ describe("unauthenticated request", () => {
     expect(response.headers.get('Content-Type')).toBe('application/ld+json')
 
     const document = await response.json()
-    expect(document.client_id).toContain(agentUuid);
-    expect(document.redirect_uris).toContain(agentRedirectUrl(agentUuid));
+    expect(document.client_id).toContain(agentUrl);
+    expect(document.redirect_uris).toContain(redirectUrl);
     expect(document.grant_types).toEqual(expect.arrayContaining(['authorization_code', 'refresh_token']));
   })
 })
 
 // This is handled by AuthnContextHandler
 describe("request without client_id", () => {
-  const path = `/agents/${agentUuid}`
+  const path = `/agents/${encodedWebId}`
   const url = `${baseUrl}${path}`
 
   test('should respond 401 when applicationId from token is undefined', async () => {
@@ -96,7 +97,7 @@ describe("request without client_id", () => {
 })
 
 describe('authenticated request', () => {
-  const path = `/agents/${agentUuid}`
+  const path = `/agents/${encodedWebId}`
   const url = `${baseUrl}${path}`
   const headers = {
     'DPoP': dpopProof,
@@ -118,7 +119,7 @@ describe('authenticated request', () => {
       } as SolidTokenVerifierFunction
     })
 
-    manager.getFromAgentUrl.mockImplementationOnce(async (url) => {
+    manager.getSaiSession.mockImplementationOnce(async (webId) => {
       return {
         webId,
         findApplicationRegistration: async (applicationId) => {
@@ -132,7 +133,7 @@ describe('authenticated request', () => {
       method: 'GET',
       headers,
     })
-    expect(manager.getFromAgentUrl).toBeCalledWith(agentUrl)
+    expect(manager.getSaiSession).toBeCalledWith(webId)
     expect(response.ok).toBe(true)
     expect(response.status).toBe(200)
     expect(response.headers.get('Link')).toBe(`<${clientId}>; anchor="${applicationRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
@@ -154,8 +155,7 @@ describe('authenticated request', () => {
       } as SolidTokenVerifierFunction
     })
 
-    manager.getFromAgentUrl.mockImplementation(async (url) => {
-      expect(url).toBe(agentUrl)
+    manager.getSaiSession.mockImplementation(async (webId) => {
       return {
         webId,
         findSocialAgentRegistration: async (webid) => {
@@ -170,7 +170,7 @@ describe('authenticated request', () => {
       headers,
     })
 
-    expect(manager.getFromAgentUrl).toBeCalledWith(agentUrl)
+    expect(manager.getSaiSession).toBeCalledWith(webId)
     expect(response.ok).toBe(true)
     expect(response.status).toBe(200)
     expect(response.headers.get('Link')).toBe(`<${clientId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)

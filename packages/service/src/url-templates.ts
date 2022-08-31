@@ -4,15 +4,24 @@ export const baseUrl: string = process.env.BASE_URL!
 
 export const frontendUrl: string = process.env.FRONTEND_URL!
 
-export function uuid2agentUrl(uuid: string): string {
-  return `${baseUrl}/agents/${uuid}`
+export function encodeWebId(webId: string): string {
+  return Buffer.from(webId).toString('base64')
 }
 
-export function agentUuid(url: string): string {
-  return url.split('/').at(-1)!
+export function decodeWebId(encoded: string): string {
+  return Buffer.from(encoded, 'base64').toString('ascii')
 }
 
-export function agentRedirectUrl(url: string): string {
-  const uuid = url.split('/').at(-1)!
-  return `${baseUrl}/agents/${uuid}/redirect`
+export function webId2agentUrl(webId: string): string {
+  const encoded = encodeWebId(webId)
+  return `${baseUrl}/agents/${encoded}`
+}
+
+export function agentUrl2webId(agentUrl: string): string {
+  const encoded = agentUrl.split('/').at(-1)!
+  return decodeWebId(encoded)
+}
+
+export function agentRedirectUrl(agentUrl: string): string {
+  return `${agentUrl}/redirect`
 }

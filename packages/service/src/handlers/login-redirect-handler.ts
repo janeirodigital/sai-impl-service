@@ -3,7 +3,7 @@ import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/
 import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
-import { frontendUrl, uuid2agentUrl } from "../url-templates";
+import { frontendUrl, decodeWebId } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { SessionManager } from "../session-manager";
 
@@ -24,12 +24,7 @@ export class LoginRedirectHandler extends HttpHandler {
   }
 
   private async handleAsync(context: HttpHandlerContext): Promise<HttpHandlerResponse> {
-    const agentUrl = uuid2agentUrl(context.request.parameters!.uuid)
-    const webId = await this.sessionManager.getWebId(agentUrl)
-
-    if (!webId) {
-      throw new NotFoundHttpError()
-    }
+    const webId = decodeWebId(context.request.parameters!.encodedWebId)
 
     const oidcSession = await this.sessionManager.getOidcSession(webId)
     // TODO clarify scenario if new a session was just created

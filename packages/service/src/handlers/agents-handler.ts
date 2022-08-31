@@ -2,7 +2,7 @@ import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { AuthnContext } from "../models/http-solid-context";
-import { uuid2agentUrl, agentRedirectUrl } from "../url-templates";
+import { agentRedirectUrl, agentUrl2webId } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { NotFoundHttpError } from "@digita-ai/handlersjs-http";
 
@@ -14,9 +14,8 @@ export class AgentsHandler extends HttpHandler {
   }
 
   async findAgentRegistration(webid: string, applicationId: string, agentUrl: string): Promise<string | undefined> {
-    const sai = await this.sessionManager.getFromAgentUrl(agentUrl);
-
-    if (!sai) throw new NotFoundHttpError("Session ID does not belong to any known agent");
+    const webId = agentUrl2webId(agentUrl)
+    const sai = await this.sessionManager.getSaiSession(webId);
 
     if (sai.webId === webid) {
        return (await sai.findApplicationRegistration(applicationId))?.iri
@@ -26,17 +25,13 @@ export class AgentsHandler extends HttpHandler {
   }
 
   async handleAsync(context: AuthnContext): Promise<HttpHandlerResponse> {
-    const agentUrl = uuid2agentUrl(context.request.parameters!.uuid)
+    const agentUrl = context.request.url.toString()
     if (!context.authn.authenticated) {
       return {
         body: this.clientIdDocument(agentUrl),
         status: 200,
         headers: { 'Content-Type': 'application/ld+json' }
       }
-    }
-    if(!context.authn.clientId) {
-      // TODO: add logging
-      throw new UnauthorizedHttpError()
     }
     const registrationIri = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUrl)
     const headers : { [key: string]: string} = {}

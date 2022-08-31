@@ -3,7 +3,7 @@ import { ComponentsManager } from 'componentsjs';
 import { lastValueFrom } from 'rxjs'
 import { Server } from '@digita-ai/handlersjs-http';
 import { MockedSessionManager } from '@janeirodigital/sai-server-mocks'
-import { baseUrl, agentRedirectUrl, uuid2agentUrl, frontendUrl } from '../../src/url-templates'
+import { baseUrl, agentRedirectUrl, frontendUrl, webId2agentUrl } from '../../src/url-templates'
 import { createTestServer } from "./components-builder";
 
 import { createSolidTokenVerifier, SolidAccessTokenPayload, SolidTokenVerifierFunction } from '@solid/access-token-verifier';
@@ -23,6 +23,7 @@ let componentsManager: ComponentsManager<Server>
 let manager: MockedSessionManager
 
 const webId = 'https://alice.example'
+const agentUrl = webId2agentUrl(webId)
 
 beforeAll(async () => {
   const created = await createTestServer()
@@ -71,7 +72,6 @@ describe('authenticated request', () => {
       } as SolidTokenVerifierFunction
     })
     manager.getOidcSession.mockReset()
-    manager.getAgentUrlForSession.mockReset()
   })
 
   test('should respond 400 if not json content type', async () => {
@@ -132,7 +132,6 @@ describe('authenticated request', () => {
   })
 
   test('should respond with url for redirecting', async () => {
-    const agentUrl = 'https://aa.example/some'
     const idp = 'https://op.example'
     const opRedirectUrl = 'https:/op.example/auth/?something'
     const loginMock = jest.fn(async (loginOptions: any) => {
@@ -145,10 +144,6 @@ describe('authenticated request', () => {
     manager.getOidcSession.mockImplementationOnce(async (sessionId: string) => {
       expect(sessionId).toBe(webId)
       return mockedOidcSession
-    })
-    manager.getAgentUrlForSession.mockImplementation(async (oidcSession: Session) => {
-      expect(oidcSession).toBe(mockedOidcSession)
-      return agentUrl
     })
     const response = await fetch(url, {
       method: 'POST',
@@ -172,30 +167,13 @@ describe('authenticated request', () => {
 })
 
 describe('login-redirect', () => {
-  const agentUuid = '8cfa17ac-19b9-42bc-8df4-aad3ddf64bf5'
-  const agentUrl = uuid2agentUrl(agentUuid)
   const url = agentRedirectUrl(agentUrl)
 
   beforeEach(() => {
-    manager.getWebId.mockReset()
     manager.getOidcSession.mockReset()
   })
 
-  test('responds 404 if no user associated with given agent', async () => {
-    manager.getWebId.mockImplementationOnce(async (url) => {
-      expect(url).toBe(agentUrl)
-      return undefined
-    })
-    const response = await fetch(url)
-    expect(manager.getWebId).toBeCalledTimes(1)
-    expect(response.ok).toBeFalsy()
-    expect(response.status).toBe(404)
-  })
-
   test('responds 500 if oidc session handling throws', async () => {
-    manager.getWebId.mockImplementationOnce(async (url) => {
-      return webId
-    })
     const handleIncomingRedirectMock = jest.fn(async (url: string) => {
       throw new Error('boom!')
     });
@@ -206,7 +184,6 @@ describe('login-redirect', () => {
     })
 
     const response = await fetch(url)
-    expect(manager.getWebId).toBeCalledWith(agentUrl)
     expect(manager.getOidcSession).toBeCalledWith(webId)
     expect(handleIncomingRedirectMock).toBeCalledTimes(1)
     expect(response.ok).toBeFalsy()
@@ -214,9 +191,6 @@ describe('login-redirect', () => {
   })
 
   test('responds 500 if oidc session handling of incoming redirect failed', async () => {
-    manager.getWebId.mockImplementationOnce(async (url) => {
-      return webId
-    })
     const handleIncomingRedirectMock = jest.fn(async (url: string) => {
       return undefined
     });
@@ -231,7 +205,6 @@ describe('login-redirect', () => {
     })
 
     const response = await fetch(url)
-    expect(manager.getWebId).toBeCalledWith(agentUrl)
     expect(manager.getOidcSession).toBeCalledWith(webId)
     expect(handleIncomingRedirectMock).toBeCalledTimes(1)
     expect(response.ok).toBeFalsy()
@@ -239,9 +212,6 @@ describe('login-redirect', () => {
   })
 
   test('responds 302 when successful', async () => {
-    manager.getWebId.mockImplementationOnce(async (url) => {
-      return webId
-    })
     const handleIncomingRedirectMock = jest.fn(async (url: string) => {
       return undefined
     });
@@ -257,7 +227,6 @@ describe('login-redirect', () => {
     })
 
     const response = await fetch(url, { redirect: 'manual' })
-    expect(manager.getWebId).toBeCalledWith(agentUrl)
     expect(manager.getOidcSession).toBeCalledWith(webId)
     expect(handleIncomingRedirectMock).toBeCalledTimes(1)
     expect(response.status).toBe(302)

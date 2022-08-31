@@ -3,7 +3,7 @@ import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
-import { agentRedirectUrl } from "../url-templates";
+import { agentRedirectUrl, webId2agentUrl } from "../url-templates";
 import { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 
@@ -35,7 +35,7 @@ export class LoginHandler extends HttpHandler {
       return { status: 204, headers: {} }
     }
 
-    const agentUrl = await this.sessionManager.getAgentUrlForSession(oidcSession)
+    const agentUrl = webId2agentUrl(webId)
 
     const completeRedirectUrl: string = await new Promise((resolve) => {
       oidcSession.login({

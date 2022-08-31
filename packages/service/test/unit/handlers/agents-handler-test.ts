@@ -2,10 +2,10 @@ import {
   AgentsHandler,
   SessionManager,
   agentRedirectUrl,
-  uuid2agentUrl,
-  HttpSolidContext,
   UnauthenticatedAuthnContext,
-  AuthenticatedAuthnContext
+  AuthenticatedAuthnContext,
+  webId2agentUrl,
+  encodeWebId
 } from "../../../src";
 import { jest } from '@jest/globals';
 
@@ -16,7 +16,7 @@ jest.mock('../../../src/session-manager', () => {
     ...originalModule,
     SessionManager: jest.fn(() => {
       return {
-        getFromAgentUrl: jest.fn()
+        getSaiSession: jest.fn()
       }
     })
   }
@@ -27,15 +27,15 @@ import { INTEROP } from '@janeirodigital/interop-namespaces';
 import { InMemoryStorage } from "@inrupt/solid-client-authn-node";
 import { HttpHandlerRequest } from "@digita-ai/handlersjs-http";
 
-const uuid = '75340942-4225-42e0-b897-5f36278166de';
-const agentUrl = uuid2agentUrl(uuid)
+const aliceWebId = 'https://alice.example'
+const aliceAgentUrl = webId2agentUrl(aliceWebId)
 
 const manager = jest.mocked(new SessionManager(new InMemoryStorage()))
 let agentsHandler: AgentsHandler
 
 
 beforeEach(() => {
-  manager.getFromAgentUrl.mockReset();
+  manager.getSaiSession.mockReset();
   agentsHandler = new AgentsHandler(manager)
 })
 
@@ -43,7 +43,7 @@ describe('unauthenticated request', () => {
   test('should contain valid Client ID Document', (done) => {
     const request = {
       headers: {},
-      parameters: { uuid }
+      url: aliceAgentUrl
     } as unknown as HttpHandlerRequest
     const authn = {
       authenticated: false
@@ -51,8 +51,8 @@ describe('unauthenticated request', () => {
     const ctx = { request, authn } as UnauthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
-      expect(response.body.client_id).toContain(uuid);
-      expect(response.body.redirect_uris).toContain(agentRedirectUrl(uuid));
+      expect(response.body.client_id).toContain(encodeWebId(aliceWebId));
+      expect(response.body.redirect_uris).toContain(agentRedirectUrl(aliceAgentUrl));
       expect(response.body.grant_types).toEqual(expect.arrayContaining(['authorization_code', 'refresh_token']));
       done()
     })
@@ -60,20 +60,18 @@ describe('unauthenticated request', () => {
 });
 
 describe('authenticated request', () => {
-  const webId = 'https://user.example/'
   const clientId = 'https://client.example/'
 
   const authn = {
     authenticated: true,
-    webId,
+    webId: aliceWebId,
     clientId
   }
 
   test('application registration discovery', (done) => {
     const applicationRegistrationIri = 'https://some.example/application-registration'
 
-    manager.getFromAgentUrl.mockImplementation(async (url) => {
-      expect(url).toBe(agentUrl)
+    manager.getSaiSession.mockImplementation(async (webId) => {
       return {
         webId,
         findApplicationRegistration: async (applicationId) => {
@@ -84,44 +82,46 @@ describe('authenticated request', () => {
     })
 
     const request = {
-      parameters: { uuid }
+      url: aliceAgentUrl
     } as unknown as HttpHandlerRequest
 
     const ctx = { request, authn } as AuthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
+      expect(manager.getSaiSession).toBeCalledWith(aliceWebId)
       expect(response.headers.Link).toBe(`<${clientId}>; anchor="${applicationRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
       done()
     })
   });
 
   test('social agent registration discovery', (done) => {
-    const differentWebId = 'https://different-user.example/'
+    const bobWebId = 'https://bob.example/'
     const socialAgentRegistrationIri = 'https://some.example/application-registration'
 
-    manager.getFromAgentUrl.mockImplementation(async (url) => {
-      expect(url).toBe(agentUrl)
+    manager.getSaiSession.mockImplementation(async (webId) => {
       return {
         webId,
         findSocialAgentRegistration: async (webid) => {
-          expect(webid).toBe(differentWebId)
+          expect(webid).toBe(bobWebId)
           return { iri: socialAgentRegistrationIri}
         }
       } as AuthorizationAgent
     })
 
     const request = {
-      parameters: { uuid }
+      url: aliceAgentUrl
     } as unknown as HttpHandlerRequest
 
-    const differentWebIdAuthn = {
-      ...authn,
-      webId: differentWebId
+    const authn = {
+      authenticated: true,
+      webId: bobWebId,
+      clientId
     }
 
-    const ctx = { request, authn: differentWebIdAuthn} as AuthenticatedAuthnContext;
+    const ctx = { request, authn: authn} as AuthenticatedAuthnContext;
 
     agentsHandler.handle(ctx).subscribe(response => {
+      expect(manager.getSaiSession).toBeCalledWith(aliceWebId)
       expect(response.headers.Link).toBe(`<${clientId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
       done()
     })

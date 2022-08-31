@@ -2,7 +2,7 @@ import { jest } from "@jest/globals";
 import { Mock } from "jest-mock";
 import { InMemoryStorage, Session } from "@inrupt/solid-client-authn-node";
 import { HttpError, BadRequestHttpError, HttpHandlerRequest } from "@digita-ai/handlersjs-http";
-import { agentRedirectUrl, agentUuid, AuthenticatedAuthnContext, LoginHandler } from "../../../src";
+import { agentRedirectUrl, AuthenticatedAuthnContext, LoginHandler, webId2agentUrl } from "../../../src";
 
 import { SessionManager } from "../../../src/session-manager";
 
@@ -11,7 +11,6 @@ jest.mock('../../../src/session-manager', () => {
     SessionManager: jest.fn(() => {
       return {
         getOidcSession: jest.fn(),
-        getAgentUrlForSession: jest.fn()
       }
     })
   }
@@ -35,12 +34,11 @@ describe('authenticated request', () => {
     clientId: 'https://projectron.example'
   }
   const opRedirectUrl = 'https:/op.example/auth/?something'
-  const agentUrl = 'https://sai.example/agents/123'
+  const agentUrl = webId2agentUrl(authn.webId)
 
   let loginMock: Mock<Promise<void>>
   beforeEach(() => {
     manager.getOidcSession.mockReset();
-    manager.getAgentUrlForSession.mockReset();
     MockedSession.mockReset();
     loginMock = jest.fn(async (loginOptions: any) => {
       loginOptions.handleRedirect(opRedirectUrl);
@@ -124,10 +122,6 @@ describe('authenticated request', () => {
     manager.getOidcSession.mockImplementationOnce(async (webId) => {
       expect(webId).toBe(aliceWebId)
       return mockOidcSession
-    })
-    manager.getAgentUrlForSession.mockImplementationOnce(async (oidcSession) => {
-      expect(oidcSession).toBe(mockOidcSession)
-      return agentUrl
     })
     loginHandler.handle(ctx).subscribe(response => {
       expect(response.status).toBe(200)
