@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
@@ -55,7 +56,7 @@ export class AgentsHandler extends HttpHandler {
       client_name: 'Solid Authorization Agent',
       redirect_uris: [ agentRedirectUrl(agentUrl) ],
       grant_types : ['refresh_token','authorization_code'],
-      authorization_redirect_uri: 'TODO fronted redirect uri'
+      authorization_redirect_uri: process.env.FRONTEND_AUTHORIZATION_URL!
     }
   }
 

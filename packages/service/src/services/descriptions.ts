@@ -1,6 +1,7 @@
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { getOneObject } from "../utils/rdf-parser";
 import { INTEROP, buildNamespace } from "@janeirodigital/interop-namespaces";
+import { parseTurtle } from "@janeirodigital/interop-utils"
+import { getOneObject } from "../utils/rdf-parser";
+import { parseJsonld } from "../utils/jsonld-parser";
 
 // TODO (elf-pavlik) add to interop-namespaces
 const SKOS = buildNamespace('http://www.w3.org/2004/02/skos/core#')
@@ -15,18 +16,26 @@ const SKOS = buildNamespace('http://www.w3.org/2004/02/skos/core#')
  * @param targetLang XSD language requested, e.g.: "en", "es", "i-navajo".
  */
 export const getDescriptions = async (
-  agent: AuthorizationAgent,
   applicationIri: string,
   targetLang: string
 ) => {
-  const document = await agent.fetch(applicationIri).then((r) => r.dataset());
+  const clientIdResponse = await fetch(applicationIri)
+  const document = await parseJsonld(await clientIdResponse.text(), clientIdResponse.url)
+  const accessNeedGroupIri = getOneObject(
+    document.match(null, INTEROP.hasAccessNeedGroup)
+  )?.value
+  if (!accessNeedGroupIri) return null;
+  const accessNeedGropupResponse = await fetch(accessNeedGroupIri)
+  const accessNeedGroup = await parseTurtle(await accessNeedGropupResponse.text(), accessNeedGropupResponse.url)
+
   const descriptionSetIri = getOneObject(
-    document.match(null, INTEROP.hasAccessDescriptionSet)
+    accessNeedGroup.match(null, INTEROP.hasAccessDescriptionSet)
   )?.value;
 
   if (!descriptionSetIri) return null;
 
-  const descriptionSet = await agent.fetch(descriptionSetIri).then((r) => r.dataset());
+  const descriptionSetResponse = await fetch(descriptionSetIri)
+  const descriptionSet = await parseTurtle(await descriptionSetResponse.text(), descriptionSetResponse.url)
   // TODO (angel) contemplate cases where the descriptions are spread across multiple locations
   //              on the web. e.g.: .../desc-en.ttl, .../desc-es.ttl, etc.
 
