@@ -34,7 +34,7 @@
                   "routes": [
                     {
                       "@type": "HttpHandlerRoute",
-                      "path": "/agents/:uuid",
+                      "path": "/agents/:encodedWebId",
                       "operations": [
                         {
                           "@type": "HttpHandlerOperation",
@@ -88,7 +88,7 @@
                   "routes": [
                     {
                       "@type": "HttpHandlerRoute",
-                      "path": "/agents/:uuid/redirect",
+                      "path": "/agents/:encodedWebId/redirect",
                       "operations": [
                         {
                           "@type": "HttpHandlerOperation",
