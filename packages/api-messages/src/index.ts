@@ -1,35 +1,72 @@
-export const MessageTypes = {
+export const RequestMessageTypes = {
   APPLICATIONS_REQUEST: '[APPLICATION PROFILES] Application Profiles Requested',
-  APPLICATIONS_RESPONSE: '[APPLICATION PROFILES] Application Profiles Received',
-  DESCRIPTION_REQUESTED: '[DESCRIPTIONS] Description Requested'
+  DESCRIPTIONS_REQUEST: '[DESCRIPTIONS] Descriptions Requested',
 } as const
 
-type Keys = keyof typeof MessageTypes
+export const ResponseMessageTypes = {
+  APPLICATIONS_RESPONSE: '[APPLICATION PROFILES] Application Profiles Received',
+  DESCRIPTIONS_RESPONSE: '[DESCRIPTIONS] Descriptions Received'
+} as const
 
-// type Message = {
-//   type:  typeof MessageTypes[Keys];
-//   payload?:
-// }
+type ResponseKeys = keyof typeof ResponseMessageTypes
 
-export type Message = ApplicationsRequest | ApplicationsResponse
+export type ResponseMessage = ApplicationsResponseMessage | DescriptionsResponseMessage
+
+export type ApplicationsResponseMessage = {
+  type: typeof ResponseMessageTypes.APPLICATIONS_RESPONSE,
+  payload: Application[]
+}
+
+export type DescriptionsResponseMessage = {
+  type: typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
+  payload: Description[]
+}
 
 export type IRI = string;
 
-export class ApplicationsRequest {
-  public type = MessageTypes.APPLICATIONS_REQUEST
+abstract class MessageBase {
+  stringify (): string {
+    return JSON.stringify(this)
+  }
+}
+
+export class ApplicationsRequest extends MessageBase {
+  public type = RequestMessageTypes.APPLICATIONS_REQUEST
 }
 
 export class ApplicationsResponse {
-  public type = MessageTypes.APPLICATIONS_RESPONSE
+  public type = ResponseMessageTypes.APPLICATIONS_RESPONSE
   public payload: Application[]
 
-  constructor(message: Message) {
+  constructor(message: ApplicationsResponseMessage) {
     if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this}, received: ${message.type}`)
+      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
     }
     this.payload = message.payload
   }
 }
+
+export class DescriptionsRequest extends MessageBase {
+  public type = RequestMessageTypes.DESCRIPTIONS_REQUEST
+
+  constructor(private applicationId: IRI, private lang: string) {
+    super()
+  }
+}
+
+export class DescriptionsResponse {
+  public type = ResponseMessageTypes.DESCRIPTIONS_RESPONSE
+  public payload: Description[]
+
+  constructor(message: DescriptionsResponseMessage) {
+    if (message.type !== this.type) {
+      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
+    }
+    this.payload = message.payload
+  }
+}
+
+export type Request = ApplicationsRequest | DescriptionsRequest
 
 export interface UniqueId {
   id: IRI;

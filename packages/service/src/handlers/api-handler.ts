@@ -2,8 +2,9 @@ import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { SaiContext } from "../models/http-solid-context";
-import { MessageTypes } from "@janeirodigital/sai-api-messages";
-import { getApplications } from "../services";
+import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
+import { getApplications, getDescriptions } from "../services";
+import { validateContentType } from "../utils/http-validators";
 
 export class ApiHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
@@ -15,13 +16,22 @@ export class ApiHandler extends HttpHandler {
 
 
   async handleAsync (context: SaiContext): Promise<HttpHandlerResponse> {
-
-    switch(context.request.body?.type) {
-      case MessageTypes.APPLICATIONS_REQUEST:
+    validateContentType(context, 'application/json');
+    const body = context.request.body
+    if (!body) {
+      throw new BadRequestHttpError()
+    }
+    switch(body.type) {
+      case RequestMessageTypes.APPLICATIONS_REQUEST:
         return { body: {
-          type: MessageTypes.APPLICATIONS_RESPONSE,
+          type: ResponseMessageTypes.APPLICATIONS_RESPONSE,
           // TODO push down to sai-js to directly use an array from  context.saiSession.applicationRegistrations
           payload: await getApplications(context.saiSession)
+        }, status: 200, headers: {} }
+      case RequestMessageTypes.DESCRIPTIONS_REQUEST:
+        return { body: {
+          type: ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
+          payload: await getDescriptions(body.applicationId, body.lang)
         }, status: 200, headers: {} }
       default:
         throw new BadRequestHttpError()
