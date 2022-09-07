@@ -1,6 +1,7 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 PREFIX acl: <http://www.w3.org/ns/auth/acl#>
-PREFIX pm-shapetrees: <https://data.example/shapetrees/pm-shapetrees#>
+PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
 
 <./access-needs>
   a interop:AccessNeedGroup ;
@@ -13,15 +14,18 @@ PREFIX pm-shapetrees: <https://data.example/shapetrees/pm-shapetrees#>
 
 <#need-project>
   a interop:AccessNeed ;
-  interop:registeredShapeTree pm-shapetrees:ProjectTree ;
+  interop:registeredShapeTree solidtrees:Project ;
   interop:accessNecessity interop:accessRequired ;
   interop:accessMode acl:Read, acl:Create ;
   interop:creatorAccessMode acl:Update, acl:Delete .
 
 <#need-task>
   a interop:AccessNeed ;
-  interop:registeredShapeTree pm-shapetrees:TaskTree ;
+  interop:registeredShapeTree solidtrees:Task ;
   interop:accessNecessity interop:accessRequired ;
   interop:accessMode acl:Read, acl:Create ;
   interop:creatorAccessMode acl:Update, acl:Delete ;
   interop:inheritsFromNeed <#need-project> .
+
+<./descriptions-en>
+  interop:usesLanguage "en"^^xsd:language .

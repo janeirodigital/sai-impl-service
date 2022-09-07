@@ -1,0 +1,16 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
+PREFIX solidshapes: <http://localhost:3000/shapetrees/shapes/>
+PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
+
+solidtrees:Task
+  a shapetrees:ShapeTree ;
+  shapetrees:expectsType shapetrees:Resource ;
+  shapetrees:shape solidshapes:Task .
+
+solidtrees:desc-en\#Task
+  shapetrees:inDescriptionSet solidtrees:desc-en ;
+  shapetrees:describes solidtrees:Task .
+
+solidtrees:desc-en
+  shapetrees:usesLanguage "en"^^xsd:language .
