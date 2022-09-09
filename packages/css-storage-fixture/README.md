@@ -6,6 +6,8 @@ All accounts use `password` as the password
 
 * alice@acme.example
 * bob@yoyodyne.example
+* acme@acme.example
+* admin@shapetrees.example
 
 ## Starting CSS
 
