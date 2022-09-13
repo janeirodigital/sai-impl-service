@@ -21,3 +21,10 @@ solidtrees:desc-en\#Project
 
 solidtrees:desc-en
   shapetrees:usesLanguage "en"^^xsd:language .
+
+solidtrees:desc-pl\#Project
+  shapetrees:inDescriptionSet solidtrees:desc-pl ;
+  shapetrees:describes solidtrees:Project .
+
+solidtrees:desc-pl
+  shapetrees:usesLanguage "pl"^^xsd:language .
