@@ -5,6 +5,7 @@ import { SaiContext } from "../models/http-solid-context";
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
 import { getApplications, getDescriptions } from "../services";
 import { validateContentType } from "../utils/http-validators";
+import { getSocialAgents } from "../services/social-agents";
 
 export class ApiHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
@@ -25,8 +26,12 @@ export class ApiHandler extends HttpHandler {
       case RequestMessageTypes.APPLICATIONS_REQUEST:
         return { body: {
           type: ResponseMessageTypes.APPLICATIONS_RESPONSE,
-          // TODO push down to sai-js to directly use an array from  context.saiSession.applicationRegistrations
           payload: await getApplications(context.saiSession)
+        }, status: 200, headers: {} }
+      case RequestMessageTypes.SOCIAL_AGENTS_REQUEST:
+        return { body: {
+          type: ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
+          payload: await getSocialAgents(context.saiSession)
         }, status: 200, headers: {} }
       case RequestMessageTypes.DESCRIPTIONS_REQUEST:
         return { body: {

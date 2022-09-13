@@ -1,20 +1,27 @@
 export const RequestMessageTypes = {
   APPLICATIONS_REQUEST: '[APPLICATION PROFILES] Application Profiles Requested',
+  SOCIAL_AGENTS_REQUEST: '[SOCIAL AGENTS PROFILES] Application Profiles Requested',
   DESCRIPTIONS_REQUEST: '[DESCRIPTIONS] Descriptions Requested',
 } as const
 
 export const ResponseMessageTypes = {
   APPLICATIONS_RESPONSE: '[APPLICATION PROFILES] Application Profiles Received',
+  SOCIAL_AGENTS_RESPONSE: '[SOCIAL AGENTS PROFILES] Application Profiles Received',
   DESCRIPTIONS_RESPONSE: '[DESCRIPTIONS] Descriptions Received'
 } as const
 
 type ResponseKeys = keyof typeof ResponseMessageTypes
 
-export type ResponseMessage = ApplicationsResponseMessage | DescriptionsResponseMessage
+export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage | DescriptionsResponseMessage
 
 export type ApplicationsResponseMessage = {
   type: typeof ResponseMessageTypes.APPLICATIONS_RESPONSE,
   payload: Application[]
+}
+
+export type SocialAgentsResponseMessage = {
+  type: typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
+  payload: SocialAgent[]
 }
 
 export type DescriptionsResponseMessage = {
@@ -46,6 +53,22 @@ export class ApplicationsResponse {
   }
 }
 
+export class SocialAgentsRequest extends MessageBase {
+  public type = RequestMessageTypes.SOCIAL_AGENTS_REQUEST
+}
+
+export class SocialAgentsResponse {
+  public type = ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE
+  public payload: SocialAgent[]
+
+  constructor(message: SocialAgentsResponseMessage) {
+    if (message.type !== this.type) {
+      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
+    }
+    this.payload = message.payload
+  }
+}
+
 export class DescriptionsRequest extends MessageBase {
   public type = RequestMessageTypes.DESCRIPTIONS_REQUEST
 
@@ -66,11 +89,11 @@ export class DescriptionsResponse {
   }
 }
 
-export type Request = ApplicationsRequest | DescriptionsRequest
+export type Request = ApplicationsRequest | SocialAgentsRequest | DescriptionsRequest
 
 export interface UniqueId {
   id: IRI;
-};
+}
 
 export interface Application extends UniqueId {
   name: string;
@@ -80,6 +103,13 @@ export interface Application extends UniqueId {
   authorizationDate: string; // interop:registeredAt
   lastUpdateDate?: string;    // interop:updatedAt
   accessNeedGroup: IRI    // interop:hasAccessNeedGroup
+}
+
+export interface SocialAgent extends UniqueId {
+  label: string;
+  note?: string;
+  authorizationDate: string; // interop:registeredAt
+  lastUpdateDate?: string;    // interop:updatedAt
 }
 
 export interface Description extends UniqueId {
