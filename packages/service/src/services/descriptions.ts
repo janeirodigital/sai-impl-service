@@ -132,6 +132,7 @@ class AccessNeedGroup extends Resource {
       const descriptionSetNode = getOneSubject(shapeTree.dataset.match(null, SHAPETREES.usesLanguage, DataFactory.literal(this.descriptionsLang, XSD.language)))
       if (!descriptionSetNode) continue
       const descriptionNodes = getAllSubjects(shapeTree.dataset.match(null, SHAPETREES.describes, shapeTree.node))
+      // get description from the set for the language (in specific description set)
       const descriptionIri = descriptionNodes.filter(node => {
         return shapeTree.dataset.match(node, SHAPETREES.inDescriptionSet, descriptionSetNode)
       }).shift()?.value
