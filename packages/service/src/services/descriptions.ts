@@ -1,13 +1,9 @@
-import { XSD, INTEROP, SHAPETREES, buildNamespace } from "@janeirodigital/interop-namespaces";
-import { parseTurtle } from "@janeirodigital/interop-utils"
+import { XSD, SKOS, INTEROP, SHAPETREES } from "@janeirodigital/interop-namespaces";
+import { parseTurtle, parseJsonld } from "@janeirodigital/interop-utils"
 import { IRI } from "@janeirodigital/sai-api-messages"
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
-import { parseJsonld } from "../utils/jsonld-parser";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Store, DataFactory } from "n3";
-
-// TODO (elf-pavlik) add to interop-namespaces
-const SKOS = buildNamespace('http://www.w3.org/2004/02/skos/core#')
 
 class Resource {
 

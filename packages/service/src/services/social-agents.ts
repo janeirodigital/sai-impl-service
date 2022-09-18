@@ -1,12 +1,9 @@
 import { CRUDSocialAgentRegistration } from "@janeirodigital/interop-data-model";
 import { getOneObject } from "../utils/rdf-parser";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { INTEROP, buildNamespace } from "@janeirodigital/interop-namespaces";
+import { SKOS, INTEROP } from "@janeirodigital/interop-namespaces";
 import { SocialAgent } from "@janeirodigital/sai-api-messages";
 import { DataFactory } from "n3";
-
-// TODO (elf-pavlik) add to interop-namespaces
-const SKOS = buildNamespace('http://www.w3.org/2004/02/skos/core#')
 
 const buildSocialAgentProfile = (
   registration: CRUDSocialAgentRegistration
