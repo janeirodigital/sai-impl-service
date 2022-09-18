@@ -1,0 +1,17 @@
+coverage:
+  status:
+    projects:
+      default: off
+      service:
+        flags:
+          - service
+      api-mesages:
+        flags:
+          - api-messages
+flags:
+  application:
+    paths:
+      - packages/service
+  api-messages:
+    paths:
+      - packages/api-messages
