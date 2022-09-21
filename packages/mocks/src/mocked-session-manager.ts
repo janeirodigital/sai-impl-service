@@ -7,4 +7,6 @@ export class MockedSessionManager implements ISessionManager {
   constructor(public storage: IStorage) {}
   getSaiSession = jest.fn(async(webId: string): Promise<AuthorizationAgent> => { return undefined as unknown as AuthorizationAgent })
   getOidcSession = jest.fn (async(webId: string): Promise<Session> => { return undefined as unknown as Session })
+  getPushSubscriptions = jest.fn (async(webId: string) => { return [] as PushSubscription[] })
+  addPushSubscription = jest.fn (async(webId: string, subscription: PushSubscription) => {})
 }
