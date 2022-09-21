@@ -1,11 +1,10 @@
 import 'dotenv/config';
 import { from, Observable } from "rxjs";
-import { HttpHandler, HttpHandlerResponse, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
+import { HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import { AuthnContext } from "../models/http-solid-context";
 import { agentRedirectUrl, agentUrl2webId } from "../url-templates";
 import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
-import { NotFoundHttpError } from "@digita-ai/handlersjs-http";
 
 export class AgentsHandler extends HttpHandler {
   constructor(
@@ -14,14 +13,17 @@ export class AgentsHandler extends HttpHandler {
     super();
   }
 
-  async findAgentRegistration(webid: string, applicationId: string, agentUrl: string): Promise<string | undefined> {
-    const webId = agentUrl2webId(agentUrl)
-    const sai = await this.sessionManager.getSaiSession(webId);
+  /*
+   * If WebID from the request is the same as WebID associated with AuthZ Agent, finds Application Registration.
+   * Otherwise finds Social Agent Registration for WebID from the request.
+   */
+  async findAgentRegistration(webIdFromRequest: string, applicationId: string, agentUrl: string): Promise<string | undefined> {
+    const sai = await this.sessionManager.getSaiSession(agentUrl2webId(agentUrl));
 
-    if (sai.webId === webid) {
+    if (sai.webId === webIdFromRequest) {
        return (await sai.findApplicationRegistration(applicationId))?.iri
     } else {
-       return (await sai.findSocialAgentRegistration(webid))?.iri
+       return (await sai.findSocialAgentRegistration(webIdFromRequest))?.iri
     }
   }
 
