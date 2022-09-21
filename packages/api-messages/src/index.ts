@@ -1,8 +1,9 @@
 export const RequestMessageTypes = {
   APPLICATIONS_REQUEST: '[APPLICATION PROFILES] Application Profiles Requested',
-  SOCIAL_AGENTS_REQUEST: '[SOCIAL AGENTS PROFILES] Application Profiles Requested',
+  SOCIAL_AGENTS_REQUEST: '[SOCIAL AGENTS] Application Profiles Requested',
   DESCRIPTIONS_REQUEST: '[DESCRIPTIONS] Descriptions Requested',
   DATA_REGISTRIES_REQUEST: '[DATA_REGISTRIES] Data Registries Requested',
+  ADD_SOCIAL_AGENT_REQUEST: '[SOCIAL AGENTS] Data Registries Requested',
 } as const
 
 export const ResponseMessageTypes = {
@@ -10,12 +11,13 @@ export const ResponseMessageTypes = {
   SOCIAL_AGENTS_RESPONSE: '[SOCIAL AGENTS PROFILES] Application Profiles Received',
   DESCRIPTIONS_RESPONSE: '[DESCRIPTIONS] Descriptions Received',
   DATA_REGISTRIES_RESPONSE: '[DATA_REGISTRIES] Data Registries Received',
+  SOCIAL_AGENT_RESPONSE: '[SOCIAL AGENTS] Social Agent Received'
 } as const
 
 type ResponseKeys = keyof typeof ResponseMessageTypes
 
-export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage
-  | DataRegistriesResponseMessage | DescriptionsResponseMessage
+export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage |
+  SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage
 
 export type ApplicationsResponseMessage = {
   type: typeof ResponseMessageTypes.APPLICATIONS_RESPONSE,
@@ -25,6 +27,11 @@ export type ApplicationsResponseMessage = {
 export type SocialAgentsResponseMessage = {
   type: typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
   payload: SocialAgent[]
+}
+
+export type SocialAgentResponseMessage = {
+  type: typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
+  payload: SocialAgent
 }
 
 export type DataRegistriesResponseMessage = {
@@ -77,6 +84,26 @@ export class SocialAgentsResponse {
   }
 }
 
+export class AddSocialAgentRequest extends MessageBase {
+  public type = RequestMessageTypes.ADD_SOCIAL_AGENT_REQUEST
+
+  constructor(public webId: IRI, public label: string, public note?: string) {
+    super()
+  }
+}
+
+export class SocialAgentResponse {
+  public type = ResponseMessageTypes.SOCIAL_AGENT_RESPONSE
+  public payload: SocialAgent
+
+  constructor(message: SocialAgentResponseMessage) {
+    if (message.type !== this.type) {
+      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
+    }
+    this.payload = message.payload
+  }
+}
+
 export class DataRegistriesRequest extends MessageBase {
   public type = RequestMessageTypes.DATA_REGISTRIES_REQUEST
 }
@@ -113,7 +140,8 @@ export class DescriptionsResponse {
   }
 }
 
-export type Request = ApplicationsRequest | SocialAgentsRequest | DataRegistriesRequest | DescriptionsRequest
+export type Request = ApplicationsRequest | SocialAgentsRequest | AddSocialAgentRequest |
+  DataRegistriesRequest | DescriptionsRequest
 
 export interface UniqueId {
   id: IRI;
