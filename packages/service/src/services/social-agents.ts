@@ -1,12 +1,12 @@
 import { Store, DataFactory } from "n3";
-//import { subscribe } from "solid-webhook-client";
+import { subscribe } from "solid-webhook-client";
 import { CRUDSocialAgentRegistration } from "@janeirodigital/interop-data-model";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { SKOS, INTEROP } from "@janeirodigital/interop-namespaces";
 import { IRI, SocialAgent } from "@janeirodigital/sai-api-messages";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { getOneObject } from "../utils/rdf-parser";
-//import { webhookTargetUri } from "../url-templates";
+import { webhookTargetUri } from "../url-templates";
 
 const logger = getLoggerFor('social-agent', 5, 5);
 
@@ -62,16 +62,16 @@ export const addSocialAgent = async (agent: AuthorizationAgent, data: { webId: I
     )
     await registration.addPatch(new Store([quad]))
 
-    // try {
-    //   // TODO(elf-pavlik): store subsciption details in store including expected sender's WebID
-    //   const subsciption = subscribe(
-    //     reciprocalRegistrationIri,
-    //     webhookTargetUri(agent.webId, data.webId),
-    //     { fetch: agent.rawFetch }
-    //   )
-    // } catch (e) {
-    //   logger.error('subscription failed')
-    // }
+    try {
+      // TODO(elf-pavlik): store subsciption details in store including expected sender's WebID
+      const subsciption = await subscribe(
+        reciprocalRegistrationIri,
+        webhookTargetUri(agent.webId, data.webId),
+        { fetch: agent.rawFetch }
+      )
+    } catch (e) {
+      logger.error('subscription failed')
+    }
   }
   return buildSocialAgentProfile(registration)
 }
