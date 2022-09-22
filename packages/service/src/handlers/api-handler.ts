@@ -5,7 +5,7 @@ import { SaiContext } from "../models/http-solid-context";
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
 import { getApplications, getDescriptions } from "../services";
 import { validateContentType } from "../utils/http-validators";
-import { getSocialAgents } from "../services/social-agents";
+import { getSocialAgents, addSocialAgent } from "../services/social-agents";
 import { getDataRegistries } from "../services/data-registries";
 
 export class ApiHandler extends HttpHandler {
@@ -33,6 +33,11 @@ export class ApiHandler extends HttpHandler {
         return { body: {
           type: ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
           payload: await getSocialAgents(context.saiSession)
+         }, status: 200, headers: {} }
+      case RequestMessageTypes.ADD_SOCIAL_AGENT_REQUEST:
+        return { body: {
+          type: ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
+          payload: await addSocialAgent(context.saiSession, context.request.body)
          }, status: 200, headers: {} }
       case RequestMessageTypes.DATA_REGISTRIES_REQUEST:
         return { body: {
