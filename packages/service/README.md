@@ -5,6 +5,19 @@
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/solid/data-interoperability-panel)
 [![MIT license](https://img.shields.io/github/license/janeirodigital/sai-impl-service)](https://github.com/janeirodigital/sai-impl-service/blob/main/LICENSE)
 
+# Push Notifications
+
+## Handler
+
+* receives push api subscriptions `push-subscriptions`
+  * stores in storage
+* behind authn context
+
+## Service
+
+* sends notifications
+  * uses stored subscriptions
+
 ## Webhook Notifications Subscription
 
 1. Alice grants access to Bob

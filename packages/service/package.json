@@ -44,14 +44,17 @@
     "@janeirodigital/interop-namespaces": "^1.0.0-rc.10",
     "@janeirodigital/sai-server-interfaces": "^0.1.0",
     "@janeirodigital/sai-api-messages": "^0.1.0",
+    "@janeirodigital/sai-server-interfaces": "^0.1.0",
     "@janeirodigital/sai-server-mocks": "^0.1.0",
     "@janeirodigital/solid-redis-token-storage": "^0.0.5",
     "@solid/access-token-verifier": "^2.0.3",
+    "@types/web-push": "^3.3.2",
     "componentsjs": "^5.2.0",
     "dotenv": "^15.0.0",
     "n3": "^1.13.0",
     "rxjs": "^7.5.5",
-    "solid-webhook-client": "^0.1.1"
+    "solid-webhook-client": "^0.1.1",
+    "web-push": "^3.5.0"
   },
   "devDependencies": {
     "@jest/globals": "^27.5.1",

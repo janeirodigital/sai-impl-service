@@ -10,7 +10,9 @@ export * from "./handlers/middleware-http-handler";
 export * from "./handlers/authn-context-handler";
 export * from "./handlers/authorization-agent-context-handler";
 export * from "./handlers/api-handler";
+export * from "./handlers/push-subscription-handler";
 export * from "./handlers/webhooks-handler";
+
 // Models
 export * from "./models/http-solid-context";
 export * from "./session-manager";

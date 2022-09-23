@@ -8,6 +8,10 @@ type WebId = string;
 
 const cache = new Map<WebId, AuthorizationAgent>();
 
+const prefixes = {
+  subscription: 'push:sub'
+}
+
 async function buildSaiSession(
   oidcSession: Session,
   clientId: string
@@ -23,7 +27,6 @@ async function buildSaiSession(
 
 export class SessionManager implements ISessionManager {
   constructor(public storage: IStorage) {}
-
   async getSaiSession(webId: string): Promise<AuthorizationAgent> {
     const cached = cache.get(webId);
     if (cached) return cached;
@@ -43,5 +46,19 @@ export class SessionManager implements ISessionManager {
     }
 
     return session;
+  }
+
+  async getPushSubscriptions(webId: string): Promise<PushSubscription[]> {
+    const key = `${prefixes.subscription}${webId}`
+    const value = await this.storage.get(key)
+
+    return value ? JSON.parse(value) as PushSubscription[] : [];
+  }
+
+  async addPushSubscription(webId: string, subscription: PushSubscription): Promise<void> {
+    const key = `${prefixes.subscription}${webId}`
+    const existing = await this.getPushSubscriptions(webId);
+
+    await this.storage.set(key, JSON.stringify([subscription, ...existing]));
   }
 }
