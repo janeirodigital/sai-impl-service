@@ -138,6 +138,34 @@
                       }
                     }
                   ]
+                },
+                {
+                  "@type": "HttpHandlerController",
+                  "label": "WebHooks Controller",
+                  "preResponseHandler": {
+                    "@type": "HttpSequenceContextHandler",
+                    "contextHandlers": [
+                      {
+                        "@type": "AuthnContextHandler"
+                      }
+                    ]
+                  },
+                  "routes": [
+                    {
+                      "@type": "HttpHandlerRoute",
+                      "path": "/agents/:encodedWebId/webhook/:encodedPeerWebId",
+                      "operations": [
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "POST",
+                          "publish": false
+                        }
+                      ],
+                      "handler": {
+                        "@type": "WebHooksHandler"
+                      }
+                    }
+                  ]
                 }
               ]
             }
