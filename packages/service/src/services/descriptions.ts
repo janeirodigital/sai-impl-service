@@ -76,9 +76,32 @@ class AccessDescriptionSet extends Resource {
 
 }
 
-class ShapeTree extends Resource {
-  public static async build (iri: IRI): Promise<ShapeTree> {
-    const instance = new ShapeTree(iri)
+export class ShapeTree extends Resource {
+
+  public description: ShapeTreeDescription | null = null
+
+  constructor(iri: IRI, public descriptionsLang: string) {
+    super(iri)
+  }
+
+  private async getDescription(): Promise<ShapeTreeDescription | null> {
+    const descriptionSetNode = getOneSubject(this.dataset.match(null, SHAPETREES.usesLanguage, DataFactory.literal(this.descriptionsLang, XSD.language)))
+    if (!descriptionSetNode) return null
+    const descriptionNodes = getAllSubjects(this.dataset.match(null, SHAPETREES.describes, this.node))
+    // get description from the set for the language (in specific description set)
+    const descriptionIri = descriptionNodes.filter(node => {
+      return this.dataset.match(node, SHAPETREES.inDescriptionSet, descriptionSetNode)
+    }).shift()?.value
+    return descriptionIri ? ShapeTreeDescription.build(descriptionIri) : null
+  }
+
+  protected async bootstrap(): Promise<void> {
+    await super.bootstrap()
+    this.description = await this.getDescription()
+  }
+
+  public static async build (iri: IRI, descriptionsLang: string): Promise<ShapeTree> {
+    const instance = new ShapeTree(iri, descriptionsLang)
     await instance.bootstrap()
     return instance
   }
@@ -123,17 +146,10 @@ class AccessNeedGroup extends Resource {
   public async getShapeTreeDescriptions(): Promise<DescriptionsIndex> {
     const index: DescriptionsIndex = {}
     const shapeTreeIris = [... new Set(getAllObjects(this.dataset.match(null, INTEROP.registeredShapeTree)).map(node => node.value))]
-    const shapeTrees = await Promise.all(shapeTreeIris.map(ShapeTree.build))
+    const shapeTrees = await Promise.all(shapeTreeIris.map(iri => ShapeTree.build(iri, this.descriptionsLang)))
     for (const shapeTree of shapeTrees) {
-      const descriptionSetNode = getOneSubject(shapeTree.dataset.match(null, SHAPETREES.usesLanguage, DataFactory.literal(this.descriptionsLang, XSD.language)))
-      if (!descriptionSetNode) continue
-      const descriptionNodes = getAllSubjects(shapeTree.dataset.match(null, SHAPETREES.describes, shapeTree.node))
-      // get description from the set for the language (in specific description set)
-      const descriptionIri = descriptionNodes.filter(node => {
-        return shapeTree.dataset.match(node, SHAPETREES.inDescriptionSet, descriptionSetNode)
-      }).shift()?.value
-      if (descriptionIri) {
-        index[shapeTree.iri] = await ShapeTreeDescription.build(descriptionIri)
+      if (shapeTree.description) {
+        index[shapeTree.iri] = shapeTree.description
       }
     }
     return index

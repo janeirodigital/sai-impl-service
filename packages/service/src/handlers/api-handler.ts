@@ -42,7 +42,7 @@ export class ApiHandler extends HttpHandler {
       case RequestMessageTypes.DATA_REGISTRIES_REQUEST:
         return { body: {
           type: ResponseMessageTypes.DATA_REGISTRIES_RESPONSE,
-          payload: await getDataRegistries(context.saiSession)
+          payload: await getDataRegistries(context.saiSession, body.lang)
          }, status: 200, headers: {} }
       case RequestMessageTypes.DESCRIPTIONS_REQUEST:
         return { body: {
