@@ -106,6 +106,10 @@ export class SocialAgentResponse {
 
 export class DataRegistriesRequest extends MessageBase {
   public type = RequestMessageTypes.DATA_REGISTRIES_REQUEST
+
+  constructor(private lang: string) {
+    super()
+  }
 }
 
 export class DataRegistriesResponse {
@@ -167,6 +171,8 @@ export interface SocialAgent extends UniqueId {
 export interface DataRegistration extends UniqueId {
   shapeTree: IRI;
   dataRegistry: IRI;
+  count: number;
+  label?: string; // TODO label should be ensured
 }
 
 export interface DataRegistry extends UniqueId {

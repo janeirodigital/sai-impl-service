@@ -1,16 +1,21 @@
 import { CRUDDataRegistry } from "@janeirodigital/interop-data-model";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { DataRegistration, DataRegistry } from "@janeirodigital/sai-api-messages";
+import { ShapeTree } from "./descriptions";
 
 const buildDataRegistry = async (
-  registry: CRUDDataRegistry
+  registry: CRUDDataRegistry,
+  descriptionsLang: string
 ): Promise<DataRegistry> => {
     const registrations: DataRegistration[] = [];
     for await (const registration of registry.registrations) {
+        const shapeTree = await ShapeTree.build(registration.registeredShapeTree, descriptionsLang)
         registrations.push({
           id: registration.iri,
           shapeTree: registration.registeredShapeTree,
-          dataRegistry: registry.iri
+          dataRegistry: registry.iri,
+          count: registration.contains.length,
+          label: shapeTree.description?.label
         });
     }
     return {
@@ -19,6 +24,6 @@ const buildDataRegistry = async (
     }
 }
 
-export const getDataRegistries = async (agent: AuthorizationAgent) => {
-  return Promise.all(agent.registrySet.hasDataRegistry.map(buildDataRegistry))
+export const getDataRegistries = async (agent: AuthorizationAgent, descriptionsLang: string) => {
+  return Promise.all(agent.registrySet.hasDataRegistry.map(registry => buildDataRegistry(registry, descriptionsLang)))
 };
