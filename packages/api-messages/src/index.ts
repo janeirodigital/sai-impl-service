@@ -41,7 +41,7 @@ export type DataRegistriesResponseMessage = {
 
 export type DescriptionsResponseMessage = {
   type: typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
-  payload: Description[]
+  payload: AccessNeedGroup
 }
 
 export type IRI = string;
@@ -134,7 +134,7 @@ export class DescriptionsRequest extends MessageBase {
 
 export class DescriptionsResponse {
   public type = ResponseMessageTypes.DESCRIPTIONS_RESPONSE
-  public payload: Description[]
+  public payload: AccessNeedGroup
 
   constructor(message: DescriptionsResponseMessage) {
     if (message.type !== this.type) {
@@ -187,16 +187,21 @@ export interface Description extends UniqueId {
 
 
 export interface AccessNeedGroup extends UniqueId {
-  title: string;
-  description: string;
-  required: boolean;
-  needs: AccessNeed[],
+  label: string;
+  description?: string;
+  required?: boolean;
+  needs: AccessNeed[];
 }
 
 export interface AccessNeed extends UniqueId {
-  title: string;
-  description: string;
-  required: boolean;
+  label: string;
+  description?: string;
+  required?: boolean;
   // IRIs for the access modes
   access: Array<IRI>;
+  shapeTree: {
+    id: IRI,
+    label: string
+  }
+  children?: AccessNeed[]
 }

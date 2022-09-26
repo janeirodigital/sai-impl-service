@@ -3,7 +3,7 @@ PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 PREFIX acl: <http://www.w3.org/ns/auth/acl#>
 PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
 
-<./access-needs>
+<./access-needs#need-group-pm>
   a interop:AccessNeedGroup ;
   interop:accessNecessity interop:accessRequired ;
   interop:accessScenario interop:PersonalAccess ;

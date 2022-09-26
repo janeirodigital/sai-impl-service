@@ -1,9 +1,9 @@
 import { XSD, SKOS, INTEROP, SHAPETREES } from "@janeirodigital/interop-namespaces";
 import { parseTurtle, parseJsonld } from "@janeirodigital/interop-utils"
-import { IRI } from "@janeirodigital/sai-api-messages"
+import { IRI, AccessNeedGroup as IAccessNeedGroup, AccessNeed as IAccessNeed } from "@janeirodigital/sai-api-messages"
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
-import { Store, DataFactory } from "n3";
+import { Store, DataFactory, Quad } from "n3";
 
 class Resource {
 
@@ -131,6 +131,10 @@ class AccessNeedGroup extends Resource {
   accessDescriptionSet?: AccessDescriptionSet
   shapeTreeDescriptions: DescriptionsIndex = {}
 
+  get description(): AccessNeedGroupDescription {
+    return this.accessDescriptionSet?.accessNeedGroupDescriptions.find(desc => desc.accessNeedGroup === this.iri)!;
+  }
+
   constructor(iri: IRI, public descriptionsLang: string) {
     super(iri)
   }
@@ -155,15 +159,39 @@ class AccessNeedGroup extends Resource {
     return index
   }
 
+  public getShapeTreeForNeed(needIri: IRI): IRI {
+    return getOneObject(this.dataset.match(DataFactory.namedNode(needIri), INTEROP.registeredShapeTree, null))!.value
+  }
+
   public getShapeTreeDescriptionForNeed(needIri: IRI): IShapeTreeDescription | undefined {
-    const shapeTreeIri = getOneObject(this.dataset.match(DataFactory.namedNode(needIri), INTEROP.registeredShapeTree, null))?.value
-    if (!shapeTreeIri) return
+    const shapeTreeIri = this.getShapeTreeForNeed(needIri)
     const description = this.shapeTreeDescriptions[shapeTreeIri]
     if (!description) return
     return {
       label: description.label,
       definition: description.definition
     }
+  }
+
+  private buildAccessNeed(needNode: NamedNode): IAccessNeed {
+    const description = this.accessDescriptionSet?.accessNeedDescriptions.find(desc => desc.accessNeed === needNode.value);
+
+      return {
+        id: needNode.value,
+        label: description!.label!,
+        description: description?.definition,
+        access: [] as IRI[], // TODO
+        shapeTree: {
+          id: this.getShapeTreeForNeed(needNode.value),
+          label: this.getShapeTreeDescriptionForNeed(needNode.value)!.label!
+        },
+        children: getAllSubjects(this.dataset.match(null, INTEROP.inheritsFromNeed, needNode))
+          .map(node => this.buildAccessNeed(node as NamedNode))
+      }
+  }
+
+  public get accessNeeds(): IAccessNeed[] {
+    return getAllObjects(this.dataset.match(this.node, INTEROP.hasAccessNeed)).map(node => this.buildAccessNeed(node as NamedNode))
   }
 
   protected async bootstrap(): Promise<void> {
@@ -201,7 +229,7 @@ async function discoverAccessNeeedGroup(applicationIri: IRI): Promise<IRI | unde
 export const getDescriptions = async (
   applicationIri: string,
   descriptionsLang: string
-) => {
+): Promise<IAccessNeedGroup | null> => {
 
   const accessNeedGroupIri = await discoverAccessNeeedGroup(applicationIri)
   if (!accessNeedGroupIri) return null;
@@ -209,19 +237,10 @@ export const getDescriptions = async (
   const accessNeedGroup = await AccessNeedGroup.build(accessNeedGroupIri, descriptionsLang)
   if (!accessNeedGroup.accessDescriptionSet) return null;
 
-  return [
-    ...accessNeedGroup.accessDescriptionSet.accessNeedGroupDescriptions.map(desc => ({
-      id: desc.iri,
-      label: desc.label,
-      description: desc.definition,
-      needId: desc.accessNeedGroup
-    })),
-    ...accessNeedGroup.accessDescriptionSet.accessNeedDescriptions.map(desc => ({
-      id: desc.iri,
-      label: desc.label,
-      description: desc.definition,
-      needId: desc.accessNeed,
-      shapeTreeDescription: accessNeedGroup.getShapeTreeDescriptionForNeed(desc.accessNeed)
-    }))
-  ]
+  return {
+    id: accessNeedGroup.iri,
+    label: accessNeedGroup.description.label!,
+    description: accessNeedGroup.description.definition,
+    needs: accessNeedGroup.accessNeeds
+  }
 };
