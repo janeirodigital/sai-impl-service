@@ -9,5 +9,5 @@
   "client_name": "Projectron",
   "redirect_uris": [ "http://localhost:3000/acme/projectron/redirect" ],
   "grant_types" : ["refresh_token","authorization_code"],
-  "interop:hasAccessNeedGroup": "http://localhost:3000/acme/projectron/access-needs"
+  "interop:hasAccessNeedGroup": "http://localhost:3000/acme/projectron/access-needs#need-group-pm"
 }

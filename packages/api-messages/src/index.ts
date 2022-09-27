@@ -4,6 +4,7 @@ export const RequestMessageTypes = {
   DESCRIPTIONS_REQUEST: '[DESCRIPTIONS] Descriptions Requested',
   DATA_REGISTRIES_REQUEST: '[DATA_REGISTRIES] Data Registries Requested',
   ADD_SOCIAL_AGENT_REQUEST: '[SOCIAL AGENTS] Data Registries Requested',
+  APPLICATION_AUTHORIZATION: '[APPLICATION] Authorization submitted',
 } as const
 
 export const ResponseMessageTypes = {
@@ -11,13 +12,15 @@ export const ResponseMessageTypes = {
   SOCIAL_AGENTS_RESPONSE: '[SOCIAL AGENTS PROFILES] Application Profiles Received',
   DESCRIPTIONS_RESPONSE: '[DESCRIPTIONS] Descriptions Received',
   DATA_REGISTRIES_RESPONSE: '[DATA_REGISTRIES] Data Registries Received',
-  SOCIAL_AGENT_RESPONSE: '[SOCIAL AGENTS] Social Agent Received'
+  SOCIAL_AGENT_RESPONSE: '[SOCIAL AGENTS] Social Agent Received',
+  APPLICATION_AUTHORIZATION_REGISTERED: '[APPLICATION] Authorization registered',
 } as const
 
 type ResponseKeys = keyof typeof ResponseMessageTypes
 
 export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage |
-  SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage
+  SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage |
+  ApplicationAuthorizationResponseMessage
 
 export type ApplicationsResponseMessage = {
   type: typeof ResponseMessageTypes.APPLICATIONS_RESPONSE,
@@ -41,7 +44,12 @@ export type DataRegistriesResponseMessage = {
 
 export type DescriptionsResponseMessage = {
   type: typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
-  payload: Description[]
+  payload: AuthorizationData
+}
+
+export type ApplicationAuthorizationResponseMessage = {
+  type: typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED,
+  payload: AccessAuthorization
 }
 
 export type IRI = string;
@@ -134,7 +142,7 @@ export class DescriptionsRequest extends MessageBase {
 
 export class DescriptionsResponse {
   public type = ResponseMessageTypes.DESCRIPTIONS_RESPONSE
-  public payload: Description[]
+  public payload: AuthorizationData
 
   constructor(message: DescriptionsResponseMessage) {
     if (message.type !== this.type) {
@@ -144,8 +152,29 @@ export class DescriptionsResponse {
   }
 }
 
+export class ApplicationAuthorizationRequest extends MessageBase {
+  public type = RequestMessageTypes.APPLICATION_AUTHORIZATION
+
+  constructor(private authorization: Authorization) {
+    super()
+  }
+}
+
+export class ApplicationAuthorizationResponse {
+
+  public type = ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED
+  public payload: AccessAuthorization
+
+  constructor(message: ApplicationAuthorizationResponseMessage) {
+    if (message.type !== this.type) {
+      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
+    }
+    this.payload = message.payload
+  }
+}
+
 export type Request = ApplicationsRequest | SocialAgentsRequest | AddSocialAgentRequest |
-  DataRegistriesRequest | DescriptionsRequest
+  DataRegistriesRequest | DescriptionsRequest | ApplicationAuthorizationRequest
 
 export interface UniqueId {
   id: IRI;
@@ -187,16 +216,44 @@ export interface Description extends UniqueId {
 
 
 export interface AccessNeedGroup extends UniqueId {
-  title: string;
-  description: string;
-  required: boolean;
-  needs: AccessNeed[],
+  label: string;
+  description?: string;
+  required?: boolean;
+  needs: AccessNeed[];
 }
 
 export interface AccessNeed extends UniqueId {
-  title: string;
-  description: string;
-  required: boolean;
+  label: string;
+  description?: string;
+  required?: boolean;
   // IRIs for the access modes
   access: Array<IRI>;
+  shapeTree: {
+    id: IRI,
+    label: string
+  }
+  children?: AccessNeed[]
+  parent?: IRI
+}
+
+export interface AuthorizationData extends UniqueId {
+  accessNeedGroup: AccessNeedGroup
+}
+
+export interface DataAuthorization {
+  accessNeed: IRI,
+  scope: string,
+  dataOwner?: IRI,
+  dataRegistration?: IRI,
+  dataInstances: IRI[]
+}
+
+export interface Authorization {
+  grantee: IRI;
+  accessNeedGroup: IRI;
+  dataAuthorizations: DataAuthorization[]
+}
+
+export interface AccessAuthorization extends UniqueId {
+  // TODO
 }

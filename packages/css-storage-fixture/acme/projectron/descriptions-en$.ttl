@@ -11,8 +11,8 @@ PREFIX interop: <http://www.w3.org/ns/solid/interop#>
   a interop:AccessNeedGroupDescription ;
   interop:inAccessDescriptionSet <> ;
   interop:hasAccessNeedGroup <./access-needs#need-group-pm> ;
-  skos:prefLabel "Read and Contribute to Projects"@en ;
-  skos:definition "Allow Projectron to read the Projects you select, and create new ones. Projectron won't modify existing data, but can add more."@en .
+  skos:prefLabel "Manage Projects"@en ;
+  skos:definition "Allow Projectron to read the Projects you select, and Task in those projects."@en .
 
 <#en-need-project>
   a interop:AccessNeedDescription ;
