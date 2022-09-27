@@ -1,9 +1,10 @@
 import { XSD, SKOS, INTEROP, SHAPETREES } from "@janeirodigital/interop-namespaces";
 import { parseTurtle, parseJsonld } from "@janeirodigital/interop-utils"
-import { IRI, AccessNeedGroup as IAccessNeedGroup, AccessNeed as IAccessNeed } from "@janeirodigital/sai-api-messages"
+import { IRI, AuthorizationData, AccessNeed as IAccessNeed, Authorization, AccessAuthorization } from "@janeirodigital/sai-api-messages"
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
-import { Store, DataFactory, Quad } from "n3";
+import { Store, DataFactory } from "n3";
+import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 
 class Resource {
 
@@ -132,7 +133,7 @@ class AccessNeedGroup extends Resource {
   shapeTreeDescriptions: DescriptionsIndex = {}
 
   get description(): AccessNeedGroupDescription {
-    return this.accessDescriptionSet?.accessNeedGroupDescriptions.find(desc => desc.accessNeedGroup === this.iri)!;
+    return this.accessDescriptionSet!.accessNeedGroupDescriptions.find(desc => desc.accessNeedGroup === this.iri)!;
   }
 
   constructor(iri: IRI, public descriptionsLang: string) {
@@ -175,16 +176,17 @@ class AccessNeedGroup extends Resource {
 
   private buildAccessNeed(needNode: NamedNode): IAccessNeed {
     const description = this.accessDescriptionSet?.accessNeedDescriptions.find(desc => desc.accessNeed === needNode.value);
-
+    const parent = getOneObject(this.dataset.match(needNode, INTEROP.inheritsFromNeed))?.value
       return {
         id: needNode.value,
         label: description!.label!,
         description: description?.definition,
-        access: [] as IRI[], // TODO
+        access: getAllObjects(this.dataset.match(needNode, INTEROP.accessMode)).map(node => node.value),
         shapeTree: {
           id: this.getShapeTreeForNeed(needNode.value),
           label: this.getShapeTreeDescriptionForNeed(needNode.value)!.label!
         },
+        parent,
         children: getAllSubjects(this.dataset.match(null, INTEROP.inheritsFromNeed, needNode))
           .map(node => this.buildAccessNeed(node as NamedNode))
       }
@@ -229,7 +231,7 @@ async function discoverAccessNeeedGroup(applicationIri: IRI): Promise<IRI | unde
 export const getDescriptions = async (
   applicationIri: string,
   descriptionsLang: string
-): Promise<IAccessNeedGroup | null> => {
+): Promise<AuthorizationData | null> => {
 
   const accessNeedGroupIri = await discoverAccessNeeedGroup(applicationIri)
   if (!accessNeedGroupIri) return null;
@@ -238,9 +240,24 @@ export const getDescriptions = async (
   if (!accessNeedGroup.accessDescriptionSet) return null;
 
   return {
-    id: accessNeedGroup.iri,
-    label: accessNeedGroup.description.label!,
-    description: accessNeedGroup.description.definition,
-    needs: accessNeedGroup.accessNeeds
+    id: applicationIri,
+    accessNeedGroup: {
+      id: accessNeedGroup.iri,
+      label: accessNeedGroup.description.label!,
+      description: accessNeedGroup.description.definition,
+      needs: accessNeedGroup.accessNeeds
+    }
   }
 };
+
+// TODO
+export const recordAuthoirization = async (
+  authorization: Authorization,
+  saiSession: AuthorizationAgent
+): Promise<AccessAuthorization> => {
+  // const structure = {} // AccessAuthorizationStructure
+  // const auth = await saiSession.recordAccessAuthorization(structure)
+  // return auth.iri
+
+  return { id: 'TODO' }
+}

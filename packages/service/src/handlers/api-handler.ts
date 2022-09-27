@@ -3,7 +3,7 @@ import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-a
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { SaiContext } from "../models/http-solid-context";
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
-import { getApplications, getDescriptions } from "../services";
+import { getApplications, getDescriptions, recordAuthoirization } from "../services";
 import { validateContentType } from "../utils/http-validators";
 import { getSocialAgents, addSocialAgent } from "../services/social-agents";
 import { getDataRegistries } from "../services/data-registries";
@@ -48,6 +48,11 @@ export class ApiHandler extends HttpHandler {
         return { body: {
           type: ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
           payload: await getDescriptions(body.applicationId, body.lang)
+        }, status: 200, headers: {} }
+      case RequestMessageTypes.APPLICATION_AUTHORIZATION:
+        return { body: {
+          type: ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED,
+          payload: await recordAuthoirization(body.authorization, context.saiSession)
         }, status: 200, headers: {} }
       default:
         throw new BadRequestHttpError()
