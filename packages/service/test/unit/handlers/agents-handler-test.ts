@@ -122,7 +122,7 @@ describe('authenticated request', () => {
 
     agentsHandler.handle(ctx).subscribe(response => {
       expect(manager.getSaiSession).toBeCalledWith(aliceWebId)
-      expect(response.headers.Link).toBe(`<${clientId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
+      expect(response.headers.Link).toBe(`<${bobWebId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
       done()
     })
   });

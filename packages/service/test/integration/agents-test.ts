@@ -173,6 +173,6 @@ describe('authenticated request', () => {
     expect(manager.getSaiSession).toBeCalledWith(webId)
     expect(response.ok).toBe(true)
     expect(response.status).toBe(200)
-    expect(response.headers.get('Link')).toBe(`<${clientId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
+    expect(response.headers.get('Link')).toBe(`<${differentWebId}>; anchor="${socialAgentRegistrationIri}"; rel="${INTEROP.registeredAgent.value}"`)
   })
 })
