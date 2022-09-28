@@ -40,6 +40,11 @@
                           "@type": "HttpHandlerOperation",
                           "method": "GET",
                           "publish": false
+                        },
+                        {
+                          "@type": "HttpHandlerOperation",
+                          "method": "HEAD",
+                          "publish": false
                         }
                       ],
                       "handler": {
