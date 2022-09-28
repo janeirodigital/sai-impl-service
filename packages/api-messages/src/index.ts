@@ -254,6 +254,4 @@ export interface Authorization {
   dataAuthorizations: DataAuthorization[]
 }
 
-export interface AccessAuthorization extends UniqueId {
-  // TODO
-}
+export interface AccessAuthorization extends UniqueId, Authorization {}
