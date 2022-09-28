@@ -17,13 +17,19 @@ export class AgentsHandler extends HttpHandler {
    * If WebID from the request is the same as WebID associated with AuthZ Agent, finds Application Registration.
    * Otherwise finds Social Agent Registration for WebID from the request.
    */
-  async findAgentRegistration(webIdFromRequest: string, applicationId: string, agentUrl: string): Promise<string | undefined> {
+  async findAgentRegistration(webIdFromRequest: string, applicationId: string, agentUrl: string): Promise<{ agent: string, registration?: string }> {
     const sai = await this.sessionManager.getSaiSession(agentUrl2webId(agentUrl));
 
     if (sai.webId === webIdFromRequest) {
-       return (await sai.findApplicationRegistration(applicationId))?.iri
+       return {
+        agent: applicationId,
+        registration: (await sai.findApplicationRegistration(applicationId))?.iri
+      }
     } else {
-       return (await sai.findSocialAgentRegistration(webIdFromRequest))?.iri
+       return {
+        agent: webIdFromRequest,
+        registration: (await sai.findSocialAgentRegistration(webIdFromRequest))?.iri
+       }
     }
   }
 
@@ -36,12 +42,11 @@ export class AgentsHandler extends HttpHandler {
         headers: { 'Content-Type': 'application/ld+json' }
       }
     }
-    const registrationIri = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUrl)
+    const { agent, registration } = await this.findAgentRegistration(context.authn.webId, context.authn.clientId, agentUrl)
     const headers : { [key: string]: string} = {}
-    if (registrationIri) {
+    if (registration) {
         headers['Content-Type'] = 'application/ld+json'
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        headers['Link'] = `<${context.authn.clientId}>; anchor="${registrationIri}"; rel="${INTEROP.registeredAgent.value}"`
+        headers['Link'] = `<${agent}>; anchor="${registration}"; rel="${INTEROP.registeredAgent.value}"`
     }
     return {
       body: this.clientIdDocument(agentUrl),
