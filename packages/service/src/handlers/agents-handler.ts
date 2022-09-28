@@ -16,6 +16,9 @@ export class AgentsHandler extends HttpHandler {
   /*
    * If WebID from the request is the same as WebID associated with AuthZ Agent, finds Application Registration.
    * Otherwise finds Social Agent Registration for WebID from the request.
+   * Returns an object with
+   * agent - IRI denoting the registered agent for the registration
+   * registration - IRI denoting the registration
    */
   async findAgentRegistration(webIdFromRequest: string, applicationId: string, agentUrl: string): Promise<{ agent: string, registration?: string }> {
     const sai = await this.sessionManager.getSaiSession(agentUrl2webId(agentUrl));
