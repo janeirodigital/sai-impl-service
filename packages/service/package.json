@@ -42,7 +42,7 @@
     "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.11",
     "@janeirodigital/interop-data-model": "^1.0.0-rc.11",
     "@janeirodigital/interop-namespaces": "^1.0.0-rc.11",
-    "@janeirodigital/sai-api-messages": "^0.3.0",
+    "@janeirodigital/sai-api-messages": "^0.4.0",
     "@janeirodigital/sai-server-interfaces": "^0.1.0",
     "@janeirodigital/sai-server-mocks": "^0.1.0",
     "@janeirodigital/solid-redis-token-storage": "^0.0.5",
