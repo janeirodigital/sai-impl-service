@@ -4,7 +4,8 @@ import { IRI, AuthorizationData, AccessNeed as IAccessNeed, Authorization, Acces
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
 import { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Store, DataFactory } from "n3";
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import { AuthorizationAgent, AccessAuthorizationStructure, NestedDataAuthorizationData } from "@janeirodigital/interop-authorization-agent";
+import { DataAuthorizationData } from "@janeirodigital/interop-data-model";
 
 class Resource {
 
@@ -132,6 +133,9 @@ class AccessNeedGroup extends Resource {
   accessDescriptionSet?: AccessDescriptionSet
   shapeTreeDescriptions: DescriptionsIndex = {}
 
+  accessNeeds: IAccessNeed[] = []
+  accessNeedsIndex: { [key:IRI]: IAccessNeed } = {}
+
   get description(): AccessNeedGroupDescription {
     return this.accessDescriptionSet!.accessNeedGroupDescriptions.find(desc => desc.accessNeedGroup === this.iri)!;
   }
@@ -177,22 +181,24 @@ class AccessNeedGroup extends Resource {
   private buildAccessNeed(needNode: NamedNode): IAccessNeed {
     const description = this.accessDescriptionSet?.accessNeedDescriptions.find(desc => desc.accessNeed === needNode.value);
     const parent = getOneObject(this.dataset.match(needNode, INTEROP.inheritsFromNeed))?.value
-      return {
-        id: needNode.value,
-        label: description!.label!,
-        description: description?.definition,
-        access: getAllObjects(this.dataset.match(needNode, INTEROP.accessMode)).map(node => node.value),
-        shapeTree: {
-          id: this.getShapeTreeForNeed(needNode.value),
-          label: this.getShapeTreeDescriptionForNeed(needNode.value)!.label!
-        },
-        parent,
-        children: getAllSubjects(this.dataset.match(null, INTEROP.inheritsFromNeed, needNode))
-          .map(node => this.buildAccessNeed(node as NamedNode))
-      }
+    const need = {
+      id: needNode.value,
+      label: description!.label!,
+      description: description?.definition,
+      access: getAllObjects(this.dataset.match(needNode, INTEROP.accessMode)).map(node => node.value),
+      shapeTree: {
+        id: this.getShapeTreeForNeed(needNode.value),
+        label: this.getShapeTreeDescriptionForNeed(needNode.value)!.label!
+      },
+      parent,
+      children: getAllSubjects(this.dataset.match(null, INTEROP.inheritsFromNeed, needNode))
+        .map(node => this.buildAccessNeed(node as NamedNode))
+    }
+    this.accessNeedsIndex[need.id] = need
+    return need
   }
 
-  public get accessNeeds(): IAccessNeed[] {
+  private buildAccessNeeds(): IAccessNeed[] {
     return getAllObjects(this.dataset.match(this.node, INTEROP.hasAccessNeed)).map(node => this.buildAccessNeed(node as NamedNode))
   }
 
@@ -200,6 +206,7 @@ class AccessNeedGroup extends Resource {
     await super.bootstrap()
     this.accessDescriptionSet = await this.getAccessDescriptionSet()
     this.shapeTreeDescriptions = await this.getShapeTreeDescriptions()
+    this.accessNeeds = this.buildAccessNeeds()
   }
 
   public static async build (iri: IRI, descriptionsLang: string): Promise<AccessNeedGroup> {
@@ -250,14 +257,60 @@ export const getDescriptions = async (
   }
 };
 
-// TODO
+// currently the spec only anticipates one level of inheritance
+// since we still don't have IRIs at this point, we need to use nesting to represent inheritance
+function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: AccessNeedGroup): NestedDataAuthorizationData[] {
+  const structuredDataAuthorizations = authorization.dataAuthorizations.map(dataAuthorization => {
+    const accessNeed = accessNeedGroup.accessNeedsIndex[dataAuthorization.accessNeed]
+    const saiReady: DataAuthorizationData = {
+      satisfiesAccessNeed: accessNeed.id,
+      grantee: authorization.grantee,
+      registeredShapeTree: accessNeed!.shapeTree.id,
+      scopeOfAuthorization: INTEROP[dataAuthorization.scope].value,
+      accessMode: accessNeed!.access
+      // TODO handle more specific scopes
+    }
+    return saiReady
+  })
+  const parents: NestedDataAuthorizationData[] = []
+  const children: DataAuthorizationData[] = []
+  for (const structuredDataAuthorization of structuredDataAuthorizations) {
+    if(structuredDataAuthorization.scopeOfAuthorization === INTEROP.Inherited.value) {
+      children.push(structuredDataAuthorization)
+    } else {
+      parents.push(structuredDataAuthorization)
+    }
+  }
+  return parents.map(parentDataAuthorization => {
+
+    // add children for reach parent
+    const inheritingDataAuthorizations = children.filter(childDataAuthorization => {
+      const accessNeed = accessNeedGroup.accessNeedsIndex[childDataAuthorization.satisfiesAccessNeed!]
+      return accessNeed.parent === parentDataAuthorization.satisfiesAccessNeed
+    })
+    if (inheritingDataAuthorizations.length) {
+      parentDataAuthorization.children = inheritingDataAuthorizations
+    }
+    return parentDataAuthorization
+  })
+}
+
 export const recordAuthoirization = async (
   authorization: Authorization,
   saiSession: AuthorizationAgent
 ): Promise<AccessAuthorization> => {
-  // const structure = {} // AccessAuthorizationStructure
-  // const auth = await saiSession.recordAccessAuthorization(structure)
-  // return auth.iri
+  const accessNeedGroup = await AccessNeedGroup.build(authorization.accessNeedGroup, 'en') // TODO build without descriptions
+  const structure: AccessAuthorizationStructure = {
+    grantee: authorization.grantee,
+    hasAccessNeedGroup: authorization.accessNeedGroup,
+    dataAuthorizations: buildDataAuthorizations(authorization, accessNeedGroup)
+  }
 
-  return { id: 'TODO' }
+  const recorded = await saiSession.recordAccessAuthorization(structure)
+  // we need to ensure that Application Registration exists before generating Access Grant!
+  if (!(await saiSession.findApplicationRegistration(authorization.grantee))) {
+    await saiSession.registrySet.hasAgentRegistry.addApplicationRegistration(authorization.grantee)
+  }
+  await saiSession.generateAccessGrant(recorded.iri)
+  return { id: recorded.iri, ...authorization}
 }

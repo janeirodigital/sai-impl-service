@@ -7,6 +7,7 @@ import { IRI, SocialAgent } from "@janeirodigital/sai-api-messages";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { getOneObject } from "../utils/rdf-parser";
 import { webhookTargetUri } from "../url-templates";
+import { insertPatch } from "@janeirodigital/interop-utils";
 
 const logger = getLoggerFor('social-agent', 5, 5);
 
@@ -60,7 +61,8 @@ export const addSocialAgent = async (agent: AuthorizationAgent, data: { webId: I
       INTEROP.reciprocalRegistration,
       DataFactory.namedNode(reciprocalRegistrationIri)
     )
-    await registration.addPatch(new Store([quad]))
+    const sparqlPatch = await insertPatch(new Store([quad]))
+    await registration.applyPatch(sparqlPatch)
 
     try {
       // TODO(elf-pavlik): store subsciption details in store including expected sender's WebID
