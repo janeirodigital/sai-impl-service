@@ -182,9 +182,7 @@ export interface UniqueId {
 
 export interface Application extends UniqueId {
   name: string;
-  description: string;
-  author?: IRI;
-  thumbnail?: IRI;
+  logo?: IRI;
   authorizationDate: string; // interop:registeredAt
   lastUpdateDate?: string;    // interop:updatedAt
   accessNeedGroup: IRI    // interop:hasAccessNeedGroup

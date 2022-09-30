@@ -1,7 +1,7 @@
 import { CRUDApplicationRegistration } from "@janeirodigital/interop-data-model";
 import { getOneObject } from "../utils/rdf-parser";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { INTEROP } from "@janeirodigital/interop-namespaces";
+import { INTEROP, OIDC } from "@janeirodigital/interop-namespaces";
 import { Application } from "@janeirodigital/sai-api-messages";
 import { DataFactory } from "n3";
 
@@ -12,12 +12,10 @@ const buildApplicationProfile = (
   // TODO (angel) get iris using something like Inrupt's prefix generator
   // TODO (angel) data validation and how to handle when the applications profile is missing some components?
   const node = DataFactory.namedNode(registration.iri)
-  const applicationNode = getOneObject(registration.dataset.match(null, INTEROP.registeredAgent, null))!
+  const applicationNode = getOneObject(registration.dataset.match(node, INTEROP.registeredAgent, null))!
   const id = applicationNode.value;
-  const name = getOneObject(registration.dataset.match(applicationNode, INTEROP.applicationName))!.value;
-  const description = getOneObject(registration.dataset.match(applicationNode, INTEROP.applicationDescription))!.value;
-  const author = getOneObject(registration.dataset.match(node, INTEROP.applicationAuthor))?.value;
-  const thumbnail = getOneObject(registration.dataset.match(node, INTEROP.applicationThumbnail))?.value;
+  const name = getOneObject(registration.dataset.match(applicationNode, OIDC.client_name))!.value;
+  const logo = getOneObject(registration.dataset.match(applicationNode, OIDC.logo_uri))?.value;
   const registeredAt = registration.registeredAt!;
   const updatedAt = registration.updatedAt;
   const accessNeedGroup = getOneObject(registration.dataset.match(applicationNode, INTEROP.hasAccessNeedGroup))!.value;
@@ -25,9 +23,7 @@ const buildApplicationProfile = (
   return {
     id,
     name,
-    description,
-    author,
-    thumbnail,
+    logo,
     authorizationDate: registeredAt.toISOString(),
     lastUpdateDate: updatedAt?.toISOString(),
     accessNeedGroup,

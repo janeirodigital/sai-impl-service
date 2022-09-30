@@ -61,12 +61,17 @@ export class AgentsHandler extends HttpHandler {
 
   clientIdDocument (agentUrl: string) {
     return {
-      '@context': 'https://www.w3.org/ns/solid/oidc-context.jsonld',
+      '@context': [
+        'https://www.w3.org/ns/solid/oidc-context.jsonld',
+        {
+          interop: 'http://www.w3.org/ns/solid/interop#'
+        },
+      ],
       client_id: agentUrl,
       client_name: 'Solid Authorization Agent',
       redirect_uris: [ agentRedirectUrl(agentUrl) ],
       grant_types : ['refresh_token','authorization_code'],
-      authorization_redirect_uri: process.env.FRONTEND_AUTHORIZATION_URL!
+      'interop:hasAuthorizationRedirectEndpoint': process.env.FRONTEND_AUTHORIZATION_URL!
     }
   }
 
