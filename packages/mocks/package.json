@@ -1,5 +1,6 @@
 {
   "name": "@janeirodigital/sai-server-mocks",
+  "private": true,
   "version": "0.1.0",
   "description": "",
   "lsd:module": "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server-mocks",

@@ -1,4 +1,7 @@
-# Community Solid Server Data Fixture
+# CSS Storage Fixture
+
+Files, which are served with [Community Solid Server](https://communitysolidserver.github.io/CommunitySolidServer/)
+and can be used for manual testing. It includes a couple of accounts and storage instances with some data.
 
 ## Accounts
 
