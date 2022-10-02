@@ -4,6 +4,14 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@digita-ai/handlersjs-core/^0.0.0/components/context.jsonld",
     "https://linkedsoftwaredependencies.org/bundles/npm/@digita-ai/handlersjs-http/^0.0.0/components/context.jsonld"
   ],
+  "import": [
+    "./controllers/agents.json",
+    "./controllers/login.json",
+    "./controllers/login-redirect.json",
+    "./controllers/api.json",
+    "./controllers/push-subscription.json",
+    "./controllers/webhooks.json"
+  ],
   "@graph": [
     {
       "@id": "urn:solid:authorization-agent:default:Service",
@@ -20,190 +28,12 @@
             "nestedHandler": {
               "@type": "RoutedHttpRequestHandler",
               "handlerControllerList": [
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "Agents Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler",
-                        "strict": false
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/agents/:encodedWebId",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "GET",
-                          "publish": false
-                        },
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "HEAD",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "AgentsHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "Login Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler"
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/login",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "POST",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "LoginHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "Login Redirect Controler",
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/agents/:encodedWebId/redirect",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "GET",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "LoginRedirectHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "API Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler"
-                      },
-                      {
-                        "@type": "AuthorizationAgentContextHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/api",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "POST",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "ApiHandler"
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "Push Subscription Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler"
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/push-subscribe",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "POST",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "PushSubscriptionHandler",
-                        "sessionManager": {
-                          "@id": "urn:ssv:SessionManager"
-                        }
-                      }
-                    }
-                  ]
-                },
-                {
-                  "@type": "HttpHandlerController",
-                  "label": "WebHooks Controller",
-                  "preResponseHandler": {
-                    "@type": "HttpSequenceContextHandler",
-                    "contextHandlers": [
-                      {
-                        "@type": "AuthnContextHandler"
-                      }
-                    ]
-                  },
-                  "routes": [
-                    {
-                      "@type": "HttpHandlerRoute",
-                      "path": "/agents/:encodedWebId/webhook/:encodedPeerWebId",
-                      "operations": [
-                        {
-                          "@type": "HttpHandlerOperation",
-                          "method": "POST",
-                          "publish": false
-                        }
-                      ],
-                      "handler": {
-                        "@type": "WebHooksHandler"
-                      }
-                    }
-                  ]
-                }
+                { "@id": "urn:solid:authorization-agent:controller:Agents" },
+                { "@id": "urn:solid:authorization-agent:controller:Login" },
+                { "@id": "urn:solid:authorization-agent:controller:LoginRedirect" },
+                { "@id": "urn:solid:authorization-agent:controller:API" },
+                { "@id": "urn:solid:authorization-agent:controller:PushSubscription" },
+                { "@id": "urn:solid:authorization-agent:controller:Webhooks" }
               ]
             }
           }
