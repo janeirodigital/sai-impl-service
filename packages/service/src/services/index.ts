@@ -1,4 +1,5 @@
-export * from "./access-needs";
 export * from "./applications";
-export * from "./consents";
+export * from "./data-registries"
 export * from "./descriptions";
+export * from "./social-agents"
+export * from "./web-push"
