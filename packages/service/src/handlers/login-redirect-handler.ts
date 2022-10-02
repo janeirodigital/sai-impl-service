@@ -1,11 +1,8 @@
 import { from, Observable } from "rxjs";
-import { HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/handlersjs-http";
-import { getSessionFromStorage } from "@inrupt/solid-client-authn-node";
+import { HttpHandler, HttpHandlerResponse, HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
-import { HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
+import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { frontendUrl, decodeWebId } from "../url-templates";
-import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
-import { SessionManager } from "../session-manager";
 
 export class LoginRedirectHandler extends HttpHandler {
 

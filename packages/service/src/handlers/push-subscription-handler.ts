@@ -1,11 +1,9 @@
 import { from, Observable } from "rxjs";
-import { BadRequestHttpError, HttpHandler, HttpHandlerResponse, NotFoundHttpError } from "@digita-ai/handlersjs-http";
+import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
-import { HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
-import { AuthenticatedAuthnContext, AuthnContext } from "../models/http-solid-context";
-import { decodeWebId } from "../url-templates";
+import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
-import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 
 export class PushSubscriptionHandler extends HttpHandler {
 

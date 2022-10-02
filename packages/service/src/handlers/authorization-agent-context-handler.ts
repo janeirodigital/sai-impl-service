@@ -1,8 +1,8 @@
 import { from, Observable } from "rxjs";
 import { InternalServerError } from "@digita-ai/handlersjs-http";
-import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
-import { AuthenticatedAuthnContext, SaiContext } from "../models/http-solid-context";
-import { HttpContextHandler } from "./middleware-http-handler";
+import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import type { AuthenticatedAuthnContext, SaiContext } from "../models/http-solid-context";
+import type { HttpContextHandler } from "./middleware-http-handler";
 
 /**
  * Attaches the corresponding AuthorizationAgent to the context

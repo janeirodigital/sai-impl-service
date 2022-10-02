@@ -1,8 +1,8 @@
 import { from, Observable } from "rxjs";
 import { createSolidTokenVerifier, RequestMethod, SolidAccessTokenPayload } from "@solid/access-token-verifier";
-import { AuthnContext, UnauthenticatedAuthnContext } from "../models/http-solid-context";
-import { HttpContextHandler } from "./middleware-http-handler";
 import { BadRequestHttpError, HttpHandlerContext, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
+import type { AuthnContext } from "../models/http-solid-context";
+import type { HttpContextHandler } from "./middleware-http-handler";
 
 /**
  * Uses  access-token-verifier and sets authn on the context if token was provided,

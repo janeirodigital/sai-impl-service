@@ -1,6 +1,6 @@
-import { CRUDDataRegistry } from "@janeirodigital/interop-data-model";
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { DataRegistration, DataRegistry } from "@janeirodigital/sai-api-messages";
+import type { CRUDDataRegistry } from "@janeirodigital/interop-data-model";
+import type { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import type { DataRegistration, DataRegistry } from "@janeirodigital/sai-api-messages";
 import { ShapeTree } from "./descriptions";
 
 const buildDataRegistry = async (

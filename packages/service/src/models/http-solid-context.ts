@@ -1,6 +1,5 @@
-import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
-import { Session } from "@inrupt/solid-client-authn-node";
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import type { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import type { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 
 export interface SaiContext extends HttpHandlerContext {
   saiSession: AuthorizationAgent;

@@ -1,7 +1,7 @@
-import { catchError, mergeMap, Observable, of } from "rxjs";
-import { Handler } from "@digita-ai/handlersjs-core";
-import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
-import { HttpContextHandler } from "./middleware-http-handler";
+import { mergeMap, Observable, of } from "rxjs";
+import type { Handler } from "@digita-ai/handlersjs-core";
+import type { HttpHandlerContext } from "@digita-ai/handlersjs-http";
+import type { HttpContextHandler } from "./middleware-http-handler";
 
 /**
  * Process the context of a request with the given handlers in preparation for the final HttpHandler

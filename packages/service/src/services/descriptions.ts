@@ -1,11 +1,11 @@
+import type { DatasetCore, NamedNode } from "@rdfjs/types";
+import { Store, DataFactory } from "n3";
+import type { DataAuthorizationData } from "@janeirodigital/interop-data-model";
+import type { AuthorizationAgent, AccessAuthorizationStructure, NestedDataAuthorizationData } from "@janeirodigital/interop-authorization-agent";
 import { XSD, SKOS, INTEROP, SHAPETREES } from "@janeirodigital/interop-namespaces";
 import { parseTurtle, parseJsonld } from "@janeirodigital/interop-utils"
-import { IRI, AuthorizationData, AccessNeed as IAccessNeed, Authorization, AccessAuthorization } from "@janeirodigital/sai-api-messages"
+import type { IRI, AuthorizationData, AccessNeed as IAccessNeed, Authorization, AccessAuthorization } from "@janeirodigital/sai-api-messages"
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
-import { DatasetCore, NamedNode } from "@rdfjs/types";
-import { Store, DataFactory } from "n3";
-import { AuthorizationAgent, AccessAuthorizationStructure, NestedDataAuthorizationData } from "@janeirodigital/interop-authorization-agent";
-import { DataAuthorizationData } from "@janeirodigital/interop-data-model";
 
 class Resource {
 

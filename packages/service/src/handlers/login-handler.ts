@@ -2,9 +2,9 @@ import "dotenv/config";
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
-import { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { agentRedirectUrl, webId2agentUrl } from "../url-templates";
-import { AuthenticatedAuthnContext } from "../models/http-solid-context";
+import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 
 export class LoginHandler extends HttpHandler {

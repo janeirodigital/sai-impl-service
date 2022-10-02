@@ -1,9 +1,9 @@
-import { CRUDApplicationRegistration } from "@janeirodigital/interop-data-model";
-import { getOneObject } from "../utils/rdf-parser";
-import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { INTEROP, OIDC } from "@janeirodigital/interop-namespaces";
-import { Application } from "@janeirodigital/sai-api-messages";
 import { DataFactory } from "n3";
+import type { CRUDApplicationRegistration } from "@janeirodigital/interop-data-model";
+import type { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
+import { INTEROP, OIDC } from "@janeirodigital/interop-namespaces";
+import type { Application } from "@janeirodigital/sai-api-messages";
+import { getOneObject } from "../utils/rdf-parser";
 
 const buildApplicationProfile = (
   registration: CRUDApplicationRegistration

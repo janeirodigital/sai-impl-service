@@ -1,9 +1,6 @@
-import 'dotenv/config';
-
 import path from "path";
 import { ComponentsManager, IComponentsManagerBuilderOptions } from "componentsjs";
-import { Server } from "@digita-ai/handlersjs-http";
-import type { NodeHttpServer } from "@digita-ai/handlersjs-http";
+import type { Server, NodeHttpServer } from "@digita-ai/handlersjs-http";
 import { ConsoleLoggerFactory, getLoggerFor, setLogger, setLoggerFactory } from '@digita-ai/handlersjs-logging';
 
 setLoggerFactory(new ConsoleLoggerFactory());

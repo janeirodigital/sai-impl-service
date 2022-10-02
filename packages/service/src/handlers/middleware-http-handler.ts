@@ -1,6 +1,6 @@
-import { HttpHandlerContext } from "@digita-ai/handlersjs-http";
-import { Observable } from "rxjs";
+import type { Observable } from "rxjs";
 import { Handler } from "@digita-ai/handlersjs-core";
+import type { HttpHandlerContext } from "@digita-ai/handlersjs-http";
 
 /**
  * Acts based on the given HttpHandlerContext.

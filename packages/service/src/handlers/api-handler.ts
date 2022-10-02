@@ -1,12 +1,12 @@
 import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
-import { SaiContext } from "../models/http-solid-context";
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
 import { getApplications, getDescriptions, recordAuthoirization } from "../services";
-import { validateContentType } from "../utils/http-validators";
+import type { SaiContext } from "../models/http-solid-context";
 import { getSocialAgents, addSocialAgent } from "../services/social-agents";
 import { getDataRegistries } from "../services/data-registries";
+import { validateContentType } from "../utils/http-validators";
 
 export class ApiHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
