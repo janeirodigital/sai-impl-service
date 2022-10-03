@@ -1,13 +1,10 @@
-import { Store, DataFactory } from "n3";
-import { subscribe } from "solid-webhook-client";
 import { CRUDSocialAgentRegistration } from "@janeirodigital/interop-data-model";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { SKOS, INTEROP } from "@janeirodigital/interop-namespaces";
 import { IRI, SocialAgent } from "@janeirodigital/sai-api-messages";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { getOneObject } from "../utils/rdf-parser";
-import { webhookTargetUri } from "../url-templates";
-import { insertPatch } from "@janeirodigital/interop-utils";
+import { DataFactory } from "n3";
 
 const logger = getLoggerFor('social-agent', 5, 5);
 
@@ -49,31 +46,6 @@ export const addSocialAgent = async (agent: AuthorizationAgent, data: { webId: I
     return buildSocialAgentProfile(existing)
   }
   const registration = await agent.registrySet.hasAgentRegistry.addSocialAgentRegistration(data.webId, data.label, data.note)
- /*
-  * TODO(elf-pavlik): move to background job
-  * subscribes to the notifications for the discovered registration
-  */
 
-  const reciprocalRegistrationIri = await registration.discoverReciprocal(agent.rawFetch)
-  if (reciprocalRegistrationIri) {
-    const quad = DataFactory.quad(
-      DataFactory.namedNode(registration.iri),
-      INTEROP.reciprocalRegistration,
-      DataFactory.namedNode(reciprocalRegistrationIri)
-    )
-    const sparqlPatch = await insertPatch(new Store([quad]))
-    await registration.applyPatch(sparqlPatch)
-
-    try {
-      // TODO(elf-pavlik): store subsciption details in store including expected sender's WebID
-      const subsciption = await subscribe(
-        reciprocalRegistrationIri,
-        webhookTargetUri(agent.webId, data.webId),
-        { fetch: agent.rawFetch }
-      )
-    } catch (e) {
-      logger.error('subscription failed')
-    }
-  }
   return buildSocialAgentProfile(registration)
 }

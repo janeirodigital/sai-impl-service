@@ -1,18 +1,25 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/solid-redis-token-storage/^0.0.0/components/context.jsonld"
   ],
   "import": [
-    "./common.json"
+    "./service.json",
+    "./workers/reciprocal-registrations.json"
   ],
   "@graph": [
     {
       "@id": "urn:ssv:SessionManager",
       "@type": "SessionManager",
       "storage": {
-        "@id": "urn:ssv:InMemoryStorage",
-        "@type": "InMemoryStorage"
+        "@id": "urn:ssv:RedisStorage",
+        "@type":"RedisSolidStorage"
       }
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:reciprocal-registrations",
+      "@type": "BullQueue",
+      "name": "reciprocal-registrations"
     }
   ]
 }

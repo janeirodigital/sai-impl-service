@@ -1,5 +1,8 @@
 
 [
     "IStorage",
-    "ISessionManager"
+    "ISessionManager",
+    "IQueue",
+    "IWorker",
+    "IProcessor"
 ]

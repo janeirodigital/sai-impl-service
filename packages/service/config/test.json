@@ -4,7 +4,7 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server-mocks/^0.0.0/components/context.jsonld"
   ],
   "import": [
-    "./common.json"
+    "./service.json"
   ],
   "@graph": [
     {
