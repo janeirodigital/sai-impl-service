@@ -22,6 +22,5 @@ export * from "./processors/reciprocal-registrations"
 
 // Misc
 export * from "./session-manager";
-export * from "./in-memory-storage"
 export * from "./bull-queue"
 export * from "./bull-worker"
