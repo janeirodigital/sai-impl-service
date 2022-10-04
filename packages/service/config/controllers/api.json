@@ -35,7 +35,8 @@
             }
           ],
           "handler": {
-            "@type": "ApiHandler"
+            "@type": "ApiHandler",
+            "queue": { "@id": "urn:solid:authorization-agent:queue:reciprocal-registrations" }
           }
         }
       ]

@@ -15,5 +15,12 @@ export * from "./handlers/webhooks-handler";
 
 // Models
 export * from "./models/http-solid-context";
+export * from "./models/jobs";
+
+// Processors
+export * from "./processors/reciprocal-registrations"
+
+// Misc
 export * from "./session-manager";
-export * from "./in-memory-storage"
+export * from "./bull-queue"
+export * from "./bull-worker"

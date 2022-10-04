@@ -7,11 +7,15 @@ import type { SaiContext } from "../models/http-solid-context";
 import { getSocialAgents, addSocialAgent } from "../services/social-agents";
 import { getDataRegistries } from "../services/data-registries";
 import { validateContentType } from "../utils/http-validators";
+import { IQueue } from "@janeirodigital/sai-server-interfaces";
+import { IReciprocalRegistrationsJobData } from "../models/jobs";
 
 export class ApiHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
 
-  constructor() {
+  constructor(
+    private queue: IQueue
+  ) {
     super();
     this.logger.info("LoginHandler::constructor");
   }
@@ -35,9 +39,14 @@ export class ApiHandler extends HttpHandler {
           payload: await getSocialAgents(context.saiSession)
          }, status: 200, headers: {} }
       case RequestMessageTypes.ADD_SOCIAL_AGENT_REQUEST:
+        // eslint-disable-next-line no-case-declarations
+        const socialAgent = await addSocialAgent(context.saiSession, context.request.body)
+        // eslint-disable-next-line no-case-declarations
+        const jobData: IReciprocalRegistrationsJobData = { webId: context.saiSession.webId, registeredAgent: socialAgent.id}
+        await this.queue.add(jobData)
         return { body: {
           type: ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
-          payload: await addSocialAgent(context.saiSession, context.request.body)
+          payload: socialAgent
          }, status: 200, headers: {} }
       case RequestMessageTypes.DATA_REGISTRIES_REQUEST:
         return { body: {
