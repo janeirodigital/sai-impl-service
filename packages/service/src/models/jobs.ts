@@ -7,3 +7,10 @@ export interface IReciprocalRegistrationsJobData {
 export interface IReciprocalRegistrationsJob {
   data: IReciprocalRegistrationsJobData
 }
+
+export interface IAccessInboxJobData {
+  webId: IRI
+}
+export interface IAccessInboxJob {
+  data: IAccessInboxJobData
+}

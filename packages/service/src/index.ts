@@ -19,6 +19,7 @@ export * from "./models/jobs";
 
 // Processors
 export * from "./processors/reciprocal-registrations"
+export * from "./processors/access-inbox"
 
 // Misc
 export * from "./session-manager";

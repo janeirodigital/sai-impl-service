@@ -1,15 +1,17 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
-import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import type { IQueue, ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { frontendUrl, decodeWebId } from "../url-templates";
+import { IAccessInboxJobData } from "../models/jobs";
 
 export class LoginRedirectHandler extends HttpHandler {
 
   private logger = getLoggerFor(this, 5, 5);
 
   constructor(
-    private sessionManager: ISessionManager
+    private sessionManager: ISessionManager,
+    private queue: IQueue
   ) {
     super();
     this.logger.info("LoginRedirectHandler::constructor");
@@ -32,6 +34,9 @@ export class LoginRedirectHandler extends HttpHandler {
       // TODO clarify this scenario
       throw new InternalServerError()
     } else {
+      // ensure subscribed to access inbox
+      await this.queue.add({ webId } as IAccessInboxJobData)
+
       return { body: {}, status: 302, headers: { location: frontendUrl } };
     }
   }

@@ -19,6 +19,11 @@
       "@id": "urn:solid:authorization-agent:queue:reciprocal-registrations",
       "@type": "MockedQueue",
       "name": "reciprocal-registrations"
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:access-inbox",
+      "@type": "MockedQueue",
+      "name": "access-inbox"
     }
   ]
 }

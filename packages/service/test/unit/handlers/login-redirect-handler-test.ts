@@ -5,6 +5,7 @@ import {
   HttpHandlerRequest,
 } from "@digita-ai/handlersjs-http";
 
+import { MockedQueue } from '@janeirodigital/sai-server-mocks';
 import { LoginRedirectHandler, frontendUrl, baseUrl, encodeWebId } from '../../../src';
 
 import { SessionManager } from '../../../src/session-manager'
@@ -20,12 +21,13 @@ jest.mock('../../../src/session-manager', () => {
 
 let loginRedirectHandler: LoginRedirectHandler
 const manager = jest.mocked(new SessionManager(new InMemoryStorage()))
+const queue = new MockedQueue('access-inbox')
 
 const aliceWebId = 'https://alice.example'
 const encodedWebId = encodeWebId(aliceWebId)
 
 beforeEach(() => {
-  loginRedirectHandler = new LoginRedirectHandler(manager)
+  loginRedirectHandler = new LoginRedirectHandler(manager, queue)
   manager.getOidcSession.mockReset()
 })
 
