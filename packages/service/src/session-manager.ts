@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { ISessionManager } from "@janeirodigital/sai-server-interfaces"
+import { ISessionManager, WebhookSubscription } from "@janeirodigital/sai-server-interfaces"
 import { webId2agentUrl } from "./url-templates";
 
 type WebId = string;
@@ -9,7 +9,8 @@ type WebId = string;
 const cache = new Map<WebId, AuthorizationAgent>();
 
 const prefixes = {
-  subscription: 'push:sub'
+  push: 'push:sub:',
+  webhook: 'webhook:sub:'
 }
 
 async function buildSaiSession(
@@ -49,16 +50,27 @@ export class SessionManager implements ISessionManager {
   }
 
   async getPushSubscriptions(webId: string): Promise<PushSubscription[]> {
-    const key = `${prefixes.subscription}${webId}`
+    const key = `${prefixes.push}${webId}`
     const value = await this.storage.get(key)
 
     return value ? JSON.parse(value) as PushSubscription[] : [];
   }
 
   async addPushSubscription(webId: string, subscription: PushSubscription): Promise<void> {
-    const key = `${prefixes.subscription}${webId}`
+    const key = `${prefixes.push}${webId}`
     const existing = await this.getPushSubscriptions(webId);
 
-    await this.storage.set(key, JSON.stringify([subscription, ...existing]));
+    return this.storage.set(key, JSON.stringify([subscription, ...existing]));
+  }
+
+  async getWebhookSubscription(webId: string, peerWebId: string) : Promise<WebhookSubscription | undefined> {
+    const key = `${prefixes.webhook}${webId}:${peerWebId}`
+    const value = await this.storage.get(key)
+    return value ? JSON.parse(value) as WebhookSubscription : undefined
+  }
+
+  async setWebhookSubscription(webId: string, peerWebId: string, subscription: WebhookSubscription) : Promise<void> {
+    const key = `${prefixes.webhook}${webId}:${peerWebId}`
+    return this.storage.set(key, JSON.stringify(subscription))
   }
 }
