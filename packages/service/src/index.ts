@@ -20,6 +20,7 @@ export * from "./models/jobs";
 // Processors
 export * from "./processors/reciprocal-registrations"
 export * from "./processors/access-inbox"
+export * from "./processors/delegated-grants"
 
 // Misc
 export * from "./session-manager";

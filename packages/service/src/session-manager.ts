@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import type { PushSubscription } from 'web-push';
 import { getSessionFromStorage, IStorage, Session } from "@inrupt/solid-client-authn-node";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { ISessionManager, WebhookSubscription } from "@janeirodigital/sai-server-interfaces"

@@ -14,3 +14,11 @@ export interface IAccessInboxJobData {
 export interface IAccessInboxJob {
   data: IAccessInboxJobData
 }
+
+export interface IDelegatedGrantsJobData {
+  webId: IRI,
+  registeredAgent: IRI
+}
+export interface IDelegatedGrantsJob {
+  data: IDelegatedGrantsJobData
+}

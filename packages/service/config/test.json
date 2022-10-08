@@ -24,6 +24,11 @@
       "@id": "urn:solid:authorization-agent:queue:access-inbox",
       "@type": "MockedQueue",
       "name": "access-inbox"
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:delegated-grants",
+      "@type": "MockedQueue",
+      "name": "delegated-grants"
     }
   ]
 }

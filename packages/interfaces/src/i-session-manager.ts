@@ -1,3 +1,4 @@
+import type { PushSubscription } from 'web-push';
 import { IStorage, Session } from "@inrupt/solid-client-authn-node"
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent"
 

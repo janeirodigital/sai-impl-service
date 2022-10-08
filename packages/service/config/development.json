@@ -6,7 +6,8 @@
   "import": [
     "./service.json",
     "./workers/reciprocal-registrations.json",
-    "./workers/access-inbox.json"
+    "./workers/access-inbox.json",
+    "./workers/delegated-grants.json"
   ],
   "@graph": [
     {
@@ -26,6 +27,11 @@
       "@id": "urn:solid:authorization-agent:queue:access-inbox",
       "@type": "BullQueue",
       "name": "access-inbox"
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:delegated-grants",
+      "@type": "BullQueue",
+      "name": "delegated-grants"
     }
   ]
 }

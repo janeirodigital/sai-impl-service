@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals"
+import type { PushSubscription } from 'web-push';
 import { IStorage, Session } from "@inrupt/solid-client-authn-node"
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent"
 import { ISessionManager, WebhookSubscription } from "@janeirodigital/sai-server-interfaces"
