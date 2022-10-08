@@ -22,3 +22,10 @@ export interface IDelegatedGrantsJobData {
 export interface IDelegatedGrantsJob {
   data: IDelegatedGrantsJobData
 }
+
+export interface IPushNotificationsJobData {
+  webId: IRI
+}
+export interface IPushNotificationsJob {
+  data: IPushNotificationsJobData
+}

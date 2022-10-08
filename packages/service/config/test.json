@@ -29,6 +29,11 @@
       "@id": "urn:solid:authorization-agent:queue:delegated-grants",
       "@type": "MockedQueue",
       "name": "delegated-grants"
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:push-notifications",
+      "@type": "MockedQueue",
+      "name": "push-notifications"
     }
   ]
 }

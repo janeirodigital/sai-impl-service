@@ -4,9 +4,8 @@ import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 import { decodeWebId } from "../url-templates"
-import { ISessionManager, IQueue } from "@janeirodigital/sai-server-interfaces";
-import { IDelegatedGrantsJobData } from "../models/jobs";
-import { sendWebPush } from "../services";
+import { IQueue } from "@janeirodigital/sai-server-interfaces";
+import { IDelegatedGrantsJobData, IPushNotificationsJobData } from "../models/jobs";
 
 interface Notification {
   object: {
@@ -18,8 +17,8 @@ export class WebHooksHandler extends HttpHandler {
   private logger = getLoggerFor(this, 5, 5);
 
   constructor(
-    private sessionManager: ISessionManager,
-    private queue: IQueue
+    private grantsQueue: IQueue,
+    private pushQueue: IQueue
   ) {
     super();
     this.logger.info("WebHooksHandler::constructor");
@@ -40,12 +39,11 @@ export class WebHooksHandler extends HttpHandler {
     if (webId === peerWebId) {
       // notification from user's access inbox
       // send push notification
-      const pushSubscriptions = await this.sessionManager.getPushSubscriptions(webId)
-      await sendWebPush(webId, pushSubscriptions)
+      await this.pushQueue.add( { webId } as IPushNotificationsJobData)
     } else {
       // notification from a reciprocal agent registration
       // create job to update delegated data grants
-      this.queue.add({ webId, registeredAgent: peerWebId } as IDelegatedGrantsJobData)
+      await this.grantsQueue.add({ webId, registeredAgent: peerWebId } as IDelegatedGrantsJobData)
     }
 
     return { body: {}, status: 200, headers: {} }

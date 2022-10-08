@@ -29,7 +29,9 @@
             }
           ],
           "handler": {
-            "@type": "WebHooksHandler"
+            "@type": "WebHooksHandler",
+            "grantsQueue": { "@id": "urn:solid:authorization-agent:queue:delegated-grants" },
+            "pushQueue": { "@id": "urn:solid:authorization-agent:queue:push-notifications" }
           }
         }
       ]

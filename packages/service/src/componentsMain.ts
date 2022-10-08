@@ -31,7 +31,9 @@ export async function createServer(): Promise<{ server: Server, workers: IWorker
 
   const workerIris = [
     "urn:solid:authorization-agent:worker:ReciprocalRegistrations",
-    "urn:solid:authorization-agent:worker:AccessInbox"
+    "urn:solid:authorization-agent:worker:AccessInbox",
+    "urn:solid:authorization-agent:worker:DelegatedGrants",
+    "urn:solid:authorization-agent:worker:PushNotifications"
   ]
   const workers = await Promise.all(workerIris.map(workerIri => componentsManager.instantiate<IWorker>(workerIri))) ;
 

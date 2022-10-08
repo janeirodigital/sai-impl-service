@@ -7,7 +7,9 @@
     "./service.json",
     "./workers/reciprocal-registrations.json",
     "./workers/access-inbox.json",
-    "./workers/delegated-grants.json"
+    "./workers/delegated-grants.json",
+    "./workers/push-notifications.json"
+
   ],
   "@graph": [
     {
@@ -32,6 +34,11 @@
       "@id": "urn:solid:authorization-agent:queue:delegated-grants",
       "@type": "BullQueue",
       "name": "delegated-grants"
+    },
+    {
+      "@id": "urn:solid:authorization-agent:queue:push-notifications",
+      "@type": "BullQueue",
+      "name": "push-notifications"
     }
   ]
 }
