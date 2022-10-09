@@ -55,7 +55,7 @@ export class WebHooksHandler extends HttpHandler {
   }
 
   validateNotification(notification: Notification): void {
-    if (!notification.object.id) throw new BadRequestHttpError()
+    if (!notification.object?.id) throw new BadRequestHttpError()
   }
 
   // TODO: as spec updates, use webId from subscription response
