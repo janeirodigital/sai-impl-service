@@ -1,13 +1,13 @@
 import { Store, DataFactory } from "n3";
 import { subscribe } from "solid-webhook-client";
-import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { insertPatch } from "@janeirodigital/interop-utils";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import type { IProcessor, ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import type { IReciprocalRegistrationsJob } from "../models/jobs";
 import { webhookTargetUri } from "../url-templates";
 
-const logger = getLoggerFor('social-agent', 5, 5);
+// Indepotent processor, if reciprocal registration already known if will not try to rediscover it
+// Webhook subscription can be retried
 
 export class ReciprocalRegistrationsProcessor implements IProcessor {
   constructor(public sessionManager: ISessionManager) {}
@@ -17,8 +17,11 @@ export class ReciprocalRegistrationsProcessor implements IProcessor {
     const saiSession = await this.sessionManager.getSaiSession(webId)
     const registration = await saiSession.findSocialAgentRegistration(registeredAgent)
     if (!registration) throw Error(`registration for ${registeredAgent} was not found`)
-    const reciprocalRegistrationIri = await registration.discoverReciprocal(saiSession.rawFetch)
-    if (reciprocalRegistrationIri) {
+    // TODO define getters as mixin in sai-js and apply to both Readable and CRUD
+    let reciprocalRegistrationIri = registration.getObject(INTEROP.reciprocalRegistration)?.value ?? null
+    if (!reciprocalRegistrationIri) {
+      reciprocalRegistrationIri = await registration.discoverReciprocal(saiSession.rawFetch)
+      if (!reciprocalRegistrationIri) throw new Error(`reciprocal registration not found for ${registeredAgent}`)
       const quad = DataFactory.quad(
         DataFactory.namedNode(registration.iri),
         INTEROP.reciprocalRegistration,
@@ -26,17 +29,16 @@ export class ReciprocalRegistrationsProcessor implements IProcessor {
       )
       const sparqlPatch = await insertPatch(new Store([quad]))
       await registration.applyPatch(sparqlPatch)
-
-      try {
-        // TODO(elf-pavlik): store subsciption details in store including expected sender's WebID
-        const subsciption = await subscribe(
-          reciprocalRegistrationIri,
-          webhookTargetUri(webId, registeredAgent),
-          { fetch: saiSession.rawFetch }
-        )
-      } catch (e) {
-        logger.error('subscription failed')
-      }
     }
+
+    // manage webook subscription
+
+    if (await this.sessionManager.getWebhookSubscription(webId, registeredAgent)) return
+    const subsciption = await subscribe(
+      reciprocalRegistrationIri,
+      webhookTargetUri(webId, registeredAgent),
+      { fetch: saiSession.rawFetch }
+    )
+    return this.sessionManager.setWebhookSubscription(webId, registeredAgent, subsciption)
   }
 }

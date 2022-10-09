@@ -19,6 +19,9 @@ export * from "./models/jobs";
 
 // Processors
 export * from "./processors/reciprocal-registrations"
+export * from "./processors/access-inbox"
+export * from "./processors/delegated-grants"
+export * from "./processors/push-notifications"
 
 // Misc
 export * from "./session-manager";

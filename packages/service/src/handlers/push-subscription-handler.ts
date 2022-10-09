@@ -2,6 +2,7 @@ import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
+import type { PushSubscription } from 'web-push';
 import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 

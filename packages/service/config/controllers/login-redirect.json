@@ -24,7 +24,8 @@
             "@type": "LoginRedirectHandler",
             "sessionManager": {
               "@id": "urn:ssv:SessionManager"
-            }
+            },
+            "queue": { "@id": "urn:solid:authorization-agent:queue:access-inbox" }
           }
         }
       ]
