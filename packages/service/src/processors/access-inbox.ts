@@ -12,7 +12,7 @@ export class AccessInboxProcessor implements IProcessor {
     const saiSession = await this.sessionManager.getSaiSession(webId)
 
     if (await this.sessionManager.getWebhookSubscription(webId, webId)) return
-    if (!saiSession.webIdProfile.hasAccessInbox) return
+    if (!saiSession.webIdProfile?.hasAccessInbox) return
 
     const subsciption = await subscribe(
       saiSession.webIdProfile.hasAccessInbox,
