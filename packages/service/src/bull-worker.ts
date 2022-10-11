@@ -6,7 +6,7 @@ export class BullWorker implements IWorker {
   private bull: Worker
 
   constructor(queueName: string, processor: IProcessor) {
-    this.bull = new Worker(queueName, processor.processorFunction.bind(processor), { autorun: false})
+    this.bull = new Worker(queueName, processor.processorFunction.bind(processor), { autorun: false })
   }
 
   async run () {
