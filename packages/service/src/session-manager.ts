@@ -60,6 +60,8 @@ export class SessionManager implements ISessionManager {
   async addPushSubscription(webId: string, subscription: PushSubscription): Promise<void> {
     const key = `${prefixes.push}${webId}`
     const existing = await this.getPushSubscriptions(webId);
+    const duplicate = existing.find(existingSubscription => existingSubscription.endpoint === subscription.endpoint)
+    if (duplicate) return
 
     return this.storage.set(key, JSON.stringify([subscription, ...existing]));
   }

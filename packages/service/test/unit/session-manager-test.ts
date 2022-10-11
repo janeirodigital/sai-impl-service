@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import type { PushSubscription } from 'web-push';
 import { InMemoryStorage, IStorage, Session } from '@inrupt/solid-client-authn-node';
 
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
@@ -18,9 +19,12 @@ const mockedGetSessionFromStorage = getSessionFromStorage as jest.MockedFunction
 
 import { SessionManager } from '../../src/session-manager';
 import { webId2agentUrl } from '../../src/url-templates'
+import { WebhookSubscription } from '@janeirodigital/sai-server-interfaces';
 
 let manager: SessionManager
 let storage: IStorage
+
+const webId = 'https://alice.example'
 
 beforeEach(() => {
   storage = new InMemoryStorage()
@@ -34,7 +38,6 @@ afterEach(() => {
 
 describe('getSaiSession', () => {
   test('creates sai session', async () => {
-    const webId = 'https://user.example/'
     const oidcSession = {
       info: { webId, sessionId: webId },
       fetch: () => {}
@@ -62,7 +65,6 @@ describe('getSaiSession', () => {
 
 describe('getOidcSession', () => {
   test('should return existing oidc session', async () => {
-    const webId = 'https://user.example/'
     const oidcSession = {
       info: { webId },
       fetch: () => {}
@@ -75,8 +77,6 @@ describe('getOidcSession', () => {
   });
 
   test('should return a new oidc session if none exist', async () => {
-    const webId = 'https://user.example/'
-
     mockedGetSessionFromStorage.mockImplementationOnce((webId: string, IStorage: Storage) => undefined)
 
     const session = await manager.getOidcSession(webId);
@@ -84,5 +84,64 @@ describe('getOidcSession', () => {
     expect(session.info.isLoggedIn).toEqual(false);
     expect(session.info.sessionId).toEqual(webId);
   })
-
 });
+
+describe('PushSubscriptions', () => {
+  const subscription: PushSubscription = {
+    endpoint: 'https://pushservice.example/123',
+    keys: {
+      p256dh: 'BL7ELU24fJTAlH5Ky',
+      auth: 'juarIAPHg'
+    }
+  }
+
+  test('adds first subscription', async () => {
+    await manager.addPushSubscription(webId, subscription)
+    const subs = await manager.getPushSubscriptions(webId)
+    expect(subs.length).toBe(1)
+    expect(subs[0]).toStrictEqual(subscription)
+  })
+
+  test('adds another subscription', async () => {
+    const another: PushSubscription = {
+      endpoint: 'https://pushservice.example/345',
+      keys: {
+        p256dh: '8N6BDCac8u8li_U5PI',
+        auth: 'sOgfeAPHg'
+      }
+    }
+    await manager.addPushSubscription(webId, subscription)
+    await manager.addPushSubscription(webId, another)
+    const subs = await manager.getPushSubscriptions(webId)
+    expect(subs.length).toBe(2)
+    expect(subs).toEqual(expect.arrayContaining([subscription, another]))
+
+  })
+
+  test('does not add dupplicates', async () => {
+    await manager.addPushSubscription(webId, subscription)
+    const subs = await manager.getPushSubscriptions(webId)
+    expect(subs.length).toBe(1)
+    expect(subs[0]).toStrictEqual(subscription)
+    await manager.addPushSubscription(webId, subscription)
+    expect(subs.length).toBe(1)
+  })
+
+})
+
+describe('WebhookSubscriptions', () => {
+  const peerWebId = 'https://bob.example'
+
+  test('sets and gets the subscription', async () => {
+    const subscription: WebhookSubscription = {
+      unsubscribeEndpoint: 'https://publisher.example/123'
+    }
+
+    await manager.setWebhookSubscription(webId, peerWebId, subscription)
+    expect(await manager.getWebhookSubscription(webId, peerWebId)).toStrictEqual(subscription)
+  })
+
+  test('returns undefined if does not exist', async() => {
+    expect(await manager.getWebhookSubscription(webId, peerWebId)).toBeUndefined()
+  })
+})
