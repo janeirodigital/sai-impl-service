@@ -4,7 +4,7 @@ import { insertPatch } from "@janeirodigital/interop-utils";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
 import type { IProcessor, ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import type { IReciprocalRegistrationsJob } from "../models/jobs";
-import { webhookTargetUri } from "../url-templates";
+import { webhookTargetUrl } from "../url-templates";
 
 // Indepotent processor, if reciprocal registration already known if will not try to rediscover it
 // Webhook subscription can be retried
@@ -36,7 +36,7 @@ export class ReciprocalRegistrationsProcessor implements IProcessor {
     if (await this.sessionManager.getWebhookSubscription(webId, registeredAgent)) return
     const subsciption = await subscribe(
       reciprocalRegistrationIri,
-      webhookTargetUri(webId, registeredAgent),
+      webhookTargetUrl(webId, registeredAgent),
       { fetch: saiSession.rawFetch }
     )
     return this.sessionManager.setWebhookSubscription(webId, registeredAgent, subsciption)

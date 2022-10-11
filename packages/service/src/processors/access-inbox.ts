@@ -1,7 +1,7 @@
 import { subscribe } from "solid-webhook-client";
 import type { IProcessor, ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import type { IAccessInboxJob } from "../models/jobs";
-import { webhookTargetUri } from "../url-templates";
+import { webhookTargetUrl } from "../url-templates";
 
 
 export class AccessInboxProcessor implements IProcessor {
@@ -16,7 +16,7 @@ export class AccessInboxProcessor implements IProcessor {
 
     const subsciption = await subscribe(
       saiSession.webIdProfile.hasAccessInbox,
-      webhookTargetUri(webId, webId),
+      webhookTargetUrl(webId, webId),
       { fetch: saiSession.rawFetch }
     )
     return this.sessionManager.setWebhookSubscription(webId, webId, subsciption)

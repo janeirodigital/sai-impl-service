@@ -26,6 +26,6 @@ export function agentRedirectUrl(agentUrl: string): string {
   return `${agentUrl}/redirect`
 }
 
-export function webhookTargetUri(webId: string, peerWebId: string): string {
+export function webhookTargetUrl(webId: string, peerWebId: string): string {
   return `${baseUrl}/agents/${encodeWebId(webId)}/webhook/${encodeWebId(peerWebId)}`
 }
