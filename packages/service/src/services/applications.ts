@@ -1,38 +1,24 @@
-import { DataFactory } from "n3";
 import type { CRUDApplicationRegistration } from "@janeirodigital/interop-data-model";
 import type { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import { INTEROP, OIDC } from "@janeirodigital/interop-namespaces";
 import type { Application } from "@janeirodigital/sai-api-messages";
-import { getOneObject } from "../utils/rdf-parser";
 
 const buildApplicationProfile = (
   registration: CRUDApplicationRegistration
 ): Application => {
-  // TODO (elf-pavlik) move to sai-js
-  // TODO (angel) get iris using something like Inrupt's prefix generator
   // TODO (angel) data validation and how to handle when the applications profile is missing some components?
-  const node = DataFactory.namedNode(registration.iri)
-  const applicationNode = getOneObject(registration.dataset.match(node, INTEROP.registeredAgent, null))!
-  const id = applicationNode.value;
-  const name = getOneObject(registration.dataset.match(applicationNode, OIDC.client_name))!.value;
-  const logo = getOneObject(registration.dataset.match(applicationNode, OIDC.logo_uri))?.value;
-  const registeredAt = registration.registeredAt!;
-  const updatedAt = registration.updatedAt;
-  const accessNeedGroup = getOneObject(registration.dataset.match(applicationNode, INTEROP.hasAccessNeedGroup))!.value;
-
   return {
-    id,
-    name,
-    logo,
-    authorizationDate: registeredAt.toISOString(),
-    lastUpdateDate: updatedAt?.toISOString(),
-    accessNeedGroup,
+    id: registration.registeredAgent,
+    name: registration.name!,
+    logo: registration.logo,
+    authorizationDate: registration.registeredAt!.toISOString(),
+    lastUpdateDate: registration.updatedAt?.toISOString(),
+    accessNeedGroup: registration.accessNeedGroup!,
   };
 };
 
-export const getApplications = async (agent: AuthorizationAgent) => {
+export const getApplications = async (saiSession: AuthorizationAgent) => {
   const profiles: Application[] = [];
-  for await (const registration of agent.applicationRegistrations) {
+  for await (const registration of saiSession.applicationRegistrations) {
       profiles.push(buildApplicationProfile(registration));
   }
   return profiles;
