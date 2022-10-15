@@ -1,9 +1,9 @@
 import type { DatasetCore, NamedNode } from "@rdfjs/types";
 import { Store, DataFactory } from "n3";
-import type { DataAuthorizationData } from "@janeirodigital/interop-data-model";
+import { DataAuthorizationData, ReadableShapeTreeDescription } from "@janeirodigital/interop-data-model";
 import type { AuthorizationAgent, AccessAuthorizationStructure, NestedDataAuthorizationData } from "@janeirodigital/interop-authorization-agent";
-import { XSD, SKOS, INTEROP, SHAPETREES } from "@janeirodigital/interop-namespaces";
-import { parseTurtle, parseJsonld } from "@janeirodigital/interop-utils"
+import { XSD, SKOS, INTEROP } from "@janeirodigital/interop-namespaces";
+import { parseTurtle } from "@janeirodigital/interop-utils"
 import type { IRI, AuthorizationData, AccessNeed as IAccessNeed, Authorization, AccessAuthorization } from "@janeirodigital/sai-api-messages"
 import { getOneObject, getOneSubject, getAllSubjects, getAllObjects } from "../utils/rdf-parser";
 
@@ -78,55 +78,7 @@ class AccessDescriptionSet extends Resource {
 
 }
 
-export class ShapeTree extends Resource {
-
-  public description: ShapeTreeDescription | null = null
-
-  constructor(iri: IRI, public descriptionsLang: string) {
-    super(iri)
-  }
-
-  private async getDescription(): Promise<ShapeTreeDescription | null> {
-    const descriptionSetNode = getOneSubject(this.dataset.match(null, SHAPETREES.usesLanguage, DataFactory.literal(this.descriptionsLang, XSD.language)))
-    if (!descriptionSetNode) return null
-    const descriptionNodes = getAllSubjects(this.dataset.match(null, SHAPETREES.describes, this.node))
-    // get description from the set for the language (in specific description set)
-    const descriptionIri = descriptionNodes.filter(node => {
-      return this.dataset.match(node, SHAPETREES.inDescriptionSet, descriptionSetNode)
-    }).shift()?.value
-    return descriptionIri ? ShapeTreeDescription.build(descriptionIri) : null
-  }
-
-  protected async bootstrap(): Promise<void> {
-    await super.bootstrap()
-    this.description = await this.getDescription()
-  }
-
-  public static async build (iri: IRI, descriptionsLang: string): Promise<ShapeTree> {
-    const instance = new ShapeTree(iri, descriptionsLang)
-    await instance.bootstrap()
-    return instance
-  }
-}
-
-class ShapeTreeDescription extends Resource {
-
-  public get label (): string | undefined {
-    return getOneObject(this.dataset.match(this.node, SKOS.prefLabel))?.value;
-  }
-
-  public get definition (): string | undefined {
-    return getOneObject(this.dataset.match(this.node, SKOS.definition))?.value;
-  }
-
-  public static async build (iri: IRI): Promise<ShapeTreeDescription> {
-    const instance = new ShapeTreeDescription(iri)
-    await instance.bootstrap()
-    return instance
-  }
-}
-
-type DescriptionsIndex = { [key: IRI]: ShapeTreeDescription }
+type DescriptionsIndex = { [key: IRI]: ReadableShapeTreeDescription }
 
 class AccessNeedGroup extends Resource {
 
@@ -140,7 +92,7 @@ class AccessNeedGroup extends Resource {
     return this.accessDescriptionSet!.accessNeedGroupDescriptions.find(desc => desc.accessNeedGroup === this.iri)!;
   }
 
-  constructor(iri: IRI, public descriptionsLang: string) {
+  constructor(iri: IRI, public descriptionsLang: string, public saiSession: AuthorizationAgent) {
     super(iri)
   }
 
@@ -155,10 +107,10 @@ class AccessNeedGroup extends Resource {
   public async getShapeTreeDescriptions(): Promise<DescriptionsIndex> {
     const index: DescriptionsIndex = {}
     const shapeTreeIris = [... new Set(getAllObjects(this.dataset.match(null, INTEROP.registeredShapeTree)).map(node => node.value))]
-    const shapeTrees = await Promise.all(shapeTreeIris.map(iri => ShapeTree.build(iri, this.descriptionsLang)))
+    const shapeTrees = await Promise.all(shapeTreeIris.map(iri => this.saiSession.factory.readable.shapeTree(iri, this.descriptionsLang)))
     for (const shapeTree of shapeTrees) {
-      if (shapeTree.description) {
-        index[shapeTree.iri] = shapeTree.description
+      if (shapeTree.descriptions[this.descriptionsLang]) {
+        index[shapeTree.iri] = shapeTree.descriptions[this.descriptionsLang]
       }
     }
     return index
@@ -209,8 +161,8 @@ class AccessNeedGroup extends Resource {
     this.accessNeeds = this.buildAccessNeeds()
   }
 
-  public static async build (iri: IRI, descriptionsLang: string): Promise<AccessNeedGroup> {
-    const instance = new AccessNeedGroup(iri, descriptionsLang)
+  public static async build (iri: IRI, descriptionsLang: string, saiSession: AuthorizationAgent): Promise<AccessNeedGroup> {
+    const instance = new AccessNeedGroup(iri, descriptionsLang, saiSession)
     await instance.bootstrap()
     return instance
   }
@@ -221,29 +173,23 @@ interface IShapeTreeDescription {
   definition?: string
 }
 
-async function discoverAccessNeeedGroup(applicationIri: IRI): Promise<IRI | undefined> {
-  const clientIdResponse = await fetch(applicationIri)
-  const document = await parseJsonld(await clientIdResponse.text(), clientIdResponse.url)
-  return getOneObject(
-    document.match(null, INTEROP.hasAccessNeedGroup)
-  )?.value
-}
-
 /**
  * Get the descriptions for the requested language. If the descriptions for the language are not found
  * `null` will be returned.
  * @param applicationIri application's profile document IRI
  * @param descriptionsLang XSD language requested, e.g.: "en", "es", "i-navajo".
+ * @param saiSession Authoirization Agent from `@janeirodigital/interop-authorization-agent`
  */
 export const getDescriptions = async (
   applicationIri: string,
-  descriptionsLang: string
+  descriptionsLang: string,
+  saiSession: AuthorizationAgent
 ): Promise<AuthorizationData | null> => {
 
-  const accessNeedGroupIri = await discoverAccessNeeedGroup(applicationIri)
-  if (!accessNeedGroupIri) return null;
+  const clientIdDocument = await saiSession.factory.readable.clientIdDocument(applicationIri)
+  if (!clientIdDocument.hasAccessNeedGroup) return null;
 
-  const accessNeedGroup = await AccessNeedGroup.build(accessNeedGroupIri, descriptionsLang)
+  const accessNeedGroup = await AccessNeedGroup.build(clientIdDocument.hasAccessNeedGroup, descriptionsLang, saiSession)
   if (!accessNeedGroup.accessDescriptionSet) return null;
 
   return {
@@ -299,7 +245,7 @@ export const recordAuthoirization = async (
   authorization: Authorization,
   saiSession: AuthorizationAgent
 ): Promise<AccessAuthorization> => {
-  const accessNeedGroup = await AccessNeedGroup.build(authorization.accessNeedGroup, 'en') // TODO build without descriptions
+  const accessNeedGroup = await AccessNeedGroup.build(authorization.accessNeedGroup, 'en', saiSession) // TODO build without descriptions
   const structure: AccessAuthorizationStructure = {
     grantee: authorization.grantee,
     hasAccessNeedGroup: authorization.accessNeedGroup,

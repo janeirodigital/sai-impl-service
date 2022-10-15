@@ -56,7 +56,7 @@ export class ApiHandler extends HttpHandler {
       case RequestMessageTypes.DESCRIPTIONS_REQUEST:
         return { body: {
           type: ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
-          payload: await getDescriptions(body.applicationId, body.lang)
+          payload: await getDescriptions(body.applicationId, body.lang, context.saiSession)
         }, status: 200, headers: {} }
       case RequestMessageTypes.APPLICATION_AUTHORIZATION:
         return { body: {
@@ -65,7 +65,6 @@ export class ApiHandler extends HttpHandler {
         }, status: 200, headers: {} }
       default:
         throw new BadRequestHttpError()
-
     }
   }
 
