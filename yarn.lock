@@ -2280,39 +2280,40 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@janeirodigital/interop-authorization-agent@^1.0.0-rc.11":
-  version "1.0.0-rc.12"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.12.tgz#8b3cf012b1625f010e62f0b82a0182fb481e12ab"
-  integrity sha512-odoUtr30x37JxHdn6T7iYB006OTVBmhS7My8/XqIzuesuDOgxtviziuto+aR/BvGoCYyjEuvUZ3aaqr/ZfLzNA==
+"@janeirodigital/interop-authorization-agent@^1.0.0-rc.14":
+  version "1.0.0-rc.14"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.14.tgz#9f5b2852d5638dc85c6edc6e3ee5188c9988b218"
+  integrity sha512-NwMVT0zimoACM5buvqnzQeOzXPnKN5C0s/WeusTGwktqGfLr0acjRgcX3SZloyNy9bQevQg+fZkEIoboLS7PwQ==
   dependencies:
-    "@janeirodigital/interop-data-model" "^1.0.0-rc.12"
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.12"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.12"
+    "@janeirodigital/interop-data-model" "^1.0.0-rc.14"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.14"
     n3 "^1.11.0"
 
-"@janeirodigital/interop-data-model@^1.0.0-rc.11", "@janeirodigital/interop-data-model@^1.0.0-rc.12":
-  version "1.0.0-rc.12"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.12.tgz#89a6b3a7f666220738d2456642ffdfb76212dbd6"
-  integrity sha512-o+IZSx9ZibeYlsAon/KhTn9Kroa7ZIUNLTHLZUyfa9x2IfQD6aZYwHBXrsDcXuq0Vm7sumpoWZBIo00cmT4vzA==
+"@janeirodigital/interop-data-model@^1.0.0-rc.14":
+  version "1.0.0-rc.14"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.14.tgz#6f4fffd29c4ed30603c22db4b19cd597bdae77e8"
+  integrity sha512-s0tikH9DyRrQuF621UhcH94lBZetwwsAJXj/JJleF28czOQahZh7+UF/13DW/B05vG8nNGL6ETxJxfT0dJAxAA==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.12"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.12"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.14"
     n3 "^1.11.0"
+    ts-mixer "^6.0.1"
     typescript-memoize "^1.0.1"
 
-"@janeirodigital/interop-namespaces@^1.0.0-rc.11", "@janeirodigital/interop-namespaces@^1.0.0-rc.12":
-  version "1.0.0-rc.12"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.12.tgz#2d0ec05801da47020e265983cd3fa9f8fba8c088"
-  integrity sha512-UkPXrRM/nTfM9SzGUpwOUmMHjCeHw9X/6JHn1pQalAXCiS+VK9m41cI1wjMag3OfuOS3upQVCRwZkGq7sHspqA==
+"@janeirodigital/interop-namespaces@^1.0.0-rc.14":
+  version "1.0.0-rc.14"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.14.tgz#f3b4a2b1311e6dd593d1bfe0705e1a106d49f5ca"
+  integrity sha512-4G3KTsJ2d1dJy+ziH9RcsJD50hQ4PUjM6pziAxurmYOjiMpd6iZYndgU9Tg6BzE6NIBSUIXye5Y/hrOXJ30+gQ==
   dependencies:
     n3 "^1.11.0"
 
-"@janeirodigital/interop-utils@^1.0.0-rc.12":
-  version "1.0.0-rc.12"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.12.tgz#a5cd3edc4bc67eb8594e65ec67354d2e9e87d873"
-  integrity sha512-H6uh4jKcYGS/0CEXnJC9XvWMaUDN9SYPCLaIU0sadTw24Cw6AbvaOnxvTiZqmQWny44hjwLPbMST9Phr3deqZA==
+"@janeirodigital/interop-utils@^1.0.0-rc.14":
+  version "1.0.0-rc.14"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.14.tgz#5d092d3ca373f8d056e23f688464b6a02ca9474d"
+  integrity sha512-nauUkNfwFG3RvNVGr6fa5eFpRHUj7CFJ34vJAcf0XS6fE7dKLkGjxSbAVMevDsUOxfylXavPVyIo+9cVlKx6WA==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.12"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
     http-link-header "^1.0.3"
     jsonld-streaming-parser "^3.0.0"
     n3 "^1.11.1"
@@ -10445,6 +10446,11 @@ ts-jest@^27.1.4:
     make-error "1.x"
     semver "7.x"
     yargs-parser "20.x"
+
+ts-mixer@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/ts-mixer/-/ts-mixer-6.0.1.tgz#7c2627fb98047eb5f3c7f2fee39d1521d18fe87a"
+  integrity sha512-hvE+ZYXuINrx6Ei6D6hz+PTim0Uf++dYbK9FFifLNwQj+RwKquhQpn868yZsCtJYiclZF1u8l6WZxxKi+vv7Rg==
 
 ts-node@^10.4.0:
   version "10.9.1"
