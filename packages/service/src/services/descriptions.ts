@@ -89,7 +89,7 @@ function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: 
   })
 }
 
-export const recordAuthoirization = async (
+export const recordAuthorization = async (
   authorization: Authorization,
   saiSession: AuthorizationAgent
 ): Promise<AccessAuthorization> => {

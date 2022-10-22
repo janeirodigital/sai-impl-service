@@ -2,12 +2,11 @@ import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
-import { getApplications, getDescriptions, recordAuthoirization } from "../services";
+import type { IQueue } from "@janeirodigital/sai-server-interfaces";
+import { getApplications, getDescriptions, recordAuthorization,
+  getDataRegistries, getSocialAgents, addSocialAgent } from "../services";
 import type { SaiContext } from "../models/http-solid-context";
-import { getSocialAgents, addSocialAgent } from "../services/social-agents";
-import { getDataRegistries } from "../services/data-registries";
 import { validateContentType } from "../utils/http-validators";
-import { IQueue } from "@janeirodigital/sai-server-interfaces";
 import { IReciprocalRegistrationsJobData } from "../models/jobs";
 
 export class ApiHandler extends HttpHandler {
@@ -25,7 +24,7 @@ export class ApiHandler extends HttpHandler {
     validateContentType(context, 'application/json');
     const body = context.request.body
     if (!body) {
-      throw new BadRequestHttpError()
+      throw new BadRequestHttpError('body is required')
     }
     switch(body.type) {
       case RequestMessageTypes.APPLICATIONS_REQUEST:
@@ -40,7 +39,9 @@ export class ApiHandler extends HttpHandler {
          }, status: 200, headers: {} }
       case RequestMessageTypes.ADD_SOCIAL_AGENT_REQUEST:
         // eslint-disable-next-line no-case-declarations
-        const socialAgent = await addSocialAgent(context.saiSession, context.request.body)
+        const { webId, label, note } = body
+        // eslint-disable-next-line no-case-declarations
+        const socialAgent = await addSocialAgent(context.saiSession, { webId, label, note })
         // eslint-disable-next-line no-case-declarations
         const jobData: IReciprocalRegistrationsJobData = { webId: context.saiSession.webId, registeredAgent: socialAgent.id}
         await this.queue.add(jobData)
@@ -61,7 +62,7 @@ export class ApiHandler extends HttpHandler {
       case RequestMessageTypes.APPLICATION_AUTHORIZATION:
         return { body: {
           type: ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED,
-          payload: await recordAuthoirization(body.authorization, context.saiSession)
+          payload: await recordAuthorization(body.authorization, context.saiSession)
         }, status: 200, headers: {} }
       default:
         throw new BadRequestHttpError()

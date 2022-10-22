@@ -7,5 +7,5 @@ export const validateContentType = (ctx: HttpHandlerContext, contentType: string
     return;
   }
 
-  throw new BadRequestHttpError('Missing content-type');
+  throw new BadRequestHttpError('wrong content-type');
 }
