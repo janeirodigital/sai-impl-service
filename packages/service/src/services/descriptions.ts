@@ -13,9 +13,11 @@ const formatAccessNeed = (accessNeed: ReadableAccessNeed, descriptionsLang: stri
     shapeTree: {
       id: accessNeed.shapeTree.iri,
       label: accessNeed.shapeTree.descriptions[descriptionsLang]!.label
-    },
-    parent: accessNeed.inheritsFromNeed,
+    }
   } as AccessNeed
+  if (accessNeed.inheritsFromNeed) {
+    formatted.parent = accessNeed.inheritsFromNeed
+  }
   if (accessNeed.children) {
     formatted.children = accessNeed.children.map(child => formatAccessNeed(child, descriptionsLang))
   }
@@ -77,7 +79,7 @@ function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: 
   }
   return parents.map(parentDataAuthorization => {
 
-    // add children for reach parent
+    // add children for each parent
     const inheritingDataAuthorizations = children.filter(childDataAuthorization => {
       const accessNeed = accessNeedGroup.accessNeeds.find(need => need.iri === childDataAuthorization.satisfiesAccessNeed)!
       return accessNeed.inheritsFromNeed === parentDataAuthorization.satisfiesAccessNeed
