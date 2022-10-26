@@ -16,41 +16,33 @@ export const ResponseMessageTypes = {
   APPLICATION_AUTHORIZATION_REGISTERED: '[APPLICATION] Authorization registered',
 } as const
 
-type ResponseKeys = keyof typeof ResponseMessageTypes
+type TResponseMessage = typeof ResponseMessageTypes
+
+type TResponseMesssages = keyof TResponseMessage
+
+type VResponseMessages = TResponseMessage[TResponseMesssages]
+
+// type ResponseKeys = keyof typeof ResponseMessageTypes
 
 export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage |
   SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage |
   ApplicationAuthorizationResponseMessage
 
-export type ApplicationsResponseMessage = {
-  type: typeof ResponseMessageTypes.APPLICATIONS_RESPONSE,
-  payload: Application[]
+type Payloads = Application[] | SocialAgent[] | SocialAgent | DataRegistry[] | AuthorizationData | AccessAuthorization
+
+type IResponseMessage<T extends VResponseMessages, P extends Payloads> = {
+  type: T,
+  payload: P
 }
 
-export type SocialAgentsResponseMessage = {
-  type: typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
-  payload: SocialAgent[]
-}
+type ApplicationsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATIONS_RESPONSE, Application[]>;
+type SocialAgentsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE, SocialAgent[]>;
+type SocialAgentResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE, SocialAgent>;
+type DataRegistriesResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DATA_REGISTRIES_RESPONSE, DataRegistry[]>;
+type DescriptionsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE, AuthorizationData>;
+type ApplicationAuthorizationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED, AccessAuthorization>;
 
-export type SocialAgentResponseMessage = {
-  type: typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
-  payload: SocialAgent
-}
-
-export type DataRegistriesResponseMessage = {
-  type: typeof ResponseMessageTypes.DATA_REGISTRIES_RESPONSE,
-  payload: DataRegistry[]
-}
-
-export type DescriptionsResponseMessage = {
-  type: typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE,
-  payload: AuthorizationData
-}
-
-export type ApplicationAuthorizationResponseMessage = {
-  type: typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED,
-  payload: AccessAuthorization
-}
+type Responses = ApplicationAuthorizationResponse | SocialAgentsResponse | SocialAgentResponse | DataRegistriesResponse | DescriptionsResponse | ApplicationAuthorizationResponse
 
 export type IRI = string;
 
@@ -64,14 +56,17 @@ export class ApplicationsRequest extends MessageBase {
   public type = RequestMessageTypes.APPLICATIONS_REQUEST
 }
 
+function validateType(messageType: VResponseMessages, requiredType: VResponseMessages) {
+  if (messageType !== requiredType) {
+    throw new Error(`Invalid message type! Expected: ${messageType}, received: ${requiredType}`)
+  }
+}
 export class ApplicationsResponse {
   public type = ResponseMessageTypes.APPLICATIONS_RESPONSE
   public payload: Application[]
 
   constructor(message: ApplicationsResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -85,9 +80,7 @@ export class SocialAgentsResponse {
   public payload: SocialAgent[]
 
   constructor(message: SocialAgentsResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -105,9 +98,7 @@ export class SocialAgentResponse {
   public payload: SocialAgent
 
   constructor(message: SocialAgentResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -125,9 +116,7 @@ export class DataRegistriesResponse {
   public payload: DataRegistry[]
 
   constructor(message: DataRegistriesResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -145,9 +134,7 @@ export class DescriptionsResponse {
   public payload: AuthorizationData
 
   constructor(message: DescriptionsResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -166,9 +153,7 @@ export class ApplicationAuthorizationResponse {
   public payload: AccessAuthorization
 
   constructor(message: ApplicationAuthorizationResponseMessage) {
-    if (message.type !== this.type) {
-      throw new Error(`Invalid message type! Expected: ${this.type}, received: ${message.type}`)
-    }
+    validateType(message.type, this.type);
     this.payload = message.payload
   }
 }
@@ -243,7 +228,7 @@ export interface DataAuthorization {
   scope: string,
   dataOwner?: IRI,
   dataRegistration?: IRI,
-  dataInstances: IRI[]
+  dataInstances?: IRI[]
 }
 
 export interface Authorization {
