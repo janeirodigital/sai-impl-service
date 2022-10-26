@@ -243,7 +243,7 @@ export interface DataAuthorization {
   scope: string,
   dataOwner?: IRI,
   dataRegistration?: IRI,
-  dataInstances: IRI[]
+  dataInstances?: IRI[]
 }
 
 export interface Authorization {
