@@ -35,12 +35,12 @@ type IResponseMessage<T extends VResponseMessages, P extends Payloads> = {
   payload: P
 }
 
-type ApplicationsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATIONS_RESPONSE, Application[]>;
-type SocialAgentsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE, SocialAgent[]>;
-type SocialAgentResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE, SocialAgent>;
-type DataRegistriesResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DATA_REGISTRIES_RESPONSE, DataRegistry[]>;
-type DescriptionsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE, AuthorizationData>;
-type ApplicationAuthorizationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED, AccessAuthorization>;
+export type ApplicationsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATIONS_RESPONSE, Application[]>;
+export type SocialAgentsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE, SocialAgent[]>;
+export type SocialAgentResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE, SocialAgent>;
+export type DataRegistriesResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DATA_REGISTRIES_RESPONSE, DataRegistry[]>;
+export type DescriptionsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE, AuthorizationData>;
+export type ApplicationAuthorizationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED, AccessAuthorization>;
 
 type Responses = ApplicationAuthorizationResponse | SocialAgentsResponse | SocialAgentResponse | DataRegistriesResponse | DescriptionsResponse | ApplicationAuthorizationResponse
 
@@ -237,4 +237,6 @@ export interface Authorization {
   dataAuthorizations: DataAuthorization[]
 }
 
-export interface AccessAuthorization extends UniqueId, Authorization {}
+export interface AccessAuthorization extends UniqueId, Authorization {
+  callbackEndpoint?: IRI;
+}

@@ -57,7 +57,13 @@ export const getDescriptions = async (
 // since we still don't have IRIs at this point, we need to use nesting to represent inheritance
 function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: ReadableAccessNeedGroup): NestedDataAuthorizationData[] {
   const structuredDataAuthorizations = authorization.dataAuthorizations.map(dataAuthorization => {
-    const accessNeed = accessNeedGroup.accessNeeds.find(need => need.iri === dataAuthorization.accessNeed)!
+    const accessNeed = accessNeedGroup
+      .accessNeeds
+      .flatMap(need => [need, ...(need.children ?? [])])
+      .find(need => need.iri === dataAuthorization.accessNeed)
+    if (!accessNeed) {
+      throw new Error(`missing access need: ${dataAuthorization.accessNeed}`);
+    }
     const saiReady: DataAuthorizationData = {
       satisfiesAccessNeed: accessNeed.iri,
       grantee: authorization.grantee,
@@ -81,7 +87,11 @@ function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: 
 
     // add children for each parent
     const inheritingDataAuthorizations = children.filter(childDataAuthorization => {
-      const accessNeed = accessNeedGroup.accessNeeds.find(need => need.iri === childDataAuthorization.satisfiesAccessNeed)!
+      const accessNeed = accessNeedGroup
+      .accessNeeds
+      .flatMap(need => [need, ...(need.children ?? [])])
+      .find(need => need.iri ===  childDataAuthorization.satisfiesAccessNeed)!
+
       return accessNeed.inheritsFromNeed === parentDataAuthorization.satisfiesAccessNeed
     })
     if (inheritingDataAuthorizations.length) {
@@ -108,5 +118,10 @@ export const recordAuthorization = async (
     await saiSession.registrySet.hasAgentRegistry.addApplicationRegistration(authorization.grantee)
   }
   await saiSession.generateAccessGrant(recorded.iri)
-  return { id: recorded.iri, ...authorization}
+  const response = { id: recorded.iri, ...authorization} as AccessAuthorization;
+  const clientIdDocument = await saiSession.factory.readable.clientIdDocument(authorization.grantee);
+  if (clientIdDocument.callbackEndpoint) {
+    response.callbackEndpoint = clientIdDocument.callbackEndpoint;
+  }
+  return response
 }
