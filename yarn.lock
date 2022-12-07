@@ -2280,40 +2280,40 @@
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@janeirodigital/interop-authorization-agent@^1.0.0-rc.14":
-  version "1.0.0-rc.14"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.14.tgz#9f5b2852d5638dc85c6edc6e3ee5188c9988b218"
-  integrity sha512-NwMVT0zimoACM5buvqnzQeOzXPnKN5C0s/WeusTGwktqGfLr0acjRgcX3SZloyNy9bQevQg+fZkEIoboLS7PwQ==
+"@janeirodigital/interop-authorization-agent@^1.0.0-rc.15":
+  version "1.0.0-rc.15"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.15.tgz#25dbd489faa6efe7ded81a5c94688072598d7718"
+  integrity sha512-/gYE1CEQy8N//F5deIYVhFnuDw4KE/6mq9ZVqw+zAXKyorY2LhUIz8IWjVcKBDqn3udQ34RzGQCUV2kdPyhYGw==
   dependencies:
-    "@janeirodigital/interop-data-model" "^1.0.0-rc.14"
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.14"
+    "@janeirodigital/interop-data-model" "^1.0.0-rc.15"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.15"
     n3 "^1.11.0"
 
-"@janeirodigital/interop-data-model@^1.0.0-rc.14":
-  version "1.0.0-rc.14"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.14.tgz#6f4fffd29c4ed30603c22db4b19cd597bdae77e8"
-  integrity sha512-s0tikH9DyRrQuF621UhcH94lBZetwwsAJXj/JJleF28czOQahZh7+UF/13DW/B05vG8nNGL6ETxJxfT0dJAxAA==
+"@janeirodigital/interop-data-model@^1.0.0-rc.15":
+  version "1.0.0-rc.15"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.15.tgz#f12faf7dbaae602bca090d6967fb7b889541de3f"
+  integrity sha512-SArhZa54ctMA8RkN+WtCoxFC1U1Juc4aoftgfIHwDCKkYORq4im/0Kv9794lE79uJ09pmz+PFP44J0o+ycdvBg==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.14"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.15"
     n3 "^1.11.0"
     ts-mixer "^6.0.1"
     typescript-memoize "^1.0.1"
 
-"@janeirodigital/interop-namespaces@^1.0.0-rc.14":
-  version "1.0.0-rc.14"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.14.tgz#f3b4a2b1311e6dd593d1bfe0705e1a106d49f5ca"
-  integrity sha512-4G3KTsJ2d1dJy+ziH9RcsJD50hQ4PUjM6pziAxurmYOjiMpd6iZYndgU9Tg6BzE6NIBSUIXye5Y/hrOXJ30+gQ==
+"@janeirodigital/interop-namespaces@^1.0.0-rc.15":
+  version "1.0.0-rc.15"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.15.tgz#78b671c171e7445f88b041484fd0ebaad606d4b4"
+  integrity sha512-01Sjwq9ZHtY3eESdH4ej9DxVxDkCcxeajsN6y/DVu5+C1dWzC8FsBFtYEIZqs9Le2fG8MiK/b4Ofu6hQbMqeeg==
   dependencies:
     n3 "^1.11.0"
 
-"@janeirodigital/interop-utils@^1.0.0-rc.14":
-  version "1.0.0-rc.14"
-  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.14.tgz#5d092d3ca373f8d056e23f688464b6a02ca9474d"
-  integrity sha512-nauUkNfwFG3RvNVGr6fa5eFpRHUj7CFJ34vJAcf0XS6fE7dKLkGjxSbAVMevDsUOxfylXavPVyIo+9cVlKx6WA==
+"@janeirodigital/interop-utils@^1.0.0-rc.15":
+  version "1.0.0-rc.15"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.15.tgz#9938d5a5110d54663c42bafd8699acdb3c44e97e"
+  integrity sha512-bAiHgISsStGm0GVL8Y3AQl0ZmXARYgU+Z1wSvkZ704TbfRe0XW55PBONifSB9neogEC4gGk9c6XszwoI6635yA==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.14"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
     http-link-header "^1.0.3"
     jsonld-streaming-parser "^3.0.0"
     n3 "^1.11.1"

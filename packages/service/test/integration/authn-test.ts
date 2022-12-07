@@ -16,7 +16,7 @@ const mockedCreateSolidTokenVerifier = jest.mocked(createSolidTokenVerifier)
 
 import { Session } from "@inrupt/solid-client-authn-node";
 
-jest.setTimeout(20000)
+jest.setTimeout(30000)
 
 let server: Server
 let componentsManager: ComponentsManager<Server>

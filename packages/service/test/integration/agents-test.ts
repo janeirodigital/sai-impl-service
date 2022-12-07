@@ -9,7 +9,7 @@ import { INTEROP } from '@janeirodigital/interop-namespaces';
 import { baseUrl, agentRedirectUrl, encodeWebId, webId2agentUrl } from '../../src/url-templates'
 import { createTestServer } from "./components-builder";
 
-jest.setTimeout(20000)
+jest.setTimeout(30000)
 
 jest.mock('@solid/access-token-verifier', () => {
   return {

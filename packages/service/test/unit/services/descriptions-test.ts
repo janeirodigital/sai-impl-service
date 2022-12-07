@@ -4,7 +4,8 @@ import { CRUDApplicationRegistration, ReadableAccessAuthorization, ReadableAcces
 import { getDescriptions, recordAuthorization } from '../../../src/services'
 import { ACL, INTEROP } from '@janeirodigital/interop-namespaces'
 import { Authorization } from '@janeirodigital/sai-api-messages'
-import { access } from 'fs'
+
+jest.setTimeout(30000)
 
 describe('getDescriptions', () => {
 
@@ -132,6 +133,9 @@ describe('getDescriptions', () => {
 })
 
 describe('recordAuthorization', () => {
+  const clientIdDocument = {
+    callbackEndpoint: 'http://some.iri'
+  } as unknown as ReadableClientIdDocument;
   const saiSession = jest.mocked({
     recordAccessAuthorization: jest.fn(),
     findApplicationRegistration: jest.fn(),
@@ -143,7 +147,8 @@ describe('recordAuthorization', () => {
     },
     factory: {
       readable: {
-        accessNeedGroup: jest.fn()
+        accessNeedGroup: jest.fn(),
+        clientIdDocument: jest.fn()
       }
     }
   } as unknown as AuthorizationAgent, true)
@@ -202,14 +207,16 @@ describe('recordAuthorization', () => {
           iri: 'https://solidshapes.example/trees/Project'
         },
         accessMode: [ INTEROP.Read.value ],
-      },
-      {
-        iri: 'https://projectron.example/access-needs#need-task',
-        shapeTree: {
-          iri: 'https://solidshapes.example/trees/Task'
-        },
-        accessMode: [ INTEROP.Read.value ],
-        inheritsFromNeed: 'https://projectron.example/access-needs#need-project',
+        children: [
+          {
+            iri: 'https://projectron.example/access-needs#need-task',
+            shapeTree: {
+              iri: 'https://solidshapes.example/trees/Task'
+            },
+            accessMode: [ INTEROP.Read.value ],
+            inheritsFromNeed: 'https://projectron.example/access-needs#need-project',
+          }
+        ]
       }
     ]
   } as unknown as ReadableAccessNeedGroup
@@ -221,7 +228,7 @@ describe('recordAuthorization', () => {
     saiSession.recordAccessAuthorization.mockResolvedValue({ iri: recordedAccessAuthorizationIri } as unknown as ReadableAccessAuthorization)
 
   test('works for existing application registration', async () => {
-
+    saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument);
     saiSession.findApplicationRegistration.mockResolvedValueOnce({} as unknown as CRUDApplicationRegistration)
 
     const accessAuthorization = await recordAuthorization(authorization, saiSession)
@@ -234,6 +241,7 @@ describe('recordAuthorization', () => {
     })
     expect(accessAuthorization).toStrictEqual({
       id: recordedAccessAuthorizationIri,
+      callbackEndpoint: clientIdDocument.callbackEndpoint,
       ...authorization
     })
     expect(saiSession.generateAccessGrant).toBeCalledWith(recordedAccessAuthorizationIri)
@@ -241,6 +249,7 @@ describe('recordAuthorization', () => {
 
   test('creates application registration if one does not exist', async () => {
     saiSession.findApplicationRegistration.mockResolvedValue(undefined)
+    saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument)
     await recordAuthorization(authorization, saiSession)
     expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).toBeCalledWith(authorization.grantee)
   })
