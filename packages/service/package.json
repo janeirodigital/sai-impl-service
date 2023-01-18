@@ -19,7 +19,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "start": "node dist/componentsMain.js",
-    "debug": "node --inspect dist/componentsMain.js",
+    "debug": "npm run build && node --inspect dist/componentsMain.js",
     "build": "npm run clean && npm run build:ts && npm run build:components",
     "build:components": "componentsjs-generator -s src -c dist/components -r ssv -i .componentsignore",
     "build:ts": "tsc",

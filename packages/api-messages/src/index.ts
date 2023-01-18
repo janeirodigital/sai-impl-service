@@ -231,12 +231,22 @@ export interface DataAuthorization {
   dataInstances?: IRI[]
 }
 
-export interface Authorization {
+export interface BaseAuthorization {
   grantee: IRI;
   accessNeedGroup: IRI;
+}
+export interface GrantedAuthorization extends BaseAuthorization {
   dataAuthorizations: DataAuthorization[]
+  granted: true;
 }
 
-export interface AccessAuthorization extends UniqueId, Authorization {
+export interface DeniedAuthorization extends BaseAuthorization {
+  granted: false
+  dataAuthorizations?: never;
+}
+
+export type Authorization = GrantedAuthorization | DeniedAuthorization
+
+export interface AccessAuthorization extends UniqueId, GrantedAuthorization {
   callbackEndpoint?: IRI;
 }

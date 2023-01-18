@@ -1,7 +1,7 @@
 import { DataAuthorizationData, ReadableAccessNeed, ReadableAccessNeedGroup } from "@janeirodigital/interop-data-model";
 import type { AuthorizationAgent, AccessAuthorizationStructure, NestedDataAuthorizationData } from "@janeirodigital/interop-authorization-agent";
 import { INTEROP } from "@janeirodigital/interop-namespaces";
-import type { AuthorizationData, Authorization, AccessAuthorization, AccessNeed, AccessNeedGroup } from "@janeirodigital/sai-api-messages"
+import type { AuthorizationData, Authorization, AccessAuthorization, AccessNeed, AccessNeedGroup, GrantedAuthorization } from "@janeirodigital/sai-api-messages"
 
 const formatAccessNeed = (accessNeed: ReadableAccessNeed, descriptionsLang: string): AccessNeed => {
   const formatted = {
@@ -55,7 +55,7 @@ export const getDescriptions = async (
 
 // currently the spec only anticipates one level of inheritance
 // since we still don't have IRIs at this point, we need to use nesting to represent inheritance
-function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: ReadableAccessNeedGroup): NestedDataAuthorizationData[] {
+function buildDataAuthorizations(authorization: GrantedAuthorization, accessNeedGroup: ReadableAccessNeedGroup): NestedDataAuthorizationData[] {
   const structuredDataAuthorizations = authorization.dataAuthorizations.map(dataAuthorization => {
     const accessNeed = accessNeedGroup
       .accessNeeds
@@ -73,7 +73,7 @@ function buildDataAuthorizations(authorization: Authorization, accessNeedGroup: 
       // TODO handle more specific scopes
     }
     return saiReady
-  })
+  });
   const parents: NestedDataAuthorizationData[] = []
   const children: DataAuthorizationData[] = []
   for (const structuredDataAuthorization of structuredDataAuthorizations) {
@@ -105,11 +105,21 @@ export const recordAuthorization = async (
   authorization: Authorization,
   saiSession: AuthorizationAgent
 ): Promise<AccessAuthorization> => {
-  const accessNeedGroup = await saiSession.factory.readable.accessNeedGroup(authorization.accessNeedGroup)
-  const structure: AccessAuthorizationStructure = {
-    grantee: authorization.grantee,
-    hasAccessNeedGroup: authorization.accessNeedGroup,
-    dataAuthorizations: buildDataAuthorizations(authorization, accessNeedGroup)
+  let structure: AccessAuthorizationStructure;
+  if (authorization.granted) {
+    const accessNeedGroup = await saiSession.factory.readable.accessNeedGroup(authorization.accessNeedGroup)
+    structure = {
+      grantee: authorization.grantee,
+      hasAccessNeedGroup: authorization.accessNeedGroup,
+      dataAuthorizations: buildDataAuthorizations(authorization, accessNeedGroup),
+      granted: true,
+    }
+  } else {
+    structure = {
+      grantee: authorization.grantee,
+      hasAccessNeedGroup: authorization.accessNeedGroup,
+      granted: false,
+    }
   }
 
   const recorded = await saiSession.recordAccessAuthorization(structure)
