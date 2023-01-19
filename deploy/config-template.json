@@ -18,8 +18,8 @@
       "storage": {
         "@id": "urn:ssv:RedisStorage",
         "@type":"RedisSolidStorage",
-        "host": "localhost",
-        "port": "6379"
+        "host": "${REDIS_TOKENS_HOST}",
+        "port": "${REDIS_TOKENS_PORT}"
       }
     },
     {
