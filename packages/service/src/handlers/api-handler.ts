@@ -3,8 +3,10 @@ import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-a
 import { getLoggerFor } from '@digita-ai/handlersjs-logging';
 import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-api-messages";
 import type { IQueue } from "@janeirodigital/sai-server-interfaces";
-import { getApplications, getDescriptions, recordAuthorization,
-  getDataRegistries, getSocialAgents, addSocialAgent } from "../services";
+import {
+  getApplications, getDescriptions, recordAuthorization,
+  getDataRegistries, getSocialAgents, addSocialAgent, getUnregisteredApplicationProfile
+} from '../services';
 import type { SaiContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 import { IReciprocalRegistrationsJobData } from "../models/jobs";
@@ -32,6 +34,13 @@ export class ApiHandler extends HttpHandler {
           type: ResponseMessageTypes.APPLICATIONS_RESPONSE,
           payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
+      case RequestMessageTypes.APPLICATION_PROFILE:
+        // eslint-disable-next-line no-case-declarations
+        const { id } = body;
+        return { body: {
+          type: ResponseMessageTypes.APPLICATION_PROFILE,
+          payload: await getUnregisteredApplicationProfile(context.saiSession, id),
+          }, status: 200, headers: {} }
       case RequestMessageTypes.SOCIAL_AGENTS_REQUEST:
         return { body: {
           type: ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE,
