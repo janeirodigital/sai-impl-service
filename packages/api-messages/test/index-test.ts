@@ -188,15 +188,30 @@ describe('Request has proper message type', () => {
     expect(JSON.parse(request.stringify())).toEqual(expected)
   });
 
-  test('ApplicationAuthorizationRequest', () => {
+  test('ApplicationAuthorizationRequest (granted)', () => {
     const authorization = {
       grantee: 'https://app.example',
+      granted: true as true,
       accessNeedGroup: 'https://app.example/access-needs#group',
       dataAuthorizations: [{
         accessNeed: 'https://app.example/access-needs#project',
         scope: 'Inherited',
       }]
+    };
+    const request = new ApplicationAuthorizationRequest(authorization);
+    const expected = {
+      type: RequestMessageTypes.APPLICATION_AUTHORIZATION,
+      authorization
     }
+    expect(JSON.parse(request.stringify())).toEqual(expected)
+  });
+
+  test('ApplicationAuthorizationRequest (not granted)', () => {
+    const authorization = {
+      grantee: 'https://app.example',
+      granted: false as false,
+      accessNeedGroup: 'https://app.example/access-needs#group',
+    };
     const request = new ApplicationAuthorizationRequest(authorization);
     const expected = {
       type: RequestMessageTypes.APPLICATION_AUTHORIZATION,

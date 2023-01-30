@@ -225,33 +225,66 @@ describe('recordAuthorization', () => {
 
   saiSession.recordAccessAuthorization.mockResolvedValue({ } as ReadableAccessAuthorization)
   saiSession.factory.readable.accessNeedGroup.mockResolvedValue(accessNeedGroup)
-    saiSession.recordAccessAuthorization.mockResolvedValue({ iri: recordedAccessAuthorizationIri } as unknown as ReadableAccessAuthorization)
+  saiSession.recordAccessAuthorization.mockResolvedValue({ iri: recordedAccessAuthorizationIri } as unknown as ReadableAccessAuthorization)
 
-  test('works for existing application registration', async () => {
-    saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument);
-    saiSession.findApplicationRegistration.mockResolvedValueOnce({} as unknown as CRUDApplicationRegistration)
+  describe('granted', () => {
+    const grantedAuthorization = {...authorization, granted: true} as Authorization;
+    test('works for existing application registration', async () => {
+      saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument);
+      saiSession.findApplicationRegistration.mockResolvedValueOnce({} as unknown as CRUDApplicationRegistration)
 
-    const accessAuthorization = await recordAuthorization(authorization, saiSession)
-    expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).not.toBeCalled()
-    expect(saiSession.factory.readable.accessNeedGroup).toBeCalledWith(accessNeedGroupIri)
-    expect(saiSession.recordAccessAuthorization).toBeCalledWith({
-      grantee: authorization.grantee,
-      hasAccessNeedGroup: authorization.accessNeedGroup,
-      dataAuthorizations
+      const accessAuthorization = await recordAuthorization(grantedAuthorization, saiSession)
+      expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).not.toBeCalled()
+      expect(saiSession.factory.readable.accessNeedGroup).toBeCalledWith(accessNeedGroupIri)
+      expect(saiSession.recordAccessAuthorization).toBeCalledWith({
+        grantee: grantedAuthorization.grantee,
+        granted: grantedAuthorization.granted,
+        hasAccessNeedGroup: grantedAuthorization.accessNeedGroup,
+        dataAuthorizations
+      })
+      expect(accessAuthorization).toStrictEqual({
+        id: recordedAccessAuthorizationIri,
+        callbackEndpoint: clientIdDocument.callbackEndpoint,
+        ...grantedAuthorization
+      })
+      expect(saiSession.generateAccessGrant).toBeCalledWith(recordedAccessAuthorizationIri)
     })
-    expect(accessAuthorization).toStrictEqual({
-      id: recordedAccessAuthorizationIri,
-      callbackEndpoint: clientIdDocument.callbackEndpoint,
-      ...authorization
+
+    test('creates application registration if one does not exist', async () => {
+      saiSession.findApplicationRegistration.mockResolvedValue(undefined)
+      saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument)
+      await recordAuthorization(grantedAuthorization, saiSession)
+      expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).toBeCalledWith(grantedAuthorization.grantee)
     })
-    expect(saiSession.generateAccessGrant).toBeCalledWith(recordedAccessAuthorizationIri)
   })
 
-  test('creates application registration if one does not exist', async () => {
-    saiSession.findApplicationRegistration.mockResolvedValue(undefined)
-    saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument)
-    await recordAuthorization(authorization, saiSession)
-    expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).toBeCalledWith(authorization.grantee)
-  })
+  describe('not granted', () => {
+    const notGrantedAuthorization = {...authorization, granted: false} as Authorization;
 
+    test('works for existing application registration', async () => {
+      saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument);
+      saiSession.findApplicationRegistration.mockResolvedValueOnce({} as unknown as CRUDApplicationRegistration)
+
+      const accessAuthorization = await recordAuthorization(notGrantedAuthorization, saiSession)
+      expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).not.toBeCalled()
+      expect(saiSession.recordAccessAuthorization).toBeCalledWith({
+        grantee: notGrantedAuthorization.grantee,
+        granted: notGrantedAuthorization.granted,
+        hasAccessNeedGroup: notGrantedAuthorization.accessNeedGroup,
+      })
+      expect(accessAuthorization).toStrictEqual({
+        id: recordedAccessAuthorizationIri,
+        callbackEndpoint: clientIdDocument.callbackEndpoint,
+        ...notGrantedAuthorization
+      })
+      expect(saiSession.generateAccessGrant).toBeCalledWith(recordedAccessAuthorizationIri)
+    })
+
+    test('creates application registration if one does not exist', async () => {
+      saiSession.findApplicationRegistration.mockResolvedValue(undefined)
+      saiSession.factory.readable.clientIdDocument.mockResolvedValue(clientIdDocument)
+      await recordAuthorization(notGrantedAuthorization, saiSession)
+      expect(saiSession.registrySet.hasAgentRegistry.addApplicationRegistration).toBeCalledWith(notGrantedAuthorization.grantee)
+    })
+  })
 })

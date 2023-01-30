@@ -3,6 +3,7 @@ PREFIX uuid: <urn:uuid>
 PREFIX shapetrees: <http://www.w3.org/ns/shapetrees#>
 PREFIX solidshapes: <http://localhost:3000/shapetrees/shapes/>
 PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
+PREFIX pm: <https://vocab.example/project-management/>
 
 solidtrees:Project
   a shapetrees:ShapeTree ;
@@ -12,8 +13,7 @@ solidtrees:Project
 
 uuid:54b5e4f6-c6b5-4c9a-b885-cbf69d08370d
   shapetrees:hasShapeTree solidtrees:Task ;
-  shapetrees:viaShapePath
-    "@<https://solidshapes.example/shapes/Project>~<https://vocab.example/project-management/hasTask>" .
+  shapetrees:viaPredicate pm:hasTask .
 
 solidtrees:desc-en\#Project
   shapetrees:inDescriptionSet solidtrees:desc-en ;
