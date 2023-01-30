@@ -20,7 +20,7 @@ export const ResponseMessageTypes = {
 
 type TResponseMessage = typeof ResponseMessageTypes
 
-type TResponseMessages = keyof TResponseMessage
+type TResponseMessages = keyof TResponseMessage;
 
 type VResponseMessages = TResponseMessage[TResponseMessages]
 
@@ -30,7 +30,7 @@ export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponse
   SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage |
   ApplicationAuthorizationResponseMessage
 
-type Payloads = Application[] | SocialAgent[] | SocialAgent | DataRegistry[] | AuthorizationData | AccessAuthorization
+type Payloads = Application[] | SocialAgent[] | SocialAgent | DataRegistry[] | AuthorizationData | AccessAuthorization | Partial <Application>
 
 type IResponseMessage<T extends VResponseMessages, P extends Payloads> = {
   type: T,
@@ -38,6 +38,7 @@ type IResponseMessage<T extends VResponseMessages, P extends Payloads> = {
 }
 
 export type ApplicationsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATIONS_RESPONSE, Application[]>;
+export type UnregisteredApplicationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATION_PROFILE, Partial<Application>>
 export type SocialAgentsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENTS_RESPONSE, SocialAgent[]>;
 export type SocialAgentResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SOCIAL_AGENT_RESPONSE, SocialAgent>;
 export type DataRegistriesResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DATA_REGISTRIES_RESPONSE, DataRegistry[]>;
@@ -47,6 +48,12 @@ export type ApplicationAuthorizationResponseMessage = IResponseMessage<typeof Re
 type Responses = ApplicationAuthorizationResponse | SocialAgentsResponse | SocialAgentResponse | DataRegistriesResponse | DescriptionsResponse | ApplicationAuthorizationResponse
 
 export type IRI = string;
+
+function validateType(messageType: VResponseMessages, requiredType: VResponseMessages) {
+  if (messageType !== requiredType) {
+    throw new Error(`Invalid message type! Expected: ${messageType}, received: ${requiredType}`)
+  }
+}
 
 abstract class MessageBase {
   stringify (): string {
@@ -58,11 +65,6 @@ export class ApplicationsRequest extends MessageBase {
   public type = RequestMessageTypes.APPLICATIONS_REQUEST
 }
 
-function validateType(messageType: VResponseMessages, requiredType: VResponseMessages) {
-  if (messageType !== requiredType) {
-    throw new Error(`Invalid message type! Expected: ${messageType}, received: ${requiredType}`)
-  }
-}
 export class ApplicationsResponse {
   public type = ResponseMessageTypes.APPLICATIONS_RESPONSE
   public payload: Application[]
@@ -70,6 +72,23 @@ export class ApplicationsResponse {
   constructor(message: ApplicationsResponseMessage) {
     validateType(message.type, this.type);
     this.payload = message.payload
+  }
+}
+
+export class UnregisteredApplicationRequest extends MessageBase {
+  public type = RequestMessageTypes.APPLICATION_PROFILE
+
+  constructor(private id: IRI) {
+    super();
+  }
+}
+
+export class UnregisteredApplicationResponse {
+  public type = ResponseMessageTypes.APPLICATION_PROFILE
+  public payload: Partial<Application>
+  constructor(message: UnregisteredApplicationResponseMessage) {
+    validateType(message.type, this.type)
+    this.payload = message.payload;
   }
 }
 
