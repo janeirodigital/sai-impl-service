@@ -45,6 +45,7 @@ jobs:
           mkdir dist
           mv node_modules/ dist/
           mv packages/ dist/
+          mv deploy/ dist/
           cp package.json dist/
           cp Dockerfile dist/
           tar -zcvf dist.tar.gz dist
