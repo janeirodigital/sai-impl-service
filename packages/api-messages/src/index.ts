@@ -5,6 +5,7 @@ export const RequestMessageTypes = {
   DATA_REGISTRIES_REQUEST: '[DATA_REGISTRIES] Data Registries Requested',
   ADD_SOCIAL_AGENT_REQUEST: '[SOCIAL AGENTS] Data Registries Requested',
   APPLICATION_AUTHORIZATION: '[APPLICATION] Authorization submitted',
+  APPLICATION_PROFILE: 'ApplicationProfileRequest',
 } as const
 
 export const ResponseMessageTypes = {
@@ -14,13 +15,14 @@ export const ResponseMessageTypes = {
   DATA_REGISTRIES_RESPONSE: '[DATA_REGISTRIES] Data Registries Received',
   SOCIAL_AGENT_RESPONSE: '[SOCIAL AGENTS] Social Agent Received',
   APPLICATION_AUTHORIZATION_REGISTERED: '[APPLICATION] Authorization registered',
+  APPLICATION_PROFILE: 'ApplicationProfileResponse',
 } as const
 
 type TResponseMessage = typeof ResponseMessageTypes
 
-type TResponseMesssages = keyof TResponseMessage
+type TResponseMessages = keyof TResponseMessage
 
-type VResponseMessages = TResponseMessage[TResponseMesssages]
+type VResponseMessages = TResponseMessage[TResponseMessages]
 
 // type ResponseKeys = keyof typeof ResponseMessageTypes
 

@@ -1,6 +1,6 @@
 import type { CRUDApplicationRegistration } from "@janeirodigital/interop-data-model";
 import type { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
-import type { Application } from "@janeirodigital/sai-api-messages";
+import type { Application, IRI } from '@janeirodigital/sai-api-messages';
 
 const buildApplicationProfile = (
   registration: CRUDApplicationRegistration
@@ -23,3 +23,11 @@ export const getApplications = async (saiSession: AuthorizationAgent) => {
   }
   return profiles;
 };
+
+export const getUnregisteredApplicationProfile = async (agent: AuthorizationAgent, id: IRI): Promise<Partial<Application>> => {
+  const {name, logo, accessNeedGroup } = await agent.factory.readable.clientIdDocument(id).then(doc => (
+    { name: doc.clientName, logo: doc.logoUri, accessNeedGroup: doc.hasAccessNeedGroup }
+  ));
+
+  return { name, logo, accessNeedGroup };
+}

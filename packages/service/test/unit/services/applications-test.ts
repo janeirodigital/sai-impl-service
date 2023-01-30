@@ -1,5 +1,5 @@
 import type { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent'
-import { getApplications } from '../../../src/services/applications'
+import { getApplications, getUnregisteredApplicationProfile } from '../../../src/services/applications';
 
 const saiSession = {
   applicationRegistrations: [
@@ -40,3 +40,20 @@ test('formats correctly', async () => {
     }
   ]))
 })
+
+test('get unregistered application profile', async () => {
+  const agent = {
+    factory: {
+      readable: {
+        clientIdDocument: () => Promise.resolve(
+          {clientName: 'name', logoUri: 'http://logo', hasAccessNeedGroup: 'http://group'}
+        ),
+      }
+    }
+  } as unknown as AuthorizationAgent;
+
+  const profile = await getUnregisteredApplicationProfile(agent, "http://id")
+  expect(profile.name).toEqual('name');
+  expect(profile.logo).toEqual('http://logo');
+  expect(profile.accessNeedGroup).toEqual('http://group');
+});
