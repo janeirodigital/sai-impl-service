@@ -1,0 +1,15 @@
+{
+  "@context": [
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
+  ],
+  "@graph": [
+    {
+      "@id": "urn:ssv:redis-info",
+      "type": "RedisConnectionInfo",
+      "host": "localhost",
+      "ssv:dist/utils/redis-connection-info.jsonld#RedisConnectionInfo_port": 6380,
+      "ssv:dist/utils/redis-connection-info.jsonld#RedisConnectionInfo_username": "default",
+      "ssv:dist/utils/redis-connection-info.jsonld#RedisConnectionInfo_password": "redis-password"
+    }
+  ]
+}

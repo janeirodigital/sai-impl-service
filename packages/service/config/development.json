@@ -1,46 +1,57 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/solid-redis-token-storage/^0.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld"
   ],
   "import": [
+    "./redis-connection.json",
     "./service.json",
     "./workers/reciprocal-registrations.json",
     "./workers/access-inbox.json",
     "./workers/delegated-grants.json",
     "./workers/push-notifications.json"
-
   ],
   "@graph": [
     {
       "@id": "urn:ssv:SessionManager",
       "@type": "SessionManager",
       "storage": {
-        "@id": "urn:ssv:RedisStorage",
         "@type":"RedisSolidStorage",
-        "host": "localhost",
-        "port": "6379"
+        "info": {
+          "@id": "urn:ssv:redis-info"
+        }
       }
     },
     {
       "@id": "urn:solid:authorization-agent:queue:reciprocal-registrations",
       "@type": "BullQueue",
-      "name": "reciprocal-registrations"
+      "name": "reciprocal-registrations",
+      "info": {
+        "@id": "urn:ssv:redis-info"
+      }
     },
     {
       "@id": "urn:solid:authorization-agent:queue:access-inbox",
       "@type": "BullQueue",
-      "name": "access-inbox"
+      "name": "access-inbox",
+      "info": {
+        "@id": "urn:ssv:redis-info"
+      }
     },
     {
       "@id": "urn:solid:authorization-agent:queue:delegated-grants",
       "@type": "BullQueue",
-      "name": "delegated-grants"
+      "name": "delegated-grants",
+      "info": {
+        "@id": "urn:ssv:redis-info"
+      }
     },
     {
       "@id": "urn:solid:authorization-agent:queue:push-notifications",
       "@type": "BullQueue",
-      "name": "push-notifications"
+      "name": "push-notifications",
+      "info": {
+        "@id": "urn:ssv:redis-info"
+      }
     }
   ]
 }

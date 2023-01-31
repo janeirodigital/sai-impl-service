@@ -27,3 +27,5 @@ export * from "./processors/push-notifications"
 export * from "./session-manager";
 export * from "./bull-queue"
 export * from "./bull-worker"
+export * from "./redis-storage";
+export * from "./redis-connection-info";

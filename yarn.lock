@@ -2305,50 +2305,43 @@
   resolved "https://registry.npmjs.org/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
-"@janeirodigital/interop-authorization-agent@^1.0.0-rc.15":
-  version "1.0.0-rc.15"
-  resolved "https://registry.npmjs.org/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.15.tgz#25dbd489faa6efe7ded81a5c94688072598d7718"
-  integrity sha512-/gYE1CEQy8N//F5deIYVhFnuDw4KE/6mq9ZVqw+zAXKyorY2LhUIz8IWjVcKBDqn3udQ34RzGQCUV2kdPyhYGw==
+"@janeirodigital/interop-authorization-agent@^1.0.0-rc.16":
+  version "1.0.0-rc.16"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-authorization-agent/-/interop-authorization-agent-1.0.0-rc.16.tgz#cd0afdaf1e31fd0de40fac61b3653a2e9376f1c8"
+  integrity sha512-8Gd0I8DU5QqPAIrypYhG/ORDsd3llDcHxIp1RqwG+30hOtH0n8Nvn3uzaxa2JGfOocwZ/3XAUMj13UC1XLsxLQ==
   dependencies:
-    "@janeirodigital/interop-data-model" "^1.0.0-rc.15"
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.15"
+    "@janeirodigital/interop-data-model" "^1.0.0-rc.16"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.16"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.16"
     n3 "^1.11.0"
 
-"@janeirodigital/interop-data-model@^1.0.0-rc.15":
-  version "1.0.0-rc.15"
-  resolved "https://registry.npmjs.org/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.15.tgz#f12faf7dbaae602bca090d6967fb7b889541de3f"
-  integrity sha512-SArhZa54ctMA8RkN+WtCoxFC1U1Juc4aoftgfIHwDCKkYORq4im/0Kv9794lE79uJ09pmz+PFP44J0o+ycdvBg==
+"@janeirodigital/interop-data-model@^1.0.0-rc.16":
+  version "1.0.0-rc.16"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-data-model/-/interop-data-model-1.0.0-rc.16.tgz#14fe1bd077f78525bde6f4db128620a7ca2b4dff"
+  integrity sha512-osjMfSJedv5bPWhBa0SfHvNVrJTWSSmiCZOelyhS2z+MsqjcQ4bWJ/uzQymOilrG9NFm0AQmYFhJ7tBjNYNETQ==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
-    "@janeirodigital/interop-utils" "^1.0.0-rc.15"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.16"
+    "@janeirodigital/interop-utils" "^1.0.0-rc.16"
     n3 "^1.11.0"
     ts-mixer "^6.0.1"
     typescript-memoize "^1.0.1"
 
-"@janeirodigital/interop-namespaces@^1.0.0-rc.15":
-  version "1.0.0-rc.15"
-  resolved "https://registry.npmjs.org/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.15.tgz#78b671c171e7445f88b041484fd0ebaad606d4b4"
-  integrity sha512-01Sjwq9ZHtY3eESdH4ej9DxVxDkCcxeajsN6y/DVu5+C1dWzC8FsBFtYEIZqs9Le2fG8MiK/b4Ofu6hQbMqeeg==
+"@janeirodigital/interop-namespaces@^1.0.0-rc.16":
+  version "1.0.0-rc.16"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-namespaces/-/interop-namespaces-1.0.0-rc.16.tgz#9a9f44779a1ba461ad765fd1b078c604866f89ad"
+  integrity sha512-UAG7gvkzOf0WcV/linIvnlxxWMV8IRX1jvFFw7JaijxCLBgzYnKulVxOdhdyXv02zAHVgJevr3JwJXtibEKgRw==
   dependencies:
     n3 "^1.11.0"
 
-"@janeirodigital/interop-utils@^1.0.0-rc.15":
-  version "1.0.0-rc.15"
-  resolved "https://registry.npmjs.org/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.15.tgz#9938d5a5110d54663c42bafd8699acdb3c44e97e"
-  integrity sha512-bAiHgISsStGm0GVL8Y3AQl0ZmXARYgU+Z1wSvkZ704TbfRe0XW55PBONifSB9neogEC4gGk9c6XszwoI6635yA==
+"@janeirodigital/interop-utils@^1.0.0-rc.16":
+  version "1.0.0-rc.16"
+  resolved "https://registry.yarnpkg.com/@janeirodigital/interop-utils/-/interop-utils-1.0.0-rc.16.tgz#4314582aafe7fc496d5ac046b9e2549482f5ac1e"
+  integrity sha512-O5VnNg4/VflQ8qzRJJfQfyuUFs7DJ7wpkB0m1LrvrTWds+AjCI0g/2xH/HVLLE+ibTc77wQdadzqm1sFlB4JFg==
   dependencies:
-    "@janeirodigital/interop-namespaces" "^1.0.0-rc.15"
+    "@janeirodigital/interop-namespaces" "^1.0.0-rc.16"
     http-link-header "^1.0.3"
     jsonld-streaming-parser "^3.0.0"
     n3 "^1.11.1"
-
-"@janeirodigital/solid-redis-token-storage@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.npmjs.org/@janeirodigital/solid-redis-token-storage/-/solid-redis-token-storage-0.0.7.tgz#4ed54c8de2bc30e16628219e23e04963ac4d7276"
-  integrity sha512-M5NDNFCHBoGHJAIlieJvJBNJbQfvkwGMCZEPnjyWli0XlF2leX1yD4XRdF9JfJ+ut7gYbenY0ugEj7RsbUj3IA==
-  dependencies:
-    redis "^4.0.4"
 
 "@jest/console@^27.5.1":
   version "27.5.1"
@@ -3595,40 +3588,6 @@
   integrity sha512-5zm8bN2/CC634dTcn/0AhTRLaQRjXDZs3QfcAsQKNturHT7XVWcKy/8p3P5gXl+YkZTAmy7T5M/LyiT/jbkENw==
   dependencies:
     "@types/node" "*"
-
-"@redis/bloom@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@redis/bloom/-/bloom-1.1.0.tgz#64e310ddee72010676e14296076329e594a1f6c7"
-  integrity sha512-9QovlxmpRtvxVbN0UBcv8WfdSMudNZZTFqCsnBszcQXqaZb/TVe30ScgGEO7u1EAIacTPAo7/oCYjYAxiHLanQ==
-
-"@redis/client@1.4.2":
-  version "1.4.2"
-  resolved "https://registry.npmjs.org/@redis/client/-/client-1.4.2.tgz#2a3f5e98bc33b7b979390442e6e08f96e57fabdd"
-  integrity sha512-oUdEjE0I7JS5AyaAjkD3aOXn9NhO7XKyPyXEyrgFDu++VrVBHUPnV6dgEya9TcMuj5nIJRuCzCm8ZP+c9zCHPw==
-  dependencies:
-    cluster-key-slot "1.1.1"
-    generic-pool "3.9.0"
-    yallist "4.0.0"
-
-"@redis/graph@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@redis/graph/-/graph-1.1.0.tgz#cc2b82e5141a29ada2cce7d267a6b74baa6dd519"
-  integrity sha512-16yZWngxyXPd+MJxeSr0dqh2AIOi8j9yXKcKCwVaKDbH3HTuETpDVPcLujhFYVPtYrngSco31BUcSa9TH31Gqg==
-
-"@redis/json@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/@redis/json/-/json-1.0.4.tgz#f372b5f93324e6ffb7f16aadcbcb4e5c3d39bda1"
-  integrity sha512-LUZE2Gdrhg0Rx7AN+cZkb1e6HjoSKaeeW8rYnt89Tly13GBI5eP4CwDVr+MY8BAYfCg4/N15OUrtLoona9uSgw==
-
-"@redis/search@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@redis/search/-/search-1.1.0.tgz#7abb18d431f27ceafe6bcb4dd83a3fa67e9ab4df"
-  integrity sha512-NyFZEVnxIJEybpy+YskjgOJRNsfTYqaPbK/Buv6W2kmFNaRk85JiqjJZA5QkRmWvGbyQYwoO5QfDi2wHskKrQQ==
-
-"@redis/time-series@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/@redis/time-series/-/time-series-1.0.4.tgz#af85eb080f6934580e4d3b58046026b6c2b18717"
-  integrity sha512-ThUIgo2U/g7cCuZavucQTQzA9g9JbDDY2f64u3AbAoz/8vE2lt2U37LamDUVChhaDA3IRT9R6VvJwqnUfTJzng==
 
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
@@ -5077,11 +5036,6 @@ clone@^2.1.2:
   resolved "https://registry.npmjs.org/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
   integrity sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==
 
-cluster-key-slot@1.1.1:
-  version "1.1.1"
-  resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.1.tgz#10ccb9ded0729464b6d2e7d714b100a2d1259d43"
-  integrity sha512-rwHwUfXL40Chm1r08yrhU3qpUvdVlgkKNeyeGPOxnW8/SyVDvgRaed/Uz54AqWNaTCAThlj6QAs3TZcKI0xDEw==
-
 cluster-key-slot@^1.1.0:
   version "1.1.2"
   resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.2.tgz#88ddaa46906e303b5de30d3153b7d9fe0a0c19ac"
@@ -5548,7 +5502,7 @@ delegates@^1.0.0:
   resolved "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
   integrity sha512-bd2L678uiWATM6m5Z1VzNCErI3jiGzt6HGY8OVICs40JQq/HALfbyNJmp0UDakEY4pMMaN0Ly5om/B1VI/+xfQ==
 
-denque@^2.0.1:
+denque@^2.0.1, denque@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/denque/-/denque-2.1.0.tgz#e93e1a6569fb5e66f16a3c2a2964617d349d6ab1"
   integrity sha512-HVQE3AAb/pxF8fQAoiqpvg9i3evqug3hoiwakOyZAwJm+6vZehbkYXZ0l4JxS+I3QxM97v5aaRNhj8v5oBhekw==
@@ -6254,11 +6208,6 @@ gauge@^4.0.3:
     strip-ansi "^6.0.1"
     wide-align "^1.1.5"
 
-generic-pool@3.9.0:
-  version "3.9.0"
-  resolved "https://registry.npmjs.org/generic-pool/-/generic-pool-3.9.0.tgz#36f4a678e963f4fdb8707eab050823abc4e8f5e4"
-  integrity sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==
-
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
@@ -6823,6 +6772,21 @@ ioredis@^5.2.2:
     cluster-key-slot "^1.1.0"
     debug "^4.3.4"
     denque "^2.0.1"
+    lodash.defaults "^4.2.0"
+    lodash.isarguments "^3.1.0"
+    redis-errors "^1.2.0"
+    redis-parser "^3.0.0"
+    standard-as-callback "^2.1.0"
+
+ioredis@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/ioredis/-/ioredis-5.3.0.tgz#b5469f0fd374648ef074840c00c1d8eed42fca3f"
+  integrity sha512-Id9jKHhsILuIZpHc61QkagfVdUj2Rag5GzG1TGEvRNeM7dtTOjICgjC+tvqYxi//PuX2wjQ+Xjva2ONBuf92Pw==
+  dependencies:
+    "@ioredis/commands" "^1.1.1"
+    cluster-key-slot "^1.1.0"
+    debug "^4.3.4"
+    denque "^2.1.0"
     lodash.defaults "^4.2.0"
     lodash.isarguments "^3.1.0"
     redis-errors "^1.2.0"
@@ -9557,18 +9521,6 @@ redis-parser@^3.0.0:
   dependencies:
     redis-errors "^1.0.0"
 
-redis@^4.0.4:
-  version "4.5.1"
-  resolved "https://registry.npmjs.org/redis/-/redis-4.5.1.tgz#f5a818970bb2dc5d60540bab41308640604c7d33"
-  integrity sha512-oxXSoIqMJCQVBTfxP6BNTCtDMyh9G6Vi5wjdPdV/sRKkufyZslDqCScSGcOr6XGR/reAWZefz7E4leM31RgdBA==
-  dependencies:
-    "@redis/bloom" "1.1.0"
-    "@redis/client" "1.4.2"
-    "@redis/graph" "1.1.0"
-    "@redis/json" "1.0.4"
-    "@redis/search" "1.1.0"
-    "@redis/time-series" "1.0.4"
-
 regexpp@^3.2.0:
   version "3.2.0"
   resolved "https://registry.npmjs.org/regexpp/-/regexpp-3.2.0.tgz#0425a2768d8f23bad70ca4b90461fa2f1213e1b2"
@@ -10890,15 +10842,15 @@ y18n@^5.0.5:
   resolved "https://registry.npmjs.org/y18n/-/y18n-5.0.8.tgz#7f4934d0f7ca8c56f95314939ddcd2dd91ce1d55"
   integrity sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==
 
-yallist@4.0.0, yallist@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
-  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
-
 yallist@^3.0.2:
   version "3.1.1"
   resolved "https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz#dbb7daf9bfd8bac9ab45ebf602b8cbad0d5d08fd"
   integrity sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==
+
+yallist@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
+  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yaml@^1.10.0:
   version "1.10.2"
