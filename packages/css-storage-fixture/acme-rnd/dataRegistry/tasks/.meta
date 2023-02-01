@@ -2,7 +2,7 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
 
-<http://localhost:3000/acme/dataRegistry/tasks/>
+<http://localhost:3000/acme-rnd/dataRegistry/tasks/>
   a interop:DataRegistration ;
   interop:registeredBy <http://localhost:3000/acme/profile/card#me> ;
   interop:registeredWith <http://localhost:4000/agents/aHR0cDovL2xvY2FsaG9zdDozMDAwL2FjbWUvcHJvZmlsZS9jYXJkI21l> ;
