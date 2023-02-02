@@ -22,14 +22,14 @@ beforeEach(() => {
 
 describe('constructor', () => {
   test('creates bull worker', () => {
-    new BullWorker(queueName, processor)
-    expect(MockedWorker).toBeCalledWith(queueName, expect.any(Function), { autorun: false })
+    new BullWorker(queueName, processor, {})
+    expect(MockedWorker).toBeCalledWith(queueName, expect.any(Function), { autorun: false, connection: {} })
   })
 })
 
 describe('run', () => {
   test('runs the bull worker', () => {
-    const queue = new BullWorker(queueName, processor)
+    const queue = new BullWorker(queueName, processor, {})
     queue.run()
     expect(workerMock.run).toBeCalledTimes(1)
   })

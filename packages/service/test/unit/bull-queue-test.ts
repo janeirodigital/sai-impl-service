@@ -20,16 +20,16 @@ beforeEach(() => {
 
 describe('constructor', () => {
   test('creates bull queue', () => {
-    new BullQueue(jobName)
-    expect(MockedQueue).toBeCalledWith(jobName)
+    new BullQueue(jobName, {})
+    expect(MockedQueue).toBeCalledWith(jobName, {connection: {}});
   })
 })
 
 describe('add', () => {
   test('adds job data to bull queue', () => {
     const jobData = { webId: 'https://alice.example' }
-    const queue = new BullQueue(jobName)
+    const queue = new BullQueue(jobName, {})
     queue.add(jobData)
-    expect(queueMock.add).toBeCalledWith(jobName, jobData)
+    expect(queueMock.add).toBeCalledWith(jobName, jobData);
   })
 })
