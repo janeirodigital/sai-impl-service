@@ -3,7 +3,6 @@
     "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld"
   ],
   "import": [
-    "./redis-connection.json",
     "./service.json",
     "./workers/reciprocal-registrations.json",
     "./workers/access-inbox.json",
@@ -11,6 +10,12 @@
     "./workers/push-notifications.json"
   ],
   "@graph": [
+    {
+      "@id": "urn:ssv:redis-info",
+      "@type": "RedisConnectionInfo",
+      "port": "6380",
+      "password": "redis-pass"
+    },
     {
       "@id": "urn:ssv:SessionManager",
       "@type": "SessionManager",
