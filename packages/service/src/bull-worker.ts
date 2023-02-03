@@ -1,12 +1,13 @@
 import type { IWorker, IProcessor } from "@janeirodigital/sai-server-interfaces";
 import { Worker } from 'bullmq'
+import { RedisConnectionInfo } from './redis-connection-info';
 
 export class BullWorker implements IWorker {
 
   private bull: Worker
 
-  constructor(queueName: string, processor: IProcessor) {
-    this.bull = new Worker(queueName, processor.processorFunction.bind(processor), { autorun: false })
+  constructor(queueName: string, processor: IProcessor, info: RedisConnectionInfo) {
+    this.bull = new Worker(queueName, processor.processorFunction.bind(processor), { autorun: false, connection: info })
   }
 
   async run () {

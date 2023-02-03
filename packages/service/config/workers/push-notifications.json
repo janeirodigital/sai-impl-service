@@ -10,7 +10,8 @@
       "processor": {
         "@type": "PushNotificationsProcessor",
         "sessionManager": { "@id": "urn:ssv:SessionManager" }
-      }
+      },
+      "info": { "@id": "urn:ssv:redis-info" }
     }
   ]
 }

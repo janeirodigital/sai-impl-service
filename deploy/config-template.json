@@ -13,13 +13,23 @@
   ],
   "@graph": [
     {
+      "@id": "urn:ssv:RedisConnectionInfo",
+      "@type": "RedisConnectionInfo",
+      "host": "${REDIS_HOST}",
+      "port": "${REDIS_PORT}",
+      "username": "${REDIS_USER}",
+      "password": "${REDIS_PASSWORD}",
+      "db": "${REDIS_DB}"
+    },
+    {
       "@id": "urn:ssv:SessionManager",
       "@type": "SessionManager",
       "storage": {
         "@id": "urn:ssv:RedisStorage",
         "@type":"RedisSolidStorage",
-        "host": "${REDIS_TOKEN_HOST}",
-        "port": "${REDIS_TOKEN_PORT}"
+        "info": {
+          "@id": "urn:ssv:RedisConnectionInfo"
+        }
       }
     },
     {
