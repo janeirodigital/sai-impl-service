@@ -1,11 +1,17 @@
 
 
 export class RedisConnectionInfo {
+
+  public db?: number;
+  public port?: number;
   constructor(
     public host?: string,
-    public port?: number,
+    port?: string,
     public username?: string,
     public password?: string,
-    public db?: number,
-  ) {}
+    db?: string,
+  ) {
+    this.port = Number(port) || undefined;
+    this.db = Number(db) || undefined;
+  }
 }
