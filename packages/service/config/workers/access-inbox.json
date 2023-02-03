@@ -12,7 +12,7 @@
         "sessionManager": { "@id": "urn:ssv:SessionManager" }
       },
       "info": {
-        "@id": "urn:ssv:redis-info"
+        "@id": "urn:ssv:RedisConnectionInfo"
       }
     }
   ]

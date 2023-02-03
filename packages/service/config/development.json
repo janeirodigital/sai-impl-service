@@ -11,7 +11,7 @@
   ],
   "@graph": [
     {
-      "@id": "urn:ssv:redis-info",
+      "@id": "urn:ssv:RedisConnectionInfo",
       "@type": "RedisConnectionInfo",
       "port": "6380",
       "password": "redis-pass"
@@ -22,7 +22,7 @@
       "storage": {
         "@type":"RedisSolidStorage",
         "info": {
-          "@id": "urn:ssv:redis-info"
+          "@id": "urn:ssv:RedisConnectionInfo"
         }
       }
     },
@@ -31,7 +31,7 @@
       "@type": "BullQueue",
       "name": "reciprocal-registrations",
       "info": {
-        "@id": "urn:ssv:redis-info"
+        "@id": "urn:ssv:RedisConnectionInfo"
       }
     },
     {
@@ -39,7 +39,7 @@
       "@type": "BullQueue",
       "name": "access-inbox",
       "info": {
-        "@id": "urn:ssv:redis-info"
+        "@id": "urn:ssv:RedisConnectionInfo"
       }
     },
     {
@@ -47,7 +47,7 @@
       "@type": "BullQueue",
       "name": "delegated-grants",
       "info": {
-        "@id": "urn:ssv:redis-info"
+        "@id": "urn:ssv:RedisConnectionInfo"
       }
     },
     {
@@ -55,7 +55,7 @@
       "@type": "BullQueue",
       "name": "push-notifications",
       "info": {
-        "@id": "urn:ssv:redis-info"
+        "@id": "urn:ssv:RedisConnectionInfo"
       }
     }
   ]
