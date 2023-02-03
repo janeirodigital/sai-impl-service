@@ -1,7 +1,6 @@
 {
   "@context": [
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld",
-    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/solid-redis-token-storage/^0.0.0/components/context.jsonld"
+    "https://linkedsoftwaredependencies.org/bundles/npm/@janeirodigital/sai-server/^0.0.0/components/context.jsonld"
   ],
   "import": [
     "./service.json",
