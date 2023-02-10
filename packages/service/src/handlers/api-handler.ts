@@ -34,11 +34,11 @@ export class ApiHandler extends HttpHandler {
           type: ResponseMessageTypes.APPLICATIONS_RESPONSE,
           payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
-      case RequestMessageTypes.APPLICATION_PROFILE:
+      case RequestMessageTypes.UNREGISTERED_APPLICATION_PROFILE:
         // eslint-disable-next-line no-case-declarations
         const { id } = body;
         return { body: {
-          type: ResponseMessageTypes.APPLICATION_PROFILE,
+          type: ResponseMessageTypes.UNREGISTERED_APPLICATION_PROFILE,
           payload: await getUnregisteredApplicationProfile(context.saiSession, id),
           }, status: 200, headers: {} }
       case RequestMessageTypes.SOCIAL_AGENTS_REQUEST:
