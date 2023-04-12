@@ -33,11 +33,9 @@ export class ApiHandler extends HttpHandler {
           payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
       case RequestMessageTypes.UNREGISTERED_APPLICATION_PROFILE:
-        // eslint-disable-next-line no-case-declarations
-        const { id } = body;
         return { body: {
           type: ResponseMessageTypes.UNREGISTERED_APPLICATION_PROFILE,
-          payload: await getUnregisteredApplicationProfile(context.saiSession, id),
+          payload: await getUnregisteredApplicationProfile(context.saiSession, body.id),
           }, status: 200, headers: {} }
       case RequestMessageTypes.SOCIAL_AGENTS_REQUEST:
         return { body: {
