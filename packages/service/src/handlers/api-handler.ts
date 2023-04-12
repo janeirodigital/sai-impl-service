@@ -18,9 +18,7 @@ export class ApiHandler extends HttpHandler {
     private queue: IQueue
   ) {
     super();
-    this.logger.info("LoginHandler::constructor");
   }
-
 
   async handleAsync (context: SaiContext): Promise<HttpHandlerResponse> {
     validateContentType(context, 'application/json');
@@ -79,7 +77,6 @@ export class ApiHandler extends HttpHandler {
   }
 
   handle(context: SaiContext): Observable<HttpHandlerResponse> {
-    this.logger.info("ApiHandler::handle");
     return from(this.handleAsync(context))
   }
 }
