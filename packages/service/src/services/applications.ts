@@ -16,6 +16,10 @@ const buildApplicationProfile = (
   };
 };
 
+/**
+ * Returns all the registered applications for the currently authenticated agent
+ * @param saiSession
+ */
 export const getApplications = async (saiSession: AuthorizationAgent) => {
   const profiles: Application[] = [];
   for await (const registration of saiSession.applicationRegistrations) {
@@ -24,10 +28,13 @@ export const getApplications = async (saiSession: AuthorizationAgent) => {
   return profiles;
 };
 
+/**
+ * Returns the application profile of an application that is _not_ registered for the given agent
+ */
 export const getUnregisteredApplicationProfile = async (agent: AuthorizationAgent, id: IRI): Promise<Partial<Application>> => {
   const {name, logo, accessNeedGroup } = await agent.factory.readable.clientIdDocument(id).then(doc => (
     { name: doc.clientName, logo: doc.logoUri, accessNeedGroup: doc.hasAccessNeedGroup }
   ));
 
-  return { name, logo, accessNeedGroup };
+  return { id, name, logo, accessNeedGroup };
 }
