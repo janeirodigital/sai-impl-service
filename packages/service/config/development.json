@@ -13,7 +13,7 @@
     {
       "@id": "urn:ssv:RedisConnectionInfo",
       "@type": "RedisConnectionInfo",
-      "port": "6380",
+      "port": "6379",
       "password": "redis-pass"
     },
     {

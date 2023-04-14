@@ -18,9 +18,7 @@ export class ApiHandler extends HttpHandler {
     private queue: IQueue
   ) {
     super();
-    this.logger.info("LoginHandler::constructor");
   }
-
 
   async handleAsync (context: SaiContext): Promise<HttpHandlerResponse> {
     validateContentType(context, 'application/json');
@@ -34,12 +32,10 @@ export class ApiHandler extends HttpHandler {
           type: ResponseMessageTypes.APPLICATIONS_RESPONSE,
           payload: await getApplications(context.saiSession)
         }, status: 200, headers: {} }
-      case RequestMessageTypes.APPLICATION_PROFILE:
-        // eslint-disable-next-line no-case-declarations
-        const { id } = body;
+      case RequestMessageTypes.UNREGISTERED_APPLICATION_PROFILE:
         return { body: {
-          type: ResponseMessageTypes.APPLICATION_PROFILE,
-          payload: await getUnregisteredApplicationProfile(context.saiSession, id),
+          type: ResponseMessageTypes.UNREGISTERED_APPLICATION_PROFILE,
+          payload: await getUnregisteredApplicationProfile(context.saiSession, body.id),
           }, status: 200, headers: {} }
       case RequestMessageTypes.SOCIAL_AGENTS_REQUEST:
         return { body: {
@@ -79,7 +75,6 @@ export class ApiHandler extends HttpHandler {
   }
 
   handle(context: SaiContext): Observable<HttpHandlerResponse> {
-    this.logger.info("ApiHandler::handle");
     return from(this.handleAsync(context))
   }
 }

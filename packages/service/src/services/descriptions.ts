@@ -43,6 +43,8 @@ export const getDescriptions = async (
   const accessNeedGroup = await saiSession.factory.readable.accessNeedGroup(clientIdDocument.hasAccessNeedGroup, descriptionsLang)
 
   return {
+    // TODO if the id is the unique id of something then it should not be its own id. It should refer by a different name,
+    //      e.g.: applicationId and be documented as such
     id: applicationIri,
     accessNeedGroup: {
       id: accessNeedGroup.iri,

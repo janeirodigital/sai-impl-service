@@ -46,14 +46,14 @@ test('get unregistered application profile', async () => {
     factory: {
       readable: {
         clientIdDocument: () => Promise.resolve(
-          {clientName: 'name', logoUri: 'http://logo', hasAccessNeedGroup: 'http://group'}
+          {clientName: 'name', logoUri: 'http://logo', hasAccessNeedGroup: 'https://group'}
         ),
       }
     }
   } as unknown as AuthorizationAgent;
 
-  const profile = await getUnregisteredApplicationProfile(agent, "http://id")
+  const profile = await getUnregisteredApplicationProfile(agent, "https://id")
   expect(profile.name).toEqual('name');
   expect(profile.logo).toEqual('http://logo');
-  expect(profile.accessNeedGroup).toEqual('http://group');
+  expect(profile.accessNeedGroup).toEqual('https://group');
 });
