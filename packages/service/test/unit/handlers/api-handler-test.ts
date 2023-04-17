@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { jest, describe, beforeEach, test, expect } from '@jest/globals';
 import {
   BadRequestHttpError,
   HttpError,
@@ -7,7 +7,7 @@ import {
 } from "@digita-ai/handlersjs-http";
 
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
-import { AccessAuthorization, Application, AuthorizationData, DataRegistry, RequestMessageTypes, ResponseMessageTypes, SocialAgent } from "@janeirodigital/sai-api-messages";
+import { AccessAuthorization, Application, AuthorizationData, DataRegistry, RequestMessageTypes, Resource, ResponseMessageTypes, ShareAuthorizationConfirmation, SocialAgent } from "@janeirodigital/sai-api-messages";
 import { MockedQueue } from '@janeirodigital/sai-server-mocks'
 import { ApiHandler, SaiContext } from '../../../src';
 import * as services from '../../../src/services';
@@ -18,7 +18,9 @@ jest.mock('../../../src/services', () => {
     addSocialAgent: jest.fn(),
     getDataRegistries: jest.fn(),
     getDescriptions: jest.fn(),
-    recordAuthorization: jest.fn()
+    recordAuthorization: jest.fn(),
+    getResource: jest.fn(),
+    shareResource: jest.fn()
   }
 })
 
@@ -214,7 +216,7 @@ describe('getDescriptions', () => {
   })
 })
 
-describe('getDescriptions', () => {
+describe('recordAuthorization', () => {
 
   test('sucessful response', (done) => {
     const request = {
@@ -236,6 +238,63 @@ describe('getDescriptions', () => {
         expect(response.body.payload).toBe(accessAuthorization)
 
         expect(mocked.recordAuthorization).toBeCalledWith(request.body.authorization, saiSession)
+        done();
+      }
+    })
+  })
+})
+
+describe('getResource', () => {
+
+  test('sucessful response', (done) => {
+    const request = {
+      headers,
+      body: {
+        type: RequestMessageTypes.RESOURCE_REQUEST,
+        id: 'some-resource=iri',
+        lang: 'fr'
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request, authn, saiSession } as SaiContext;
+
+    const resource = {} as unknown as Resource
+    mocked.getResource.mockResolvedValueOnce(resource)
+
+    apiHandler.handle(ctx).subscribe({
+      next: (response: HttpHandlerResponse) => {
+        expect(response.status).toBe(200)
+        expect(response.body.type).toBe(ResponseMessageTypes.RESOURCE_RESPONSE)
+        expect(response.body.payload).toBe(resource)
+
+        expect(mocked.getResource).toBeCalledWith(saiSession, request.body.id, request.body.lang)
+        done();
+      }
+    })
+  })
+})
+
+describe('shareResource', () => {
+
+  test('sucessful response', (done) => {
+    const request = {
+      headers,
+      body: {
+        type: RequestMessageTypes.SHARE_AUTHORIZATION,
+        shareAuthorization: {}
+      }
+    } as unknown as HttpHandlerRequest
+    const ctx = { request, authn, saiSession } as SaiContext;
+
+    const confirmation = {} as unknown as ShareAuthorizationConfirmation
+    mocked.shareResource.mockResolvedValueOnce(confirmation)
+
+    apiHandler.handle(ctx).subscribe({
+      next: (response: HttpHandlerResponse) => {
+        expect(response.status).toBe(200)
+        expect(response.body.type).toBe(ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION)
+        expect(response.body.payload).toBe(confirmation)
+
+        expect(mocked.shareResource).toBeCalledWith(saiSession, request.body.shareAuthorization)
         done();
       }
     })

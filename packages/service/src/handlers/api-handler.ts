@@ -5,7 +5,8 @@ import { RequestMessageTypes, ResponseMessageTypes } from "@janeirodigital/sai-a
 import type { IQueue } from "@janeirodigital/sai-server-interfaces";
 import {
   getApplications, getDescriptions, recordAuthorization,
-  getDataRegistries, getSocialAgents, addSocialAgent, getUnregisteredApplicationProfile
+  getDataRegistries, getSocialAgents, addSocialAgent, getUnregisteredApplicationProfile,
+  getResource, shareResource
 } from '../services';
 import type { SaiContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
@@ -69,6 +70,20 @@ export class ApiHandler extends HttpHandler {
           type: ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED,
           payload: await recordAuthorization(body.authorization, context.saiSession)
         }, status: 200, headers: {} }
+        case RequestMessageTypes.RESOURCE_REQUEST: {
+          const { id, lang } = body;
+          return { body: {
+            type: ResponseMessageTypes.RESOURCE_RESPONSE,
+            payload: await getResource(context.saiSession, id, lang)
+           }, status: 200, headers: {} }
+          }
+        case RequestMessageTypes.SHARE_AUTHORIZATION: {
+          const { shareAuthorization } = body;
+          return { body: {
+            type: ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION,
+            payload: await shareResource(context.saiSession, shareAuthorization)
+            }, status: 200, headers: {} }
+          }
       default:
         throw new BadRequestHttpError()
     }
