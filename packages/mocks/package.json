@@ -15,7 +15,7 @@
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && npm run build:ts && npm run build:components",
+    "build": "npm run build:ts && npm run build:components",
     "build:components": "componentsjs-generator -s src -c dist/components -r ssvm -i .componentsignore",
     "build:ts": "tsc",
     "clean": "rm -rf dist/"
