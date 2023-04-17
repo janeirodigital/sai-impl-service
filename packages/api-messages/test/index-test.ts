@@ -1,4 +1,5 @@
-import { AccessAuthorization, AddSocialAgentRequest, Application, ApplicationAuthorizationRequest, ApplicationAuthorizationResponse, ApplicationsRequest, ApplicationsResponse, Authorization, AuthorizationData, DataRegistriesRequest, DataRegistriesResponse, DataRegistry, Description, DescriptionsRequest, DescriptionsResponse, RequestMessageTypes, ResponseMessageTypes, SocialAgent, SocialAgentResponse, SocialAgentsRequest, SocialAgentsResponse } from '../src/index';
+import { describe, test, expect } from '@jest/globals'
+import { AccessAuthorization, AddSocialAgentRequest, Application, ApplicationAuthorizationRequest, ApplicationAuthorizationResponse, ApplicationsRequest, ApplicationsResponse, Authorization, AuthorizationData, DataRegistriesRequest, DataRegistriesResponse, DataRegistry, Description, DescriptionsRequest, DescriptionsResponse, RequestMessageTypes, Resource, ResourceRequest, ResourceResponse, ResponseMessageTypes, ShareAuthorizationConfirmation, ShareAuthorizationRequest, ShareAuthorizationResponse, SocialAgent, SocialAgentResponse, SocialAgentsRequest, SocialAgentsResponse } from '../src/index';
 
 describe('ApplicationsResponse', () => {
   test('correct', () => {
@@ -132,6 +133,50 @@ describe('DataRegistriesResponse', () => {
   })
 })
 
+describe('ShareAuthorizationResponse', () => {
+  test('correct', () => {
+    const message = {
+      type: ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION,
+      payload: {} as ShareAuthorizationConfirmation
+    }
+
+    const response = new ShareAuthorizationResponse(message);
+    expect(response.type).toEqual(ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION)
+    expect(response.payload).toBe(message.payload)
+  })
+
+  test('incorrect', () => {
+    const message = {
+      type: ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
+      payload: {} as SocialAgent
+    }
+    // @ts-ignore
+    expect(() => new ShareAuthorizationResponse(message)).toThrow('Invalid message type')
+  })
+})
+
+describe('ResourceResponse', () => {
+  test('correct', () => {
+    const message = {
+      type: ResponseMessageTypes.RESOURCE_RESPONSE,
+      payload: {} as Resource
+    }
+
+    const response = new ResourceResponse(message);
+    expect(response.type).toEqual(ResponseMessageTypes.RESOURCE_RESPONSE)
+    expect(response.payload).toBe(message.payload)
+  })
+
+  test('incorrect', () => {
+    const message = {
+      type: ResponseMessageTypes.SOCIAL_AGENT_RESPONSE,
+      payload: {} as SocialAgent
+    }
+    // @ts-ignore
+    expect(() => new ResourceResponse(message)).toThrow('Invalid message type')
+  })
+})
+
 describe('Request has proper message type', () => {
   test('ApplicationsRequest', () => {
     const request = new ApplicationsRequest();
@@ -216,6 +261,36 @@ describe('Request has proper message type', () => {
     const expected = {
       type: RequestMessageTypes.APPLICATION_AUTHORIZATION,
       authorization
+    }
+    expect(JSON.parse(request.stringify())).toEqual(expected)
+  });
+
+  test('ResourceRequest', () => {
+    const id = 'https://work.alice.example/some-resource'
+    const lang = 'en'
+
+    const request = new ResourceRequest(id, lang);
+    const expected = {
+      type: RequestMessageTypes.RESOURCE_REQUEST,
+      id,
+      lang,
+    }
+    expect(JSON.parse(request.stringify())).toEqual(expected)
+  });
+
+  test('ShareAuthorizationRequest', () => {
+    const shareAuthorization = {
+      applicationId: 'https://projectron.example',
+      resource: 'https://work.alice.example/some-resource',
+      agents: [],
+      accessMode: [],
+      children: []
+    }
+
+    const request = new ShareAuthorizationRequest(shareAuthorization);
+    const expected = {
+      type: RequestMessageTypes.SHARE_AUTHORIZATION,
+      shareAuthorization
     }
     expect(JSON.parse(request.stringify())).toEqual(expected)
   });
