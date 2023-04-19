@@ -1,5 +1,13 @@
 import { IRI, UniqueId } from './index';
 
+// duplicated so that we don't need to use RDFJS and namespace builder on the frontend
+export const AccessModes = {
+  Read: 'http://www.w3.org/ns/auth/acl#Read',
+  Update: 'http://www.w3.org/ns/auth/acl#Update',
+  Create: 'http://www.w3.org/ns/auth/acl#Create',
+  Delete: 'http://www.w3.org/ns/auth/acl#Delete'
+} as const
+
 export type Payloads =  Application[]
                       | SocialAgent[]
                       | SocialAgent
@@ -7,6 +15,8 @@ export type Payloads =  Application[]
                       | AuthorizationData
                       | AccessAuthorization
                       | Partial <Application>
+                      | Resource
+                      | ShareAuthorizationConfirmation
 export interface Application extends UniqueId {
   name: string;
   logo?: IRI;
@@ -91,4 +101,43 @@ export type Authorization = GrantedAuthorization | DeniedAuthorization
 
 export interface AccessAuthorization extends UniqueId, GrantedAuthorization {
   callbackEndpoint?: IRI;
+}
+
+export type ShapeTree = {
+  id: IRI,
+  label: string,
+  references?: ShapeTree[]
+};
+
+export type ChildResource = {
+  count: number;
+  shapeTree: {
+      id: string;
+      label: string;
+  }
+}
+export type Resource = {
+  id: IRI;
+  label?: string;
+  shapeTree: ShapeTree;
+  children: ChildResource[];
+  accessGrantedTo: IRI[];
+};
+
+export type ShareAuthorizationModes = {
+  accessMode: IRI[];
+  children: {
+    shapeTree: IRI,
+    accessMode: IRI[]
+  }[];
+}
+
+export type ShareAuthorization = {
+  applicationId: IRI;
+  resource: IRI;
+  agents: IRI[];
+} & ShareAuthorizationModes
+
+export interface ShareAuthorizationConfirmation {
+  callbackEndpoint: IRI;
 }

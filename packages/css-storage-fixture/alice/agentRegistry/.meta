@@ -7,4 +7,6 @@ PREFIX interop: <http://www.w3.org/ns/solid/interop#>
 
 <http://localhost:3000/alice/agentRegistry/>
   interop:hasSocialAgentRegistration
-    <http://localhost:3000/alice/agentRegistry/acme/> .
+    <http://localhost:3000/alice/agentRegistry/acme/> ,
+    <http://localhost:3000/alice/agentRegistry/bob/> ,
+    <http://localhost:3000/alice/agentRegistry/kim/> .

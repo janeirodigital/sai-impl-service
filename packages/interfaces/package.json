@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && npm run build:ts",
+    "build": "npm run build:ts",
     "build:ts": "tsc",
     "clean": "rm -rf dist/"
   },
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@inrupt/solid-client-authn-node": "^1.11.7",
-    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.16"
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.17"
   },
   "devDependencies": {
     "typescript": "^4.5.5"

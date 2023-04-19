@@ -1,5 +1,5 @@
 import { IRI } from './index';
-import { Authorization } from './payloads';
+import { Authorization, ShareAuthorization } from './payloads';
 
 export const RequestMessageTypes = {
   APPLICATIONS_REQUEST: '[APPLICATION PROFILES] Application Profiles Requested',
@@ -9,6 +9,8 @@ export const RequestMessageTypes = {
   ADD_SOCIAL_AGENT_REQUEST: '[SOCIAL AGENTS] Data Registries Requested',
   APPLICATION_AUTHORIZATION: '[APPLICATION] Authorization submitted',
   UNREGISTERED_APPLICATION_PROFILE: 'ApplicationProfileRequest',
+  RESOURCE_REQUEST: '[RESOURCE] Resource Requested',
+  SHARE_AUTHORIZATION: '[RESOURCE] Share Authorization Requested'
 } as const
 
 export type Request = ApplicationsRequest
@@ -69,6 +71,22 @@ export class ApplicationAuthorizationRequest extends MessageBase {
   public type = RequestMessageTypes.APPLICATION_AUTHORIZATION
 
   constructor(private authorization: Authorization) {
+    super()
+  }
+}
+
+export class ResourceRequest extends MessageBase {
+  public type = RequestMessageTypes.RESOURCE_REQUEST
+
+  constructor(public id: IRI, private lang: string) {
+    super()
+  }
+}
+
+export class ShareAuthorizationRequest extends MessageBase {
+  public type = RequestMessageTypes.SHARE_AUTHORIZATION
+
+  constructor(private shareAuthorization: ShareAuthorization) {
     super()
   }
 }

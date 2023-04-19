@@ -1,4 +1,4 @@
-import { AccessAuthorization, Application, AuthorizationData, DataRegistry, Payloads, SocialAgent } from './payloads';
+import { AccessAuthorization, Application, AuthorizationData, DataRegistry, Payloads, SocialAgent, Resource, ShareAuthorizationConfirmation } from './payloads';
 
 export const ResponseMessageTypes = {
   APPLICATIONS_RESPONSE: '[APPLICATION PROFILES] Application Profiles Received',
@@ -8,6 +8,8 @@ export const ResponseMessageTypes = {
   SOCIAL_AGENT_RESPONSE: '[SOCIAL AGENTS] Social Agent Received',
   APPLICATION_AUTHORIZATION_REGISTERED: '[APPLICATION] Authorization registered',
   UNREGISTERED_APPLICATION_PROFILE: 'ApplicationProfileResponse',
+  RESOURCE_RESPONSE: '[RESOURCE] Resource Received',
+  SHARE_AUTHORIZATION_CONFIRMATION: '[RESOURCE] Share Authorization Confirmed'
 } as const
 
 export type TResponseMessage = typeof ResponseMessageTypes
@@ -26,10 +28,13 @@ export type DataRegistriesResponseMessage = IResponseMessage<typeof ResponseMess
 export type DescriptionsResponseMessage = IResponseMessage<typeof ResponseMessageTypes.DESCRIPTIONS_RESPONSE, AuthorizationData>;
 export type ApplicationAuthorizationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.APPLICATION_AUTHORIZATION_REGISTERED, AccessAuthorization>;
 export type UnregisteredApplicationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.UNREGISTERED_APPLICATION_PROFILE, Partial<Application>>
+export type ResourceResponseMessage = IResponseMessage<typeof ResponseMessageTypes.RESOURCE_RESPONSE, Resource>;
+export type ShareAuthorizationResponseMessage = IResponseMessage<typeof ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION, ShareAuthorizationConfirmation>;
 
 export type ResponseMessage = ApplicationsResponseMessage | SocialAgentsResponseMessage |
   SocialAgentResponseMessage | DataRegistriesResponseMessage | DescriptionsResponseMessage |
-  ApplicationAuthorizationResponseMessage | UnregisteredApplicationResponseMessage
+  ApplicationAuthorizationResponseMessage | UnregisteredApplicationResponseMessage |
+  ResourceResponseMessage | ShareAuthorizationResponseMessage
 
 function validateType(messageType: VResponseMessages, requiredType: VResponseMessages) {
   if (messageType !== requiredType) {
@@ -102,6 +107,28 @@ export class ApplicationAuthorizationResponse {
   public payload: AccessAuthorization
 
   constructor(message: ApplicationAuthorizationResponseMessage) {
+    validateType(message.type, this.type);
+    this.payload = message.payload
+  }
+}
+
+export class ResourceResponse {
+  public type = ResponseMessageTypes.RESOURCE_RESPONSE
+  public payload: Resource
+
+  constructor(message: ResourceResponseMessage) {
+    validateType(message.type, this.type);
+    this.payload = message.payload
+  }
+}
+
+
+export class ShareAuthorizationResponse {
+
+  public type = ResponseMessageTypes.SHARE_AUTHORIZATION_CONFIRMATION
+  public payload: ShareAuthorizationConfirmation
+
+  constructor(message: ShareAuthorizationResponseMessage) {
     validateType(message.type, this.type);
     this.payload = message.payload
   }
