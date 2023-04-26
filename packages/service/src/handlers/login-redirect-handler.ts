@@ -1,13 +1,13 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, HttpHandlerContext, InternalServerError } from "@digita-ai/handlersjs-http";
-import { getLoggerFor } from '@digita-ai/handlersjs-logging';
+import { getLogger } from '@digita-ai/handlersjs-logging';
 import type { IQueue, ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import { frontendUrl, decodeWebId } from "../url-templates";
 import { IAccessInboxJobData } from "../models/jobs";
 
 export class LoginRedirectHandler extends HttpHandler {
 
-  private logger = getLoggerFor(this, 5, 5);
+  private logger  = getLogger();
 
   constructor(
     private sessionManager: ISessionManager,
@@ -28,7 +28,11 @@ export class LoginRedirectHandler extends HttpHandler {
     const oidcSession = await this.sessionManager.getOidcSession(webId)
     // TODO clarify scenario if new a session was just created
 
-    await oidcSession.handleIncomingRedirect(context.request.url.toString())
+    try {
+      await oidcSession.handleIncomingRedirect(context.request.url.toString())
+    } catch(error) {
+      console.error(error)
+     }
 
     if (!oidcSession.info.isLoggedIn || !oidcSession.info.webId) {
       // TODO clarify this scenario

@@ -1,6 +1,6 @@
 import { from, Observable } from "rxjs";
 import { BadRequestHttpError, HttpHandler, HttpHandlerResponse } from "@digita-ai/handlersjs-http";
-import { getLoggerFor } from '@digita-ai/handlersjs-logging';
+import { getLogger } from '@digita-ai/handlersjs-logging';
 import type { ISessionManager } from "@janeirodigital/sai-server-interfaces";
 import type { PushSubscription } from 'web-push';
 import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
@@ -8,7 +8,7 @@ import { validateContentType } from "../utils/http-validators";
 
 export class PushSubscriptionHandler extends HttpHandler {
 
-  private logger = getLoggerFor(this, 5, 5);
+  private logger  = getLogger();
 
   constructor(
     private sessionManager: ISessionManager

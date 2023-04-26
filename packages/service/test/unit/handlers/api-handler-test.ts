@@ -5,6 +5,7 @@ import {
   HttpHandlerRequest,
   HttpHandlerResponse
 } from "@digita-ai/handlersjs-http";
+import { getLogger } from '@digita-ai/handlersjs-logging'
 
 import { AuthorizationAgent } from '@janeirodigital/interop-authorization-agent';
 import { AccessAuthorization, Application, AuthorizationData, DataRegistry, RequestMessageTypes, Resource, ResponseMessageTypes, ShareAuthorizationConfirmation, SocialAgent } from "@janeirodigital/sai-api-messages";
@@ -25,6 +26,7 @@ jest.mock('../../../src/services', () => {
 })
 
 const mocked = jest.mocked(services)
+const logger  = getLogger()
 
 let apiHandler: ApiHandler
 let queue: MockedQueue
@@ -52,7 +54,7 @@ describe('incorrect request', () => {
       headers: { 'content-type': 'text/turtle'},
       body: "<a> <b> <c> ."
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     apiHandler.handle(ctx).subscribe({
       error: (e: HttpError) => {
@@ -67,7 +69,7 @@ describe('incorrect request', () => {
     const request = {
       headers: { 'content-type': 'application/json'},
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     apiHandler.handle(ctx).subscribe({
       error: (e: HttpError) => {
@@ -88,7 +90,7 @@ describe('getApplications', () => {
         type: RequestMessageTypes.APPLICATIONS_REQUEST
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
     const applications = [] as unknown as Application[]
     mocked.getApplications.mockResolvedValueOnce(applications)
 
@@ -113,7 +115,7 @@ describe('getSocialAgents', () => {
         type: RequestMessageTypes.SOCIAL_AGENTS_REQUEST
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
     const socialAgents = [] as unknown as SocialAgent[]
     mocked.getSocialAgents.mockResolvedValueOnce(socialAgents)
 
@@ -142,7 +144,7 @@ describe('addSocialAgent', () => {
         note: 'Funny fella'
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     const socialAgent = { id: bobWebId } as unknown as SocialAgent
     mocked.addSocialAgent.mockResolvedValueOnce(socialAgent)
@@ -170,7 +172,7 @@ describe('getDataRegistries', () => {
         type: RequestMessageTypes.DATA_REGISTRIES_REQUEST
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
     const dataRegistries = [] as unknown as DataRegistry[]
     mocked.getDataRegistries.mockResolvedValueOnce(dataRegistries)
 
@@ -197,7 +199,7 @@ describe('getDescriptions', () => {
         lang: 'en'
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     const authorizationData = {} as unknown as AuthorizationData
     mocked.getDescriptions.mockResolvedValueOnce(authorizationData)
@@ -226,7 +228,7 @@ describe('recordAuthorization', () => {
         authorization: {}
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     const accessAuthorization = {} as unknown as AccessAuthorization
     mocked.recordAuthorization.mockResolvedValueOnce(accessAuthorization)
@@ -255,7 +257,7 @@ describe('getResource', () => {
         lang: 'fr'
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     const resource = {} as unknown as Resource
     mocked.getResource.mockResolvedValueOnce(resource)
@@ -283,7 +285,7 @@ describe('shareResource', () => {
         shareAuthorization: {}
       }
     } as unknown as HttpHandlerRequest
-    const ctx = { request, authn, saiSession } as SaiContext;
+    const ctx = { request, authn, saiSession, logger } as SaiContext;
 
     const confirmation = {} as unknown as ShareAuthorizationConfirmation
     mocked.shareResource.mockResolvedValueOnce(confirmation)

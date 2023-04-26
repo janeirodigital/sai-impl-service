@@ -42,7 +42,7 @@ describe('getResource', () => {
         }
       },
       findSocialAgentsWithAccess: jest.fn()
-    } as unknown as AuthorizationAgent, true)
+    } as unknown as AuthorizationAgent)
     saiSession.factory.readable.dataInstance.mockResolvedValueOnce(dataInstance)
     saiSession.findSocialAgentsWithAccess.mockResolvedValueOnce(agentsWithAccess)
 
@@ -81,7 +81,7 @@ describe('shareResource', () => {
         }
       },
       findSocialAgentsWithAccess: jest.fn()
-    } as unknown as AuthorizationAgent, true)
+    } as unknown as AuthorizationAgent)
 
     const clientIdDocument = {
       callbackEndpoint: 'some-endpoint'

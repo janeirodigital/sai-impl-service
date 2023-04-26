@@ -19,7 +19,7 @@ describe('getDescriptions', () => {
         accessNeedGroup: jest.fn()
       }
     }
-  } as unknown as AuthorizationAgent, true)
+  } as unknown as AuthorizationAgent)
 
   beforeEach(() => {
     saiSession.factory.readable.clientIdDocument.mockReset()
@@ -151,7 +151,7 @@ describe('recordAuthorization', () => {
         clientIdDocument: jest.fn()
       }
     }
-  } as unknown as AuthorizationAgent, true)
+  } as unknown as AuthorizationAgent)
 
   beforeEach(() => {
     saiSession.recordAccessAuthorization.mockClear()

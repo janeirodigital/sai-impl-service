@@ -1,6 +1,6 @@
 import { from, Observable } from "rxjs";
 import { HttpHandler, HttpHandlerResponse, BadRequestHttpError, UnauthorizedHttpError } from "@digita-ai/handlersjs-http";
-import { getLoggerFor } from '@digita-ai/handlersjs-logging';
+import { getLogger } from '@digita-ai/handlersjs-logging';
 import type { AuthenticatedAuthnContext } from "../models/http-solid-context";
 import { validateContentType } from "../utils/http-validators";
 import { decodeWebId } from "../url-templates"
@@ -14,7 +14,7 @@ interface Notification {
 }
 
 export class WebHooksHandler extends HttpHandler {
-  private logger = getLoggerFor(this, 5, 5);
+  private logger  = getLogger();
 
   constructor(
     private grantsQueue: IQueue,

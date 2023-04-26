@@ -1,4 +1,9 @@
-const { ConsoleLoggerFactory, getLoggerFor, setLogger, setLoggerFactory } = require('@digita-ai/handlersjs-logging')
+const { ConsoleLogger, setLogger, LoggerLevel } = require('@digita-ai/handlersjs-logging')
 
-setLoggerFactory(new ConsoleLoggerFactory());
-setLogger(getLoggerFor('HTTP', 6, 6));
+const logger = new ConsoleLogger(
+  'sai-server-tests',
+  LoggerLevel.info,
+  LoggerLevel.info
+)
+
+setLogger(logger);

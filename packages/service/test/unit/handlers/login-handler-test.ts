@@ -36,7 +36,7 @@ describe('authenticated request', () => {
   const opRedirectUrl = 'https:/op.example/auth/?something'
   const agentUrl = webId2agentUrl(authn.webId)
 
-  let loginMock: Mock<Promise<void>>
+  let loginMock: Mock
   beforeEach(() => {
     manager.getOidcSession.mockReset();
     MockedSession.mockReset();

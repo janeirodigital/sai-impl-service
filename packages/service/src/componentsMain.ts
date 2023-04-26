@@ -2,13 +2,16 @@ import path from "path";
 import yargs from "yargs/yargs"
 import { ComponentsManager, IComponentsManagerBuilderOptions } from "componentsjs";
 import type { Server, NodeHttpServer } from "@digita-ai/handlersjs-http";
-import { ConsoleLoggerFactory, getLoggerFor, setLogger, setLoggerFactory } from '@digita-ai/handlersjs-logging';
+import { ConsoleLogger, setLogger, LoggerLevel } from '@digita-ai/handlersjs-logging';
 import { IWorker } from "@janeirodigital/sai-server-interfaces";
 
-setLoggerFactory(new ConsoleLoggerFactory());
-const logger = getLoggerFor('HTTP', 6, 6)
-setLogger(logger);
+const logger = new ConsoleLogger(
+  'sai-server',
+  LoggerLevel.info,
+  LoggerLevel.info
+)
 
+setLogger(logger);
 
 const argv = yargs(process.argv.slice(2)).options({
   config: { type: 'string', default: 'config/development.json' }

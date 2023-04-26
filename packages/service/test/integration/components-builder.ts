@@ -11,7 +11,7 @@ export async function createTestServer(): Promise<{ server: Server, componentsMa
   const managerProperties: IComponentsManagerBuilderOptions<Server> = {
     mainModulePath: modulePath,
     dumpErrorState: false,
-    logLevel: "silly",
+    logLevel: "info",
   };
 
   // Setup ComponentsJS

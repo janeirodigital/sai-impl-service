@@ -20,6 +20,8 @@
       "host": "0.0.0.0",
       "nodeHttpStreamsHandler": {
         "@type": "NodeHttpRequestResponseHandler",
+        "hsts_maxAge": 0,
+        "hsts_includeSubDomains": false,
         "httpHandler": {
           "@type": "HttpCorsRequestHandler",
           "options_exposeHeaders": ["Link"],

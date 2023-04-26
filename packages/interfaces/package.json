@@ -15,12 +15,9 @@
   "license": "MIT",
   "dependencies": {
     "@inrupt/solid-client-authn-node": "^1.11.7",
-    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.17"
+    "@janeirodigital/interop-authorization-agent": "^1.0.0-rc.18"
   },
   "devDependencies": {
-    "typescript": "^4.5.5"
-  },
-  "volta": {
-    "node": "16.15.1"
+    "typescript": "^5.0.4"
   }
 }

@@ -1,9 +1,9 @@
 import { CRUDSocialAgentRegistration } from "@janeirodigital/interop-data-model";
 import { AuthorizationAgent } from "@janeirodigital/interop-authorization-agent";
 import { IRI, SocialAgent } from "@janeirodigital/sai-api-messages";
-import { getLoggerFor } from '@digita-ai/handlersjs-logging';
+import { getLogger } from '@digita-ai/handlersjs-logging';
 
-const logger = getLoggerFor('social-agent', 5, 5);
+const logger  = getLogger();
 
 const buildSocialAgentProfile = (
   registration: CRUDSocialAgentRegistration
