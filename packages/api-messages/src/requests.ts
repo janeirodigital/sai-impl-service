@@ -20,6 +20,8 @@ export type Request = ApplicationsRequest
   | DescriptionsRequest
   | ApplicationAuthorizationRequest
   | UnregisteredApplicationProfileRequest
+  | ResourceRequest
+  | ShareAuthorizationRequest
 
 abstract class MessageBase {
   stringify (): string {
