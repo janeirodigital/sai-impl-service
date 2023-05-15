@@ -25,3 +25,15 @@ PREFIX interop: <http://www.w3.org/ns/solid/interop#>
   interop:inAccessDescriptionSet <> ;
   interop:hasAccessNeed <./access-needs#need-task> ;
   skos:prefLabel "Access to Tasks allows Projectron to identify and manage the work to be done in a given Project."@en .
+
+<#en-need-image>
+  a interop:AccessNeedDescription ;
+  interop:inAccessDescriptionSet <> ;
+  interop:hasAccessNeed <./access-needs#need-image> ;
+  skos:prefLabel "Access to Images allows Projectron to identify and manage the work to be done in a given Project."@en .
+
+<#en-need-file>
+  a interop:AccessNeedDescription ;
+  interop:inAccessDescriptionSet <> ;
+  interop:hasAccessNeed <./access-needs#need-file> ;
+  skos:prefLabel "Access to Files allows Projectron to identify and manage the work to be done in a given Project."@en .

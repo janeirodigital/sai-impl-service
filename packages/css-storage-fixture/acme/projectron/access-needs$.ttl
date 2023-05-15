@@ -25,5 +25,20 @@ PREFIX solidtrees: <http://localhost:3000/shapetrees/trees/>
   interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
   interop:inheritsFromNeed <#need-project> .
 
+<#need-image>
+  a interop:AccessNeed ;
+  interop:registeredShapeTree solidtrees:Image ;
+  interop:accessNecessity interop:accessRequired ;
+  interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
+  interop:inheritsFromNeed <#need-project> .
+
+<#need-file>
+  a interop:AccessNeed ;
+  interop:registeredShapeTree solidtrees:File ;
+  interop:accessNecessity interop:accessRequired ;
+  interop:accessMode acl:Read, acl:Create, acl:Update, acl:Delete ;
+  interop:inheritsFromNeed <#need-project> .
+
+
 <./descriptions-en>
   interop:usesLanguage "en"^^xsd:language .

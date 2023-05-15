@@ -19,3 +19,15 @@ solidtrees:desc-pl\#Task
   shapetrees:inDescriptionSet solidtrees:desc-pl ;
   shapetrees:describes solidshapes:Task ;
   skos:prefLabel "Zadania"@pl .
+
+solidtrees:desc-pl\#Image
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-pl ;
+  shapetrees:describes solidshapes:Image ;
+  skos:prefLabel "Grafiki"@pl .
+
+solidtrees:desc-pl\#File
+  a shapetrees:Description ;
+  shapetrees:inDescriptionSet solidtrees:desc-pl ;
+  shapetrees:describes solidshapes:File ;
+  skos:prefLabel "Pliki"@pl .

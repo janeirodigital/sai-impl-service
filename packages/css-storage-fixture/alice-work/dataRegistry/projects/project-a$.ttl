@@ -5,4 +5,8 @@ PREFIX pm: <https://vocab.example/project-management/>
   rdfs:label "Project A" ;
   pm:hasTask
     <http://localhost:3000/alice-work/dataRegistry/tasks/task-a> ,
-    <http://localhost:3000/alice-work/dataRegistry/tasks/task-b> .
+    <http://localhost:3000/alice-work/dataRegistry/tasks/task-b> ;
+  pm:hasImage
+    <http://localhost:3000/alice-work/dataRegistry/images/cat> ;
+  pm:hasFile
+    <http://localhost:3000/alice-work/dataRegistry/files/solid-interop> .
